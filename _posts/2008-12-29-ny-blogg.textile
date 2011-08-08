@@ -1,0 +1,8 @@
+--- 
+layout: post
+title: Ny blogg
+created: 1230589459
+---
+Håller så smått på att sätta upp en ny personlig blogg för mig här - bastemat är på plats och jag kan skriva inlägg, men ex. pingningar, pingbacks, lifestreams etc saknas. (Och som Björn påpekade - en favicon)
+
+En bra början dock.

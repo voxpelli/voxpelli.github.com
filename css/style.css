@@ -1,0 +1,16 @@
+*{margin:0;padding:0}
+html{background:#DEDEDE}
+body{font-size:18px;font-family:"Helvetica neue", Helvetica, Arial, "MS Trebuchet", sans-serif;margin:10px auto;max-width:600px;color:#212121}
+a{color:#B82C2C}
+a:hover{color:#912323}
+img{border:0}
+h1{font-size:2.8em;padding:2px 20px;text-align:center;}
+h1 a{color:#212121;text-shadow:#fff 0 1px 1px;text-decoration:none}
+h1 a:hover{color:#212121}
+h1 em{color:#d33;font-style:normal}
+h2{font-size:1em}
+h2,p,li{margin-bottom:5px}
+ul,ol{padding-left:1.5em}
+.subtitle{font-size:.8em;padding:0 100px;text-align:center;margin-bottom:15px}
+body > div:not(#header) {background:#fff;-moz-border-radius:10px;-webkit-border-radius:10px;border-radius:10px;padding: 15px 20px;margin-bottom:8px}
+address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}
