@@ -1,6 +1,6 @@
 ---
 layout: default
-title: VoxPelli
+title: Pelle Wessman
 frontpage: true
 ---
 
@@ -10,10 +10,10 @@ frontpage: true
   <ul class="posts">
     {% for post in site.posts %}
       <li>
-        <time datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-          {{ post.date | date_to_string }}
-        </time> &raquo;
         <a {% if post.lang == null %}hreflang="se" lang="se"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
+        <time datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+          - {{ post.date | date_to_string }}
+        </time>
       </li>
     {% endfor %}
   </ul>
@@ -21,5 +21,5 @@ frontpage: true
 
 <section>
   <h2>Subscribe</h2>
-  <p>If you want to follow my blog in a feed reader then I've an <a href="" type="application/atom+xml">english only</a> version of my feed as well as a feed with <a href="" type="application/atom+xml">all posts</a>.</p>
+  <p>If you want to follow my blog in a feed reader then I've an <a href="/english.xml" type="application/atom+xml">english only</a> version of my feed as well as a feed with <a href="/all.xml" type="application/atom+xml">all posts</a>.</p>
 </section>

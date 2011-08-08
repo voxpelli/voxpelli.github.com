@@ -1,16 +1,43 @@
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<title>{{ page.title }}</title>
-	<link rel="stylesheet" type="text/css" media="all" href="/css/style.css" />
+  <meta charset="utf-8" />
+
+  <title>{{ page.title }}</title>
+
+  <link rel="stylesheet" type="text/css" media="all" href="/css/style.css" />
+  <link rel="alternate" type="application/atom+xml" href="/all.xml" title="All posts" />
+  <link rel="alternate" type="application/atom+xml" href="/english.xml" title="English posts" />
+
+  {% if page.author != null %}
+    <link rel="author" type="text/html"  href="/" />
+  {% endif %}
 </head>
 <body>
-	<header>
-		<h1><a href="/">Pelle Wessman</a></h1>
-		<div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
-	</header>
+  <header>
+    <h1><a href="/">Pelle Wessman</a></h1>
+    <div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
+  </header>
 
-	{{ content }}
+  {{ content }}
 
+  <script type="text/javascript">
+    (function() {
+      var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto&button=compact&uid=voxpelli&category=text';
+      t.parentNode.insertBefore(s, t);
+    })();
+  </script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-6823873-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
 </body>

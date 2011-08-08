@@ -9,4 +9,4 @@ Samma visa har det de senaste veckorna varit även i Sverige, dock utan någon r
 
 Själv ville jag haka på trenden - men eftersom att jag sitter på "Drupal":http://drupal.org/ på denna bloggen så kan jag inte använda den "Wordpress plugin":http://wordpress.org/extend/plugins/shockingly-big-ie6-warning/ som "Joakim Jardenberg":http://jardenberg.se/ tipsade om på Mindpark-bloggen utan fick slänga ihop en egen lite snabbt.
 
-Ni hittar min Drupal-modul på GitHub: http://github.com/voxpelli/drupal-ie6notify
+Ni hittar min Drupal-modul på GitHub: "http://github.com/voxpelli/drupal-ie6notify":http://github.com/voxpelli/drupal-ie6notify
