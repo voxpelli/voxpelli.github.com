@@ -1,6 +1,17 @@
 ---
 layout: default
 ---
-<div id="post">
-{{ content }}
-</div>
+<article {% if page.lang == null %}lang="se"{% endif %}>
+  <header>
+    <h2>{{page.title}}</h2>
+  </header>
+
+  {{ content }}
+
+  <footer>
+    <time {% if page.lang == null %}lang="en"{% endif %} datetime="{{ page.date | date_to_xmlschema }}" pubdate>
+      {{ page.date | date_to_long_string }}
+    </time>
+    - <a href="/" rel="author">Pelle Wessman</a>
+  </footer>
+</article>

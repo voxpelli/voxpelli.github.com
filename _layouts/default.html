@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js">
+<html lang="en" class="no-js">
 <head>
 	<meta charset="utf-8" />
 	<title>{{ page.title }}</title>
 	<link rel="stylesheet" type="text/css" media="all" href="/css/style.css" />
 </head>
 <body>
-	<div id="header">
-		<h1><a href="/">VoxPelli</a></h1>
-		<div class="subtitle">Pelle Wessman's writings about stuff</div>
-	</div>
+	<header>
+		<h1><a href="/">Pelle Wessman</a></h1>
+		<div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
+	</header>
 
 	{{ content }}
 
