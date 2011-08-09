@@ -1,2 +1,2 @@
 auto: true
-permalink: pretty
+permalink: /:categories/:year/:month/:title

@@ -1,4 +1,4 @@
 ---
 layout: refresh
-refresh_to_post_id: /2009/05/13/presentationer-konferenser-och-meetups
+refresh_to_post_id: /2009/05/presentationer-konferenser-och-meetups
 ---
