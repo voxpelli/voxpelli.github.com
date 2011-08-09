@@ -10,7 +10,7 @@ frontpage: true
   <ul class="posts">
     {% for post in site.posts %}
       <li>
-        <a {% if post.lang == null %}hreflang="se" lang="se"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
+        <a {% if post.lang == null %}lang="se"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
         <time datetime="{{ post.date | date_to_xmlschema }}" pubdate>
           - {{ post.date | date_to_string }}
         </time>

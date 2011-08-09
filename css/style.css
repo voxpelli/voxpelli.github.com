@@ -3,7 +3,7 @@ html{background:#DEDEDE}
 body{font-size:18px;line-height:1.5;text-align: justify;font-family:"Helvetica neue", Helvetica, Arial, "MS Trebuchet", sans-serif;margin:10px auto;max-width:600px;color:#212121}
 a{color:#B82C2C}
 a:hover{color:#912323}
-a[hreflang="se"]:before {content:"";width:16px;height:16px;margin-right: 4px;display:inline-block;background:url(img/se.png) no-repeat 0 0;text-indent:-5000em;vertical-align:middle}
+a[lang="se"]:before {content:"";width:16px;height:16px;margin-right: 4px;display:inline-block;background:url(img/se.png) no-repeat 0 0;text-indent:-5000em;vertical-align:middle}
 img{border:0}
 h1{font-size:2.8em;line-height:1.2;padding:2px 20px;text-align:center;}
 h1 a{color:#212121;text-shadow:#fff 0 1px 1px;text-decoration:none}
