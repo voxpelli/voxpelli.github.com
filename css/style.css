@@ -15,7 +15,7 @@ h2,p:last-child,ul:last-child,ol:last-child{margin-bottom:5px}
 li{margin-bottom:.25em}
 ul,ol{padding-left:1.5em}
 .subtitle{font-size:.8em;padding:0 100px;text-align:center;margin-bottom:15px}
-body > *:not(header):not(address) {background:#fff;-moz-border-radius:10px;-webkit-border-radius:10px;border-radius:10px;padding: 15px 20px;margin-bottom:8px}
+body > *:not(header):not(address) {background:#fff;border-radius:10px;padding: 15px 20px;margin-bottom:8px}
 address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}
 ul.posts{list-style:none;padding:0}
 ul.posts time,article footer{color:#aaa;font-size:.8em}
