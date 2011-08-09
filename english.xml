@@ -5,10 +5,10 @@ layout: nil
 <feed xmlns="http://www.w3.org/2005/Atom">
  
  <title>VoxPelli</title>
- <link href="http://voxpelli.se/english.xml" rel="self"/>
- <link href="http://voxpelli.se/"/>
+ <link href="http://voxpelli.com/english.xml" rel="self"/>
+ <link href="http://voxpelli.com/"/>
  <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>http://voxpelli.se/</id>
+ <id>http://voxpelli.com/</id>
  <author>
    <name>Pelle Wessman</name>
    <email>pelle@kodfabrik.se</email>
@@ -18,9 +18,9 @@ layout: nil
   {% if post.lang == "en" %}
    <entry>
      <title>{{ post.title }}</title>
-     <link href="http://voxpelli.se{{ post.url }}"/>
+     <link href="http://voxpelli.com{{ post.url }}"/>
      <updated>{{ post.date | date_to_xmlschema }}</updated>
-     <id>http://voxpelli.se{{ post.id }}</id>
+     <id>http://voxpelli.com{{ post.id }}</id>
      <content type="html">{{ post.content | xml_escape }}</content>
    </entry>
   {% endif %}

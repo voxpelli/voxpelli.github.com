@@ -14,13 +14,25 @@
   {% endif %}
 </head>
 <body>
-  <header>
-    <h1><a href="/">Pelle Wessman</a></h1>
-    <div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
-  </header>
+  <div class="page">
+    <header>
+      <h1><a href="/">Pelle Wessman</a></h1>
+      <div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
+    </header>
 
-  {{ content }}
+    {{ content }}
+  </div>
 
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-6823873-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
   <script type="text/javascript">
     (function() {
       var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
@@ -31,13 +43,10 @@
     })();
   </script>
   <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-6823873-1']);
-    _gaq.push(['_trackPageview']);
     (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+      po.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
     })();
   </script>
 </body>
