@@ -1,0 +1,14 @@
+*{margin:0;padding:0}
+html{background:#DEDEDE}
+body{font-size:18px;line-height:1.5;font-family:"Helvetica neue",Helvetica,Arial,"MS Trebuchet",sans-serif;color:#222;padding:0 15px}
+body > .page{margin:10px auto 20px;}
+a{color:#B82C2C}
+a:hover{color:#912323}
+h1{font-size:2.8em;line-height:1.2;padding:2px 20px;text-align:center;}
+h1 a{color:#212121;text-shadow:#fff 0 1px 1px;text-decoration:none}
+h1 a:hover{color:#212121}
+p,ul,ol,.highlight{margin-bottom:1em}
+h2,p:last-child,ul:last-child,ol:last-child{margin-bottom:5px}
+.subtitle{font-size:.8em;padding:0 100px;text-align:center;margin-bottom:15px}
+body > .page > *:not(header):not(address){background:#fff;box-shadow:0 0 2px #444;padding:15px 20px;margin-bottom:8px}
+address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}

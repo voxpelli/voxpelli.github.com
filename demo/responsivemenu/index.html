@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="utf-8" />
+
+  <title>Responsive menu</title>
+
+  <link rel="stylesheet" type="text/css" media="all" href="style.css" />
+
+  <style>
+  .nav-wrapper,
+  nav ul:before {
+    border: 1px solid #690;
+    border-radius: 3px;
+  }
+  .nav-wrapper {
+    height: 35px;
+    background: #bfd255;
+    background: -moz-linear-gradient(top, #bfd255 0%, #8eb92a 50%, #72aa00 51%, #9ecb2d 100%);
+    overflow: hidden;
+    color: #fff;
+    margin-bottom: 1em;
+  }
+  .nav-wrapper a {
+    color: #fff;
+    text-decoration: none;
+  }
+  .nav-wrapper:hover {
+    overflow: visible;
+    border-bottom-right-radius: 0;
+  }
+  nav ul {
+    position: relative;
+    word-spacing: 5000em;
+    padding: 0 10% 0 60%;
+    margin: -1px;
+    text-align: justify;
+    text-shadow: 0 1px #000;
+  }
+  nav li {
+    position: relative;
+    z-index: 20;
+    display: inline-block;
+    padding: 4px 0 4px 10px;
+    margin: 0;
+    word-spacing: normal;
+  }
+  nav li:first-child {
+    padding-left: 20px;
+    margin-left: -200%;
+  }
+  nav ul:first-line {
+    word-spacing: normal;
+  }
+  nav ul:before {
+    content: "";
+    display: block;
+    position: absolute;
+    background: #9ecb2d;
+    margin-left: 1px;
+    left: 60%;
+    right: 0;
+    top: 36px;
+    bottom: 0;
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  nav ul:after {
+    overflow: hidden;
+    content: "▼";
+    display: block;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 34px;
+    width: 24px;
+    max-height: 37px;
+    line-height: 33px;
+    text-align: left;
+  }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1><a href="/">Responsive menu</a></h1>
+      <div class="subtitle">CSS doing some crazy things</div>
+    </header>
+
+    <nav>
+      <div class="nav-wrapper">
+        <ul>
+          <li><a href="#">Adipiscing</a></li>
+          <li><a href="#">Vulputate</a></li>
+          <li><a href="#">Ornare</a></li>
+          <li><a href="#">Nullam</a></li>
+          <li><a href="#">Vehicula</a></li>
+          <li><a href="#">Etiam</a></li>
+          <li><a href="#">Condimentum</a></li>
+          <li><a href="#">Dapibus</a></li>
+          <li><a href="#">Nibh</a></li>
+        </ul>
+      </div>
+      <p>
+        The above menu creates a dropdown automatically when the browser window is too small to fit all items.
+      </p>
+      <p>
+        Uses :first-line together with a really big word-spacing value to make all menu items that doesn't fit on one row have their own rows.
+      </p>
+    </nav>
+
+    <section>
+      <h2>Browser Support</h2>
+      <p>
+        Only seems to support Firefox. WebKit-based browsers line breaks everything and Opera doesn't seem to like it much at all.
+      </p>
+    </section>
+
+    <section>
+      <h2>Disclaimer</h2>
+      <p>
+        This was a late night hack – the CSS might not be the prettiest, but the result was achieved ;)
+      </p>
+    </section>
+
+    <address>
+      Made by <a href="http://kodfabrik.se">Pelle Wessman</a>
+    </address>
+</body>
