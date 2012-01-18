@@ -13,7 +13,7 @@ author: true
     <time {% if page.lang == null %}lang="en"{% endif %} datetime="{{ page.date | date_to_xmlschema }}" pubdate>
       {{ page.date | date_to_long_string }}
     </time>
-    <a class="FlattrButton" href="http://voxpelli.com{{ page.url }}" title="{{ page.title }}" lang="{% if page.lang == 'en' %}en{% else %}se{% endif %}"></a>
+    <a class="FlattrButton" href="http://voxpelli.com{{ page.url }}" title="{{ page.title }}" lang="{% if page.lang == 'en' %}en{% else %}se{% endif %}" rel="flattr;tags:blog;"></a>
     <div class="Plus1Button">
       <g:plusone size="medium" count="false"></g:plusone>
     </div>
