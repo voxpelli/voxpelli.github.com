@@ -1,6 +1,6 @@
---- 
+---
 layout: post
-title: "Fika som p\xC3\xA5 gymmet? Med fastpris"
+title: "Fika som på gymmet? Med fastpris"
 created: 1279056247
 ---
 Vad kostar en kopp kaffe? Nada. Vad kostar en barista? Multum. Lokal? Detsamma. De fasta kostnaderna är de stora utgifterna på ett kafé, inte råvarorna. Det är inte kaffet man betalar för - det är tillgängligheten.

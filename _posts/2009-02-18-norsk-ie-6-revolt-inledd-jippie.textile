@@ -1,4 +1,4 @@
---- 
+---
 layout: post
 title: Norsk IE 6 revolt inledd - jippie!
 created: 1234993895

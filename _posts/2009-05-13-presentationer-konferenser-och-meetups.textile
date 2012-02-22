@@ -1,4 +1,4 @@
---- 
+---
 layout: post
 title: Presentationer, konferenser och meetups
 created: 1242247013

@@ -1,4 +1,4 @@
---- 
+---
 layout: post
 title: Pingback, Multiping och Global Redirect
 created: 1230935716

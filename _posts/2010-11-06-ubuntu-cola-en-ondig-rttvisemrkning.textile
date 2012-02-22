@@ -1,6 +1,6 @@
---- 
+---
 layout: post
-title: "Ubuntu Cola: En on\xC3\xB6dig r\xC3\xA4ttvisem\xC3\xA4rkning?"
+title: "Ubuntu Cola: En onödig rättvisemärkning?"
 created: 1289064167
 ---
 Det var några år sedan den introducerades - Ubuntu Colan - den där lite snyggare konkurrenten till Coca Cola som med afrikanska namnet för medmänsklighet och rättvisemärkt socker skulle frälsa Sverige från det multinationella Coca Colas klor. Fast - hur stor poäng är det med den egentligen?

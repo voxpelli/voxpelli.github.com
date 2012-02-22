@@ -1,4 +1,4 @@
---- 
+---
 layout: post
 title: Ny blogg
 created: 1230589459

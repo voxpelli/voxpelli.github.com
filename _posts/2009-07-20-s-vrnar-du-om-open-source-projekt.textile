@@ -1,6 +1,6 @@
---- 
+---
 layout: post
-title: "S\xC3\xA5 v\xC3\xA4rnar du om open source projekt"
+title: "Så värnar du om open source projekt"
 created: 1248112748
 ---
 Vi använder alla open source idag och vi påverkas alla av vilken riktning utvecklingen av ett open source projekt tar.
