@@ -5,7 +5,7 @@ lang: en
 ---
 ### The short story, distilled to its essence
 
-We built the AJAX-parts for the new social feed feature with a combination of [jquery.form.js](http://jquery.malsup.com/form/) and [jquery.alterbyobject.js](https://github.com/voxpelli/jquery-alterbyobject) – a combo that leaves the server in constant control of what's happening.
+We built the AJAX-parts for the [new social feed feature](http://www.dailymotion.com/video/xqfed0_the-social-feed_tech) on Flattr.com with a combination of [jquery.form.js](http://jquery.malsup.com/form/) and [jquery.alterbyobject.js](https://github.com/voxpelli/jquery-alterbyobject) – a combo that leaves the server in constant control of what's happening.
 
 The server defines regular forms for the AJAX-requests and then defines JSON-responses to those requests that specifies how pages should be altered.
 
@@ -28,7 +28,7 @@ All in all a clean and easy solution for keeping AJAX DRY in your regular server
 
 ### The long story where I write a lot and use cool words
 
-In building the new social feed feature on Flattr.com I once again came across the issue of deciding who would be controlling the interface – would it be client-side javascript or server-side php?
+In building the [new social feed feature](http://www.dailymotion.com/video/xqfed0_the-social-feed_tech) on Flattr.com I once again came across the issue of deciding who would be controlling the interface – would it be client-side javascript or server-side php?
 
 Initially it feels good to hack some javascript and make everything go swooshy and pretty – but when it comes to saving changes in the database and rendering views, then that's typically something handles by the server-side. Hacking is cool – but duplicating your normal form- and template-methods just to go all swooshy? It will cause headaches and isn't cool.
 
