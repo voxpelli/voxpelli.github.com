@@ -12,7 +12,7 @@ h1 a:hover{color:#212121}
 h1 em{color:#d33;font-style:normal}
 h2,h3,h4{font-size:1em}
 p,ul,ol,.highlight{margin-bottom:1em}
-h2,p:last-child,ul:last-child,ol:last-child{margin-bottom:5px}
+h2,h3,p:last-child,ul:last-child,ol:last-child{margin-bottom:5px}
 li{margin-bottom:.25em}
 ul,ol{padding-left:1.5em}
 .highlight{font-size:12px;overflow:auto}
