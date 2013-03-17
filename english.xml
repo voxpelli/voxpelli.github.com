@@ -3,11 +3,11 @@ layout: nil
 ---
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
- 
- <title>Pelle Wessman</title>
- <link href="http://voxpelli.com/english.xml" rel="self" type="application/atom+xml"/>
- <link href="http://voxpelli.superfeedr.com/" rel="hub"  />
- <link href="http://voxpelli.com/"/>
+
+ <title>Pelle Wessman – English posts</title>
+ <link href="http://voxpelli.com/english.xml" rel="self" type="application/atom+xml" />
+ <link href="http://voxpelli.superfeedr.com/" rel="hub" />
+ <link href="http://voxpelli.com/" type="text/html" />
  <updated>{{ site.time | date_to_xmlschema }}</updated>
  <id>http://voxpelli.com/</id>
  <author>
@@ -26,5 +26,5 @@ layout: nil
    </entry>
   {% endif %}
  {% endfor %}
- 
+
 </feed>
