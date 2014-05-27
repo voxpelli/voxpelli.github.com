@@ -1,3 +1,4 @@
 permalink: /:categories/:year/:month/:title/
-pygments: true
+markdown: kramdown
+highlighter: pygments
 relative_permalinks: false
