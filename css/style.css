@@ -25,7 +25,9 @@ ul.posts time,article footer,.webmention-published{color:#aaa;font-size:.8em}
 .indie-actions > indie-action {margin:0 0 -1px 6px;float:right}
 .indie-actions a{text-decoration: none}
 .subtome{text-align:center}
-.u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
+.h-entry .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
+.h-feed .u-photo{width:80px;border-radius:80px;float:left;margin-right:20px;}
+.h-feed .h-card{overflow:hidden;padding-bottom:0;}
 
 .webmention-mention{padding-left: 60px;position: relative}
 .webmention-mention:last-child{margin-bottom:0}

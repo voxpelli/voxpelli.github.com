@@ -15,7 +15,7 @@
   {% if page.webmentionable != null %}<link rel="webmention" href="https://webmention.herokuapp.com/api/webmention" />{% endif %}
 </head>
 <body>
-  <div class="page">
+  <div class="page{% if page.frontpage != null %} h-feed{% endif %}">
     <header>
       <h1><a href="/">Pelle Wessman</a></h1>
       <div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>

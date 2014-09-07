@@ -9,15 +9,23 @@ frontpage: true
 
   <ul class="posts">
     {% for post in site.posts %}
-      <li>
-        <a {% if post.lang == null %}lang="se"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
-        <time datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+      <li class="h-entry">
+        <a {% if post.lang == null %}lang="se"{% endif %} class="p-name" href="{{ post.url }}">{{ post.title }}</a>
+        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
           - {{ post.date | date_to_string }}
         </time>
       </li>
     {% endfor %}
   </ul>
 </nav>
+
+<section class="p-author h-card">
+  <img class="u-photo" src="/avatar.jpg" alt="" />
+  <p>
+    Hi, I'm <a class="p-name u-url" rel="me" href="/">Pelle Wessman</a> and this is my blog.<br />
+    Here I post whatever stuff I'm currently interested in, may it be coding, knitting, cooking – the future will tell.
+  </p>
+</section>
 
 <section>
   <h2>Subscribe</h2>
