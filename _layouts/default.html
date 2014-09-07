@@ -13,6 +13,11 @@
   {% if page.author != null %}<link rel="author" type="text/html" href="/" title="Pelle Wessman" />{% endif %}
   {% if page.flattrable != null %}<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=http%3A%2F%2Fvoxpelli.com{{ page.url | cgi_escape }}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang != null %}{{ page.lang | cgi_escape }}{% else %}sv{% endif %}" title="Flattr this post" />{% endif %}
   {% if page.webmentionable != null %}<link rel="webmention" href="https://webmention.herokuapp.com/api/webmention" />{% endif %}
+
+  {% if page.frontpage == null %}
+    <script type="text/javascript" src="/js/x-tag-components.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+  {% endif %}
 </head>
 <body>
   <div class="page{% if page.frontpage != null %} h-feed{% endif %}">
