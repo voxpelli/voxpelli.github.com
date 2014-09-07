@@ -17,10 +17,22 @@ webmentionable: true
     <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" pubdate>
       {{ page.date | date_to_long_string }}
     </time> by
+    
     <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> Pelle Wessman</a>
-    <a class="FlattrButton" href="http://voxpelli.com{{ page.url }}" title="{{ page.title }}" lang="{% if page.lang == 'en' %}en{% else %}se{% endif %}" rel="flattr;tags:blog;"></a>
-    <div class="Plus1Button">
-      <g:plusone size="medium" count="false"></g:plusone>
+
+    <div class="indie-actions">
+      <indie-action do="tip" with="{{ page.url }}">
+        <a class="FlattrButton" href="http://voxpelli.com{{ page.url }}" title="{{ page.title }}" lang="{% if page.lang == 'en' %}en{% else %}se{% endif %}" rel="flattr;tags:blog;"></a>
+      </indie-action>
+      <indie-action do="like" with="{{ page.url }}">
+        <g:plusone size="medium" count="false"></g:plusone>
+      </indie-action>
+      <indie-action do="post" with="{{ page.url }}">
+        <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={{ page.url | uri_escape }}">
+          <img src="http://si0.twimg.com/images/dev/cms/intents/icons/reply_hover.png" alt="">
+          Reply
+        </a>
+      </indie-action>
     </div>
   </footer>
 </article>
