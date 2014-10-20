@@ -2,74 +2,21 @@
 (function () {
   'use strict';
 
-  var loadIndieConfig = (function () {
-    var config, configFrame, configTimeout,
-      callbacks = [],
-      handleConfig, parseConfig;
-
-    handleConfig = function () {
-      config = config || {};
-
-      configFrame.parentNode.removeChild(configFrame);
-      configFrame = undefined;
-
-      window.removeEventListener('message', parseConfig);
-
-      clearTimeout(configTimeout);
-
-      while (callbacks[0]) {
-        callbacks.shift()(config);
-      }
-    };
-
-    parseConfig = function (message) {
-      var correctSource = (configFrame && message.source === configFrame.contentWindow);
-
-      if (correctSource && config === undefined) {
-        try {
-          config = JSON.parse(message.data);
-        } catch (ignore) {}
-
-        handleConfig();
-      }
-    };
-
-    return function (callback) {
-      if (config) {
-        callback(config);
-        return;
-      }
-
-      callbacks.push(callback);
-
-      if (configFrame) {
-        return;
-      }
-
-      configFrame = document.createElement('iframe');
-      configFrame.src = 'web+action:load';
-      document.getElementsByTagName('body')[0].appendChild(configFrame);
-      configFrame.style.display = 'none';
-
-      window.addEventListener('message', parseConfig);
-
-      configTimeout = setTimeout(handleConfig, 2000);
-    };
-  }());
-
   var loadingClassRegexp = /(^|\s)indieconfig-loading(\s|$)/;
 
   var doTheAction = function (indieConfig) {
     var href, action, anchors;
 
+    // Don't block the tag anymore as the queued action is now handled
     this.className = this.className.replace(loadingClassRegexp, ' ');
 
-    action = this.getAttribute('do');
-
+    // Pick the correct endpoint for the correct action
+    action = this.getAttribute('do');    
     if ((action === 'reply' || action === 'post') && indieConfig.reply) {
       href = indieConfig.reply;
     }
 
+    // If no endpoint is found, try the URL of the first a-tag within it
     if (!href) {
       anchors = this.getElementsByTagName('a');
       if (anchors[0]) {
@@ -77,20 +24,35 @@
       }
     }
 
+    // We have found an endpoint!
     if (href) {
-      window.location = href.replace('{url}', encodeURIComponent(this.with || window.location.href));
+      //Resolve a relative target
+      var target = document.createElement('a');
+      target.href = this.getAttribute('with');
+      target = target.href;
+
+      // Insert the target into the endpoint
+      href = href.replace('{url}', encodeURIComponent(target || window.location.href));
+
+      // And redirect to it
+      window.location = href;
     }
   };
 
+  // Event handler for a click on an indie-action tag
   var handleTheAction = function (e) {
+    // Prevent the default of eg. any a-tag fallback within the indie-action tag
     e.preventDefault();
 
+    // Make sure this tag hasn't already been queued for the indieconfig-load
     if (!loadingClassRegexp.test(this.className)) {
       this.className += ' indieconfig-loading';
-      loadIndieConfig(doTheAction.bind(this));
+      // Set "doTheAction" to be called when the indie-config has been loaded
+      window.loadIndieConfig(doTheAction.bind(this));
     }
   };
 
+  // Once the page is loased add click event listeners to all indie-action tags
   window.addEventListener('DOMContentLoaded', function () {
     var actions = document.querySelectorAll('indie-action'),
       i,
