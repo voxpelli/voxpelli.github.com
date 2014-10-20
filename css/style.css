@@ -24,7 +24,8 @@ ul.posts time,article footer,.webmention-published{color:#aaa;font-size:.8em}
 .indie-actions{float:right}
 .indie-actions > indie-action {margin:0 0 -1px 6px;float:right}
 .indie-actions a{text-decoration: none}
-indie-action[do="reply"] a:before {content: url(http://si0.twimg.com/images/dev/cms/intents/icons/reply_hover.png);margin: 0 2px 0 0;vertical-align:middle;}
+indie-action[do="reply"] a:before {content: ""; background: url(http://si0.twimg.com/images/dev/cms/intents/icons/reply_hover.png);display:inline-block;width:16px;height:16px;margin: 0 2px 0 0;vertical-align:text-top;}
+indie-action[do="reply"].indieconfig-loading a:before {background: url(img/loader.gif); background-size: 16px 16px;}
 .subtome{text-align:center}
 .h-entry .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
 .h-feed .u-photo{width:80px;border-radius:80px;float:left;margin-right:20px;}
