@@ -1,6 +1,6 @@
 *{margin:0;padding:0}
 html{background:#DEDEDE}
-body{font-size:18px;line-height:1.5;text-align:justify;font-family:"Helvetica neue",Helvetica,Arial,"MS Trebuchet",sans-serif;color:#222}
+body{font-size:18px;line-height:1.5;text-align:left;font-family:"Helvetica neue",Helvetica,Arial,"MS Trebuchet",sans-serif;color:#222}
 body > .page{margin:10px auto 20px;max-width:600px;}
 a{color:#B82C2C}
 a:hover{color:#912323}
