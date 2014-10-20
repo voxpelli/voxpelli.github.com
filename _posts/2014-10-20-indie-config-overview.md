@@ -44,3 +44,7 @@ So – Indie-Config enables independent sites to open reply windows etc for othe
 For more info on Indie-Config and Web Actions and to follow what happens with them within the community, check [http://indiewebcamp.com/indie-config](http://indiewebcamp.com/indie-config) and [http://indiewebcamp.com/webactions](http://indiewebcamp.com/webactions).
 
 I'll try to follow up here soon with more posts on how to implement all of this. For now, check the [source of this blog](https://github.com/voxpelli/voxpelli.github.com/tree/master/js) for a simple implementation.
+
+## Try it out
+
+The "Reply" button at this very blog post is wired up so it uses your Indie-Config and falls back to Twitter Intents. **So get your Indie-Config up and try replying to this post!**
