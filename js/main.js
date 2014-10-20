@@ -1,102 +1,103 @@
-(function(){  
+/*jslint browser: true, plusplus: true, vars: true, indent: 2 */
+(function () {
+  'use strict';
 
-  // return;
+  var loadIndieConfig = (function () {
+    var config, configFrame, configTimeout,
+      callbacks = [],
+      handleConfig, parseConfig;
 
-  var indieConfig,
-    indieConfigFrame,
-    loadIndieConfig = function () {
-      if (indieConfigFrame) {
-        return;
-      }
+    handleConfig = function () {
+      config = config || {};
 
-      indieConfigFrame = document.createElement('iframe');
-      indieConfigFrame.src = 'web+action:load';
-      document.getElementsByTagName('body')[0].appendChild(indieConfigFrame);
-      indieConfigFrame.style.display = 'none';
+      configFrame.parentNode.removeChild(configFrame);
+      configFrame = undefined;
 
-      window.addEventListener('message', parseIndieConfig);
-    },
-    parseIndieConfig = function (message) {
-      var correctSource = (indieConfigFrame && message.source === indieConfigFrame.contentWindow);
+      window.removeEventListener('message', parseConfig);
 
-      if (!correctSource) {
-        return;
-      }
+      clearTimeout(configTimeout);
 
-      try {
-        indieConfig = JSON.parse(message.data);
-      } catch (e) {}
-
-      if (indieConfig) {
-        indieConfigFrame.parentNode.removeChild(indieConfigFrame);
-        indieConfigFrame = undefined;
-        xtag.fireEvent(window, 'IndieConfigLoaded');
-        window.removeEventListener('message', parseIndieConfig)
+      while (callbacks[0]) {
+        callbacks.shift()(config);
       }
     };
 
-  xtag.register('indie-action', {
-    extends: 'a',
-    lifecycle: {
-      created: function() {
-        if (this.do !== 'reply' && this.do !== 'post') {
-          return;
-        }
-        var label;
-        if (this.do === 'reply') {
-          label = 'Reply';
-        } else if (this.do === 'post') {
-          label = 'Post';
-        }
-        this.innerHTML = '<a href="#"></a>';
-        this.childNodes[0].textContent = this.title || label;
-      },
-      inserted: function() {},
-      removed: function() {},
-      attributeChanged: function() {}
-    }, 
-    events: { 
-      'click:delegate(a)' : function (e) {
-        var elem = this.parentNode;
-        if (elem.nodeName !== 'INDIE-ACTION' || (elem.do !== 'reply' && elem.do !== 'post')) {
-          return;
-        }
-        e.preventDefault();
-        var doTheAction = function () {
-          var href;
+    parseConfig = function (message) {
+      var correctSource = (configFrame && message.source === configFrame.contentWindow);
 
-          if ((this.do === 'reply' || this.do === 'post') && indieConfig.reply) {
-            href = indieConfig.reply;
-          }
+      if (correctSource && config === undefined) {
+        try {
+          config = JSON.parse(message.data);
+        } catch (ignore) {}
 
-          if (!href && this.href) {
-            href = this.href;
-          }
-
-          if (href) {
-            window.location = href.replace('{url}', encodeURIComponent(this.with || window.location.href));
-          }
-        };
-        var waitForConfig = function () {
-          window.removeEventListener('IndieConfigLoaded', waitForConfig);
-          doTheAction.call(elem);
-        };
-        if (!indieConfig) {
-          window.addEventListener('IndieConfigLoaded', waitForConfig);
-          loadIndieConfig();
-        } else {
-          doTheAction.call(elem);
-        }
+        handleConfig();
       }
-    },
-    accessors: {
-      do: {
-        attribute: { name:'do' } // use a different attribute name
+    };
+
+    return function (callback) {
+      if (config) {
+        callback(config);
+        return;
       }
-    }, 
-    methods: {
-      
+
+      callbacks.push(callback);
+
+      if (configFrame) {
+        return;
+      }
+
+      configFrame = document.createElement('iframe');
+      configFrame.src = 'web+action:load';
+      document.getElementsByTagName('body')[0].appendChild(configFrame);
+      configFrame.style.display = 'none';
+
+      window.addEventListener('message', parseConfig);
+
+      configTimeout = setTimeout(handleConfig, 2000);
+    };
+  }());
+
+  var loadingClassRegexp = /(^|\s)indieconfig-loading(\s|$)/;
+
+  var doTheAction = function (indieConfig) {
+    var href, action, anchors;
+
+    this.className = this.className.replace(loadingClassRegexp, ' ');
+
+    action = this.getAttribute('do');
+
+    if ((action === 'reply' || action === 'post') && indieConfig.reply) {
+      href = indieConfig.reply;
+    }
+
+    if (!href) {
+      anchors = this.getElementsByTagName('a');
+      if (anchors[0]) {
+        href = anchors[0].href;
+      }
+    }
+
+    if (href) {
+      window.location = href.replace('{url}', encodeURIComponent(this.with || window.location.href));
+    }
+  };
+
+  var handleTheAction = function (e) {
+    e.preventDefault();
+
+    if (!loadingClassRegexp.test(this.className)) {
+      this.className += ' indieconfig-loading';
+      loadIndieConfig(doTheAction.bind(this));
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', function () {
+    var actions = document.querySelectorAll('indie-action'),
+      i,
+      length = actions.length;
+
+    for (i = 0; i < length; i++) {
+      actions[i].addEventListener('click', handleTheAction);
     }
   });
-
-})();
+}());
