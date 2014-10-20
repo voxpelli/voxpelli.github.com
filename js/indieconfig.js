@@ -58,6 +58,6 @@ window.loadIndieConfig = (function () {
     window.addEventListener('message', parseConfig);
 
     // If no config has been loaded in 2 seconds, abort
-    configTimeout = setTimeout(handleConfig, 2000);
+    configTimeout = setTimeout(handleConfig, 3000);
   };
 }());
