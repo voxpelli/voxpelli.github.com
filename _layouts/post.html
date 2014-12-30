@@ -49,7 +49,8 @@ webmentionable: true
     url = document.querySelectorAll ? document.querySelectorAll("link[rel~=canonical]") : false;
     url = url && url[0] ? url[0].href : false;
     sn.type = "text/javascript"; sn.async = true;
-    sn.src = "//webmention.herokuapp.com/api/embed?url=" + encodeURIComponent(url || window.location);
+    // Using a cutting-edge embed here to try out the possibly upcoming embed solutions
+    sn.src = "//webmention.herokuapp.com/api/embed?version=cutting-edge&url=" + encodeURIComponent(url || window.location);
     s.parentNode.insertBefore(sn, s);
   }());
 </script>
