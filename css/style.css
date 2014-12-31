@@ -1,6 +1,6 @@
 *{margin:0;padding:0}
 html{background:#DEDEDE}
-body{font-size:18px;line-height:1.5;text-align:left;font-family:"Helvetica neue",Helvetica,Arial,"MS Trebuchet",sans-serif;color:#222}
+body{font-size:18px;line-height:1.5;text-align:left;font-family:"Helvetica neue",Helvetica,Arial,"MS Trebuchet",sans-serif;font-weight:300;color:#222}
 body > .page{margin:10px auto 20px;max-width:600px;}
 a{color:#B82C2C}
 a:hover{color:#912323}
@@ -10,7 +10,7 @@ h1{font-size:2.8em;line-height:1.2;padding:2px 20px;text-align:center;}
 h1 a{color:#212121;text-shadow:#fff 0 1px 1px;text-decoration:none}
 h1 a:hover{color:#212121}
 h1 em{color:#d33;font-style:normal}
-h2,h3,h4{font-size:1em}
+h2,h3,h4{font-size:1em;font-weight:500}
 p,ul,ol,.highlight,.webmention-mention,.webmention-facepile{margin-bottom:1em}
 h2,h3{margin-bottom:5px}
 li{margin-bottom:.25em}
@@ -36,6 +36,7 @@ indie-action[do="reply"].indieconfig-loading a:before {background: url(img/loade
 .webmention-author img {position: absolute;top: 0;left: -5px;width: 50px;border-radius: 240px}
 input[type=url]{width:50%}
 .webmention-facepile{padding-left:0;margin-left:-5px;}
+.webmention-facepile:last-child{margin-bottom:-5px}
 .webmention-facepile > li {display: inline-block;position: relative;margin: 0 5px 5px 0;}
 .webmention-interaction-presentation:after {
   display: block;
