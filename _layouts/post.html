@@ -22,10 +22,10 @@ webmentionable: true
 
     <div class="indie-actions">
       <indie-action do="tip" with="{{ page.url }}">
-        <a class="FlattrButton" href="http://voxpelli.com{{ page.url }}" title="{{ page.title }}" lang="{% if page.lang == 'en' %}en{% else %}se{% endif %}" rel="flattr;tags:blog;"></a>
+        <a class="action tip" target="_blank" href="https://flattr.com/submit/auto?url={url}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang == 'en' %}en{% else %}se{% endif %}">Pay forward</a>
       </indie-action>
       <indie-action do="like" with="{{ page.url }}">
-        <g:plusone size="medium" count="false"></g:plusone>
+        <a class="action like" target="_blank" href="https://plus.google.com/share?url={url}">Like</a>
       </indie-action>
       <indie-action do="reply" with="{{ page.url }}">
         <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Reply</a>

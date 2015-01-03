@@ -11,9 +11,16 @@
     this.className = this.className.replace(loadingClassRegexp, ' ');
 
     // Pick the correct endpoint for the correct action
-    action = this.getAttribute('do');    
+    action = this.getAttribute('do');
+
     if ((action === 'reply' || action === 'post') && indieConfig.reply) {
       href = indieConfig.reply;
+    } else if (action === 'like' && indieConfig.like) {
+      href = indieConfig.like;
+    } else if (action === 'repost' && indieConfig.repost) {
+      href = indieConfig.repost;
+    } else if (action === 'tip' && indieConfig.tip) {
+      href = indieConfig.tip;
     }
 
     // If no endpoint is found, try the URL of the first a-tag within it
