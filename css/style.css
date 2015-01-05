@@ -16,7 +16,7 @@ h2,h3{margin-bottom:5px}
 li{margin-bottom:.25em}
 ul,ol{padding-left:1.5em}
 .highlight{font-size:18px;overflow:auto}
-.subtitle{font-size:.8em;padding:0 100px;text-align:center;margin-bottom:15px}
+.subtitle{font-size:.8em;padding:0 20px;text-align:center;margin-bottom:15px}
 body > .page > *:not(header):not(address){background:#fff;box-shadow:0 0 2px #444;padding:15px 20px;margin-bottom:8px}
 address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}
 ul.posts{list-style:none;padding:0}
@@ -28,8 +28,9 @@ indie-action[do="reply"] a:before {content: ""; background: url(http://si0.twimg
 indie-action[do="reply"].indieconfig-loading a:before {background: url(img/loader.gif); background-size: 16px 16px;}
 .subtome{text-align:center}
 .h-entry .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
-.h-feed .u-photo{width:80px;border-radius:80px;float:left;margin-right:20px;}
-.h-feed .h-card{overflow:hidden;padding-bottom:0;}
+.h-feed .u-photo{width:97px;border-radius:80px;float:left;margin-right:20px;margin-bottom:10px}
+.h-feed .h-card{overflow:hidden;padding-bottom:10px;}
+.h-feed .h-card p{margin-bottom:10px;}
 
 .webmention-mention{padding-left: 60px;position: relative}
 .webmention-mention:last-child{margin-bottom:0}
@@ -70,6 +71,14 @@ input[type=url]{width:50%}
   border: 1px solid #ccc;
 }
 .webmention-interaction-presentation > span > img {position: absolute;left: 0;top: 0;width: 100%;}
+
+@media screen and (max-device-width: 420px) {h1 {font-size:2em}}
+@media screen and (max-device-width: 480px) {
+  article footer{text-align:center;padding:10px 0}
+  .indie-actions,.indie-actions > indie-action {float:none;margin-left:0}
+  .indie-actions{padding-top: 20px;}
+  .indie-actions a {padding: 10px;}
+}
 
 .highlight{background:#ffffff;}
 .highlight .c{color:#999988;font-style:italic}
