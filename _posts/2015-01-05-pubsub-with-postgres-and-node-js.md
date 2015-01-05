@@ -37,8 +37,8 @@ But maintaining a persistent connection over time with retrial on failures as we
 
 So I then created the [pg-pubsub](https://www.npmjs.com/package/pg-pubsub) module to package all that code behind a neat little interface and have it maintain a persistent connection, subscribe to notification channels and retry on connection failures for me.
 
-I decided to utilise my newly created [promised-retry](https://www.npmjs.com/package/promised-retry) module to set up theretry mechanism and then added the simple `addChannel
-()`, `removeChannel()` and `close()` methods that one would expect from a publish/subscribe listener to enable the setup and teardown of the module.
+I decided to utilise my newly created [promised-retry](https://www.npmjs.com/package/promised-retry) module to set up a retry mechanism and then added the simple `addChannel
+()`, `removeChannel()` and `close()` methods that one would expect from a publish/subscribe listener to enable the setup and teardown of the module. I also added in automatic JSON-parsing.
 
 All in all that resulted all you needing to do to subscribe to Postgres notifications being:
 
