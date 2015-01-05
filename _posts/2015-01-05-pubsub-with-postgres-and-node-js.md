@@ -35,7 +35,7 @@ LISTEN mentions
 
 But maintaining a persistent connection over time with retrial on failures as well as ensuring that all subscriptions are properly set up for each connection and teared down on application shutdown takes a bit more code – not much – but a little.
 
-So I then created the [pg-pubsub](https://www.npmjs.com/package/pg-pubsub) module to package all that code behind a neat little interface and have it maintain a persistent connection, subscribes to notification channels and retry on connection failures for me.
+So I then created the [pg-pubsub](https://www.npmjs.com/package/pg-pubsub) module to package all that code behind a neat little interface and have it maintain a persistent connection, subscribe to notification channels and retry on connection failures for me.
 
 I decided to utilise my newly created [promised-retry](https://www.npmjs.com/package/promised-retry) module to set up theretry mechanism and then added the simple `addChannel
 ()`, `removeChannel()` and `close()` methods that one would expect from a publish/subscribe listener to enable the setup and teardown of the module.
