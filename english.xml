@@ -18,7 +18,7 @@ layout: nil
  {% for post in site.posts %}
   {% if post.lang == "en" %}
    <entry>
-     <title>{{ post.title }}</title>
+     <title>{{ post.title | xml_escape }}</title>
      <link href="http://voxpelli.com{{ post.url }}"/>
      <updated>{{ post.date | date_to_xmlschema }}</updated>
      <id>http://voxpelli.com{{ post.id }}</id>
