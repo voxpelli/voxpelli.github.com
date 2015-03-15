@@ -5,7 +5,7 @@ date: 2014-08-18T09:45:00+02:00
 lang: en
 ---
 
-<span class="p-summary">Last week I said goodbye to [Valtech](https://valtech.se/), where I've been this last year, and this week I'm happy to say hello to [Bloglovin](http://www.bloglovin.com/) where I'm rejoining parts of my [good old](http://goodold.se/) team.</span>
+<span class="p-summary">Last week I said goodbye to [Valtech](https://valtech.se/), where I've been this last year, and this week I'm happy to say hello to [Bloglovin](http://www.bloglovin.com/blog/4308583/?claim=42679w3fmct) where I'm rejoining parts of my [good old](http://goodold.se/) team.</span>
 
 I joined Valtech almost exactly one year ago, on the very same day that their new [Malmö](https://www.youtube.com/watch?v=MTvIv-FYtJ4) office opened. Since then I've got to see lots of parts of the company – been working in England for 2-3 months, paid regular visits to Stockholm and worked with Danes. And I've seen Valtech find their way in [Malmö](http://www.themalmo.com/). A tiny four seat office in Malmö's supermodern [Media Evolution City](http://www.mediaevolutioncity.se/) sure is a stark contrast to the 100+ people strong office in the 19:th century [royal mint](http://sv.wikipedia.org/wiki/Kungliga_Myntet) in central Stockholm. But Valtech have taken thoughtful steps to create a office that's true to Malmö spirit and not a Stockholm replica – and it's starting to pay of.
 
