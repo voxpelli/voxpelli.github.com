@@ -12,8 +12,12 @@
   <link rel="{% if page.frontpage == null %}home {% endif %}alternate" type="application/atom+xml" href="/english.xml" title="English posts" />
   <link rel="canonical" href="{% if page.frontpage == null %}{{ page.url }}{% else %}/{% endif %}" />
   <meta name="twitter:site" content="@voxpelli" />
-  {% if page.author != null %}<link rel="author" type="text/html" href="/" title="Pelle Wessman" />{% endif %}
-  {% if page.flattrable != null %}<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=http%3A%2F%2Fvoxpelli.com{{ page.url | cgi_escape }}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang != null %}{{ page.lang | cgi_escape }}{% else %}sv{% endif %}" title="Flattr this post" />{% endif %}
+  {% if page.frontpage != null %}
+    <link rel="self" href="{{ site.base_url }}" type="text/html" />
+    <link rel="hub" href="{{ site.push_hub }}" />
+  {% endif %}
+  {% if page.author != null %}<link rel="author" type="text/html" href="/" title="{{ site.author_name }}" />{% endif %}
+  {% if page.flattrable != null %}<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url={{ site.base_url | cgi_escape }}{{ page.url | cgi_escape }}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang != null %}{{ page.lang | cgi_escape }}{% else %}sv{% endif %}" title="Flattr this post" />{% endif %}
   {% if page.webmentionable != null %}<link rel="webmention" href="https://webmention.herokuapp.com/api/webmention" />{% endif %}
 
   {% if page.frontpage == null %}
@@ -24,7 +28,7 @@
 <body>
   <div class="page{% if page.frontpage != null %} h-feed{% endif %}">
     <header>
-      <h1><a href="/">Pelle Wessman</a></h1>
+      <h1><a href="/">{{ site.blog_name }}</a></h1>
       <div class="subtitle">Things <a {% if page.frontpage != null %}rel="me"{% endif %} href="/about">about me</a> and the world around us</div>
     </header>
 

@@ -2,3 +2,8 @@ permalink: /:categories/:year/:month/:title/
 markdown: kramdown
 highlighter: pygments
 relative_permalinks: false
+base_url: http://voxpelli.com
+push_hub: http://voxpelli.superfeedr.com/
+author_name: Pelle Wessman
+author_email: pelle@kodfabrik.se
+blog_name: Pelle Wessman

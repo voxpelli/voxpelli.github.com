@@ -18,7 +18,7 @@ webmentionable: true
       {{ page.date | date_to_long_string }}
     </time> by
     
-    <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> Pelle Wessman</a>
+    <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> {{ site.author_name }}</a>
 
     <div class="indie-actions">
       <indie-action do="tip" with="{{ page.url }}">
