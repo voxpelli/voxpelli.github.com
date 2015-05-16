@@ -1,30 +1,17 @@
 ---
-layout: nil
+layout: atom
+subtitle: "English posts"
+html_url: "/"
+id: "/english.xml"
 ---
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-
- <title>{{ site.blog_name }} – English posts</title>
- <link href="{{ site.base_url }}/english.xml" rel="self" type="application/atom+xml" />
- <link href="{{ site.push_hub }}" rel="hub" />
- <link href="{{ site.base_url }}/" type="text/html" />
- <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>{{ site.base_url }}/</id>
- <author>
-   <name>{{ site.author_name }}</name>
-   <email>{{ site.author_email }}</email>
- </author>
-
- {% for post in site.posts %}
-  {% if post.lang == "en" %}
-   <entry>
-     <title>{{ post.title | xml_escape }}</title>
-     <link href="{{ site.base_url }}{{ post.url }}"/>
-     <updated>{{ post.date | date_to_xmlschema }}</updated>
-     <id>{{ site.base_url }}{{ post.id }}</id>
-     <content type="html">{{ post.content | xml_escape }}</content>
-   </entry>
-  {% endif %}
- {% endfor %}
-
-</feed>
+{% for post in site.posts %}
+ {% if post.lang == "en" %}
+  <entry>
+    <title>{{ post.title | xml_escape }}</title>
+    <link href="{{ site.base_url }}{{ post.url }}"/>
+    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    <id>{{ site.base_url }}{{ post.id }}</id>
+    <content type="html">{{ post.content | xml_escape }}</content>
+  </entry>
+ {% endif %}
+{% endfor %}

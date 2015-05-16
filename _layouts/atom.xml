@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>{{ site.blog_name }}{% if page.subtitle != null %} – {{ page.subtitle }}{% endif %}</title>
+ <link href="{{ site.base_url }}{{ page.url }}" rel="self" type="application/atom+xml" />
+ <link href="{{ site.push_hub }}" rel="hub" />
+ {% if page.html_url != null %}<link href="{{ site.base_url }}{{ page.html_url }}" type="text/html" />{% endif %}
+ <updated>{{ site.time | date_to_xmlschema }}</updated>
+ <id>{{ site.base_url }}{{ page.id }}</id>
+ <author>
+   <name>{{ site.author_name }}</name>
+   <email>{{ site.author_email }}</email>
+ </author>
+
+ {{ content }}
+
+</feed>
