@@ -15,6 +15,7 @@
   {% if page.frontpage != null %}
     <link rel="self" href="{{ site.base_url }}" type="text/html" />
     <link rel="hub" href="{{ site.push_hub }}" />
+  	<link rel="micropub" href="http://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />
   {% endif %}
   {% if page.author != null %}<link rel="author" type="text/html" href="/" title="{{ site.author_name }}" />{% endif %}
   {% if page.flattrable != null %}<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url={{ site.base_url | cgi_escape }}{{ page.url | cgi_escape }}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang != null %}{{ page.lang | cgi_escape }}{% else %}sv{% endif %}" title="Flattr this post" />{% endif %}
