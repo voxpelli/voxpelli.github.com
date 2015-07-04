@@ -5,7 +5,7 @@ date: 2015-07-04T12:15:00+02:00
 lang: en
 ---
 
-There are plenty of perspectives on things in life and at first they all seem pretty shallow and simple – black and white to speak in terms of color – things are one way or another and that's that.
+There are plenty of perspectives on things in life. At first they all seem pretty shallow and simple – black and white to speak in terms of color – things are one way or another and that's that.
 
 Then we start to familiarize ourselves with these ways to look at life and we see the many shades of grey in-between. We see that there's not simply just women or men in the world. There's masculine women, feminine men and more. There's not just extroverts and introverts either – there's many variations in-between. Not just gay people or straight people but plenty of stops along the way.
 
