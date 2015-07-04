@@ -8,7 +8,7 @@ frontpage: true
   <h2>Blog Posts</h2>
 
   <ul class="posts">
-    {% for post in site.posts %}
+    {% for post in site.posts limit:10 %}
       <li class="h-entry">
         <a {% if post.lang == null %}lang="se"{% endif %} class="p-name" href="{{ post.url }}">{{ post.title }}</a>
         <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
@@ -17,6 +17,12 @@ frontpage: true
       </li>
     {% endfor %}
   </ul>
+
+  {% if site.posts.size > 15 %}
+    <div class="posts-extras">
+      <a href="/archive">Archive</a>
+    </div>
+  {% endif %}
 </nav>
 
 <section class="p-author h-card">
@@ -33,6 +39,3 @@ frontpage: true
   <p class="subtome"><input class="btn" type="button" onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()" value="Subscribe to posts"></p>
 </section>
 
-<section>
-<a target="_blank" href="https://www.bloglovin.com/blogs/pelle-wessman-4308583" class="blsdk-follow">Follow</a><script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s);js.id = id;js.src = "https://widget.bloglovin.com/assets/widget/loader.js";fjs.parentNode.insertBefore(js, fjs);}(document, "script", "bloglovin-sdk"))</script>
-</section>
