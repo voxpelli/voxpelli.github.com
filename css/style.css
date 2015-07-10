@@ -34,6 +34,8 @@ indie-action.indieconfig-loading a:before {opacity:1;background-image: url(img/l
 .h-feed .u-photo{width:97px;border-radius:80px;float:left;margin-right:20px;margin-bottom:10px}
 .h-feed .h-card{overflow:hidden;padding-bottom:10px;}
 .h-feed .h-card p{margin-bottom:10px;}
+.posts-extras {padding:0;margin:0}
+.posts-extras li {display:inline-block;margin:0;padding: 0 10px 0 0}
 
 .webmention-mention{padding-left: 60px;position: relative}
 .webmention-mention:last-child{margin-bottom:0}
