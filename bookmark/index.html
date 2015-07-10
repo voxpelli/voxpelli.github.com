@@ -1,0 +1,40 @@
+---
+layout: default
+title: Bookmarks – Pelle Wessman
+---
+
+<h2>Bookmarks</h2>
+
+<section class="posts">
+  {% for post in site.categories.bookmark %}
+    <article class="h-entry" {% if post.lang == null %}lang="se"{% endif %}>
+      <header>
+        <h2 class="p-name">{{post.title}}</h2>
+      </header>
+
+      <div class="e-content">
+        {{ post.content }}
+      </div>
+
+      <footer {% if post.lang == null %}lang="en"{% endif %} >
+        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+          {{ post.date | date_to_long_string }}
+        </time> by
+    
+        <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> {{ site.author_name }}</a>
+
+        <div class="indie-actions">
+          <indie-action do="tip" with="{{ post.url }}">
+            <a class="action tip" target="_blank" href="https://flattr.com/submit/auto?url={url}&amp;user_id=voxpelli&amp;title={{ post.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if post.lang == 'en' %}en{% else %}se{% endif %}">Pay forward</a>
+          </indie-action>
+          <indie-action do="like" with="{{ post.url }}">
+            <a class="action like" target="_blank" href="https://plus.google.com/share?url={url}">Like</a>
+          </indie-action>
+          <indie-action do="reply" with="{{ post.url }}">
+            <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Reply</a>
+          </indie-action>
+        </div>
+      </footer>
+    </article>
+  {% endfor %}
+</section>
