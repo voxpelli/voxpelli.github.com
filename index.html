@@ -9,12 +9,14 @@ frontpage: true
 
   <ul class="posts">
     {% for post in site.posts limit:10 %}
-      <li class="h-entry">
-        <a {% if post.lang == null %}lang="se"{% endif %} class="p-name" href="{{ post.url }}">{{ post.title }}</a>
-        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-          - {{ post.date | date_to_string }}
-        </time>
-      </li>
+      {% if post.category == null %}
+        <li class="h-entry">
+          <a {% if post.lang == null %}lang="se"{% endif %} class="p-name" href="{{ post.url }}">{{ post.title }}</a>
+          <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+            - {{ post.date | date_to_string }}
+          </time>
+        </li>
+      {% endif %}
     {% endfor %}
   </ul>
 
