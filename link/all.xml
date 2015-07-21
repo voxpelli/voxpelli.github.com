@@ -1,11 +1,10 @@
 ---
 layout: atom
-subtitle: "English posts"
-html_url: "/"
-id: "/english.xml"
+subtitle: "Links"
+html_url: "/link/"
+id: "/link/all.xml"
 ---
-{% for post in site.posts %}
- {% if post.lang == "en" and post.category == null %}
+{% for post in site.categories.link %}
   <entry>
     <title>{{ post.title | xml_escape }}</title>
     <link href="{{ site.base_url }}{{ post.url }}"/>
@@ -13,5 +12,4 @@ id: "/english.xml"
     <id>{{ site.base_url }}{{ post.id }}</id>
     <content type="html">{{ post.content | xml_escape }}</content>
   </entry>
- {% endif %}
 {% endfor %}

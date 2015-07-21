@@ -21,6 +21,7 @@ body > .page > *:not(header):not(address){background:#fff;box-shadow:0 0 2px #44
 address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}
 ul.posts{list-style:none;padding:0}
 ul.posts time,article footer,.webmention-published{color:#aaa;font-size:.8em}
+time a{color:#aaa}
 .indie-actions{float:right}
 .indie-actions > indie-action {margin:0 0 -1px 6px;float:right}
 .indie-actions a{text-decoration: none}
