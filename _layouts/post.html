@@ -4,35 +4,7 @@ author: true
 flattrable: true
 webmentionable: true
 ---
-<article class="h-entry" {% if page.lang == null %}lang="se"{% endif %}>
-  <header>
-    <h2 class="p-name">{{page.title}}</h2>
-  </header>
-
-  <div class="e-content">
-    {{ content }}
-  </div>
-
-  <footer {% if page.lang == null %}lang="en"{% endif %} >
-    <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" pubdate>
-      {{ page.date | date_to_long_string }}
-    </time> by
-    
-    <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> {{ site.author_name }}</a>
-
-    <div class="indie-actions">
-      <indie-action do="tip" with="{{ page.url }}">
-        <a class="action tip" target="_blank" href="https://flattr.com/submit/auto?url={url}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang == 'en' %}en{% else %}se{% endif %}">Pay forward</a>
-      </indie-action>
-      <indie-action do="like" with="{{ page.url }}">
-        <a class="action like" target="_blank" href="https://plus.google.com/share?url={url}">Like</a>
-      </indie-action>
-      <indie-action do="reply" with="{{ page.url }}">
-        <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Reply</a>
-      </indie-action>
-    </div>
-  </footer>
-</article>
+{% include post.html post=page indieactions=true %}
 
 <div>
   Have you written a response to this? Let me know the URL:

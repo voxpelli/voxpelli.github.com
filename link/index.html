@@ -7,33 +7,7 @@ category: link
 <h2>Links</h2>
 
 {% for post in site.categories.link %}
-  <article class="h-entry">
-    <header>
-      <h2 class="p-name">
-        {% if post.mf-bookmark %}
-          <a class="u-bookmark-of" href="{{post.mf-bookmark | first}}">{{post.title}}</a>
-        {% elsif post.mf-bookmark-of %}
-          <a class="u-bookmark-of" href="{{post.mf-bookmark-of | first}}">{{post.title}}</a>
-        {% elsif post.mf-repost-of %}
-          <a class="u-repost-of" href="{{post.mf-repost-of | first}}">{{post.title}}</a>
-        {% else %}
-          {{post.title}}
-        {% endif %}
-      </h2>
-    </header>
-
-    <div class="e-content">
-      {{ post.content }}
-    </div>
-
-    <footer>
-      <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-        <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_long_string }}</a>
-      </time>
-        by
-      <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> {{ site.author_name }}</a>
-    </footer>
-  </article>
+  {% include post.html post=post %}
 {% endfor %}
 
 <section>
