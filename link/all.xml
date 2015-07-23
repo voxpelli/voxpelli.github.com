@@ -5,11 +5,5 @@ html_url: "/link/"
 id: "/link/all.xml"
 ---
 {% for post in site.categories.link %}
-  <entry>
-    <title>{{ post.title | xml_escape }}</title>
-    <link href="{{ site.base_url }}{{ post.url }}"/>
-    <updated>{{ post.date | date_to_xmlschema }}</updated>
-    <id>{{ site.base_url }}{{ post.id }}</id>
-    <content type="html">{{ post.content | xml_escape }}</content>
-  </entry>
+  {% include rssentry.xml %}
 {% endfor %}
