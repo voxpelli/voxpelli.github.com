@@ -1,6 +1,13 @@
 {% assign post = include.post %}
 
-<article class="h-entry" {% if post.lang == null %}lang="se"{% endif %}>
+<article
+  class="h-entry"
+  {% if post.lang == null %}
+    lang="se"
+  {% elsif post.lang != 'en' %}
+    lang="{{ post.lang }}"
+  {% endif %}
+>
   <header>
     <h2 class="p-name">
       {% if post.mf-bookmark %}
