@@ -1,9 +1,9 @@
 ---
 layout: atom
 subtitle: "Links"
-html_url: "/link/"
+html_url: "/links/"
 id: "/links/all.xml"
 ---
-{% for post in site.categories.link %}
+{% for post in site.categories.links %}
   {% include rssentry.xml %}
 {% endfor %}

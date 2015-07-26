@@ -9,7 +9,7 @@
 
   <link rel="stylesheet" type="text/css" media="all" href="/css/style.css" />
 
-  {% if page.category == 'link' %}
+  {% if page.category == 'links' %}
     <link rel="alternate" type="application/atom+xml" href="/links/all.xml" title="All links" />
   {% endif %}
   <link rel="{% if page.frontpage == null %}home {% endif %}alternate" type="application/atom+xml" href="/all.xml" title="All posts" />
