@@ -1,55 +1,9 @@
 {% assign post = include.post %}
+{% assign standalone = include.standalone %}
+{% assign indieactions = include.indieactions %}
 
-<article
-  class="h-entry"
-  {% if post.lang == null %}
-    lang="se"
-  {% elsif post.lang != 'en' %}
-    lang="{{ post.lang }}"
-  {% endif %}
->
-  <header>
-    <h2 class="p-name">
-      {% if post.mf-bookmark %}
-        <a class="u-bookmark-of" href="{{post.mf-bookmark | first}}">{{post.title}}</a>
-      {% elsif post.mf-bookmark-of %}
-        <a class="u-bookmark-of" href="{{post.mf-bookmark-of | first}}">{{post.title}}</a>
-      {% elsif post.mf-repost-of %}
-        <a class="u-repost-of" href="{{post.mf-repost-of | first}}">{{post.title}}</a>
-      {% else %}
-        {{post.title}}
-      {% endif %}
-    </h2>
-  </header>
-
-  <div class="e-content">
-      {% if content %}
-        {{ content }}
-      {% else %}
-        {{ post.content }}
-      {% endif %}
-  </div>
-
-  <footer>
-    <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-      <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_long_string }}</a>
-    </time>
-      by
-    <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" /> {{ site.author_name }}</a>
-
-    {% if include.indieactions %}
-      <div class="indie-actions">
-        <indie-action do="tip" with="{{ page.url }}">
-          <a class="action tip" target="_blank" href="https://flattr.com/submit/auto?url={url}&amp;user_id=voxpelli&amp;title={{ page.title | cgi_escape }}&amp;category=text&amp;tags=blog&amp;language={% if page.lang == 'en' %}en{% else %}se{% endif %}">Pay forward</a>
-        </indie-action>
-        <indie-action do="like" with="{{ page.url }}">
-          <a class="action like" target="_blank" href="https://plus.google.com/share?url={url}">Like</a>
-        </indie-action>
-        <indie-action do="reply" with="{{ page.url }}">
-          <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Reply</a>
-        </indie-action>
-      </div>
-    {% endif %}
-
-  </footer>
-</article>
+{% if post.mf-like-of != null %}
+  {% include post-like.html post=post standalone=standalone indieactions=indieactions %}
+{% else %}
+  {% include post-content.html post=post standalone=standalone indieactions=indieactions %}
+{% endif %}

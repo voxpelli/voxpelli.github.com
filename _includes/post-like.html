@@ -1,0 +1,8 @@
+<article class="h-entry">
+  <h2>Liked:</h2>
+  <ul>
+    {% for like in post.mf-like-of %}
+      <li><a class="u-like-of" href="{{like}}">{{like}}</a></li>
+    {% endfor %}
+  </ul>
+</article>
