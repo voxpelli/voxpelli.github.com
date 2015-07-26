@@ -1,0 +1,11 @@
+---
+layout: default
+title: Social
+category: social
+---
+
+<h2>Social</h2>
+
+{% for post in site.categories.social %}
+  {% include post.html post=post %}
+{% endfor %}
