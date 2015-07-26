@@ -6,6 +6,15 @@
     lang="{{ post.lang }}"
   {% endif %}
 >
+
+  {% if post.mf-photo != null %}
+    <div class="photos">
+      {% for photo in post.mf-photo %}
+        <img class="u-photo" src="{{photo}}" alt="" />
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% if post.title != null %}
     <header>
       <h2 class="p-name">
@@ -22,6 +31,15 @@
     </header>
   {% endif %}
 
+  {% if post.mf-in-reply-to != null %}
+    <h3 lang="en">In reply to: </h3>
+    <ul>
+      {% for reply in post.mf-in-reply-to %}
+        <li><a class="u-in-reply-to" rel="in-reply-to" href="{{reply}}">{{reply}}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   <div class="e-content">
     {% if content %}
       {{ content }}
@@ -29,6 +47,18 @@
       {{ post.content }}
     {% endif %}
   </div>
+
+  {% if post.mf-syndication != null %}
+    <div class="elsewhere">
+      <h3 lang="en">Also posted on:</h3>
+      <ul>
+        {% for elsewhere in post.mf-syndication %}
+          <li><a href="{{ elsewhere }}" {% if standalone == true %}rel="syndication"{% endif %}>
+            {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | split:'.' | first | capitalize }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 
   <footer>
     <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
