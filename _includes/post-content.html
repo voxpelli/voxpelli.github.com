@@ -32,7 +32,11 @@
   {% endif %}
 
   {% if post.mf-in-reply-to != null %}
-    <h3 lang="en">In reply to: </h3>
+    {% if swedish == true %}
+      <h3>Svar på:</h3>
+    {% else %}
+      <h3{% if nonenglish == true %} lang="en"{% endif %}>In reply to:</h3>
+    {% endif %}
     <ul>
       {% for reply in post.mf-in-reply-to %}
         <li><a class="u-in-reply-to" rel="in-reply-to" href="{{reply}}">{{reply}}</a></li>
@@ -50,7 +54,11 @@
 
   {% if post.mf-syndication != null %}
     <div class="elsewhere">
-      <h3 lang="en">Also posted on:</h3>
+      {% if swedish == true %}
+        <h3>Också postat på:</h3>
+      {% else %}
+        <h3{% if nonenglish == true %} lang="en"{% endif %}>Also posted on:</h3>
+      {% endif %}
       <ul>
         {% for elsewhere in post.mf-syndication %}
           <li><a href="{{ elsewhere }}" {% if standalone == true %}rel="syndication"{% endif %}>
@@ -60,7 +68,7 @@
     </div>
   {% endif %}
 
-  <footer>
+  <footer{% if nonenglish == true %} lang="en"{% endif %}>
     <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
       <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_long_string }}</a>
     </time>

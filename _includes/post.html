@@ -2,6 +2,14 @@
 {% assign standalone = include.standalone %}
 {% assign indieactions = include.indieactions %}
 
+{% if post.lang == null or post.lang == 'se' %}
+  {% assign swedish = true %}
+{% endif %}
+
+{% if post.lang != 'en' %}
+  {% assign nonenglish = true %}
+{% endif %}
+
 {% if post.mf-like-of != null %}
   {% include post-like.html post=post standalone=standalone indieactions=indieactions %}
 {% else %}
