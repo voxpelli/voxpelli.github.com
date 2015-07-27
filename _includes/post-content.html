@@ -7,8 +7,16 @@
   {% endif %}
 >
 
-  {% if post.mf-photo != null %}
-    <div class="photos">
+  {% if post.mf-video != null %}
+    <div class="media">
+      {% for video in post.mf-video %}
+        <video class="u-video" src="{{video}}" controls loop>
+          <div lang="en">Looks like you can't see this video. <a href="{{video}}" download>Download it</a> instead.</div>
+        </video>
+      {% endfor %}
+    </div>
+  {% elsif post.mf-photo != null %}
+    <div class="media">
       {% for photo in post.mf-photo %}
         <img class="u-photo" src="{{photo}}" alt="" />
       {% endfor %}
