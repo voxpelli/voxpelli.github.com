@@ -61,7 +61,7 @@
       {% endif %}
       <ul>
         {% for elsewhere in post.mf-syndication %}
-          <li><a href="{{ elsewhere }}" {% if standalone == true %}rel="syndication"{% endif %}>
+          <li><a href="{{ elsewhere }}" class="u-syndication" {% if standalone == true %}rel="syndication"{% endif %}>
             {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | split:'.' | first | capitalize }}</a></li>
         {% endfor %}
       </ul>
