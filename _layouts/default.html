@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
 
-  <title>{% if page.frontpage == null %}{{ page.title }} – {% endif %}{{ site.blog_name }}</title>
+  <title>{% if page.frontpage == null and page.title != null %}{{ page.title }} – {% endif %}{{ site.blog_name }}</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
