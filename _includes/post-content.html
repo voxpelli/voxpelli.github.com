@@ -61,7 +61,7 @@
   </div>
 
   {% if post.mf-syndication != null %}
-    <div class="elsewhere">
+    <div class="elsewhere linklist">
       {% if swedish == true %}
         <h3>Också postat på:</h3>
       {% else %}
@@ -71,6 +71,37 @@
         {% for elsewhere in post.mf-syndication %}
           <li><a href="{{ elsewhere }}" class="u-syndication" {% if standalone == true %}rel="syndication"{% endif %}>
             {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | split:'.' | first | capitalize }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if post.persontags != null %}
+    <div class="persons linklist">
+      {% if swedish == true %}
+        <h3>Nämnda:</h3>
+      {% else %}
+        <h3{% if nonenglish == true %} lang="en"{% endif %}>Mentioned:</h3>
+      {% endif %}
+      <ul>
+        {% for elsewhere in post.persontags %}
+          <li><a href="{{ elsewhere }}" class="u-category h-card">
+            {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | split:'.' | first }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if post.tags.size > 0 %}
+    <div class="tags linklist">
+      {% if swedish == true %}
+        <h3>Taggar:</h3>
+      {% else %}
+        <h3{% if nonenglish == true %} lang="en"{% endif %}>Tags:</h3>
+      {% endif %}
+      <ul>
+        {% for tag in post.tags %}
+          <li class="p-category">{{ tag }}</li>
         {% endfor %}
       </ul>
     </div>
