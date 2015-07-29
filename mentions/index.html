@@ -1,0 +1,16 @@
+---
+layout: default
+title: Mentions
+---
+
+<h2>Mentions</h2>
+
+<script id="webmention-hosted">
+  (function () {
+    var sn = document.createElement("script"), s = document.getElementsByTagName("script")[0];
+    sn.type = "text/javascript"; sn.async = true;
+    // Using a cutting-edge embed here to try out the possibly upcoming embed solutions
+    sn.src = "//webmention.herokuapp.com/api/embed?version=cutting-edge&nofacepile=1&site={{ site.base_url | remove_first:'http://'  | remove_first:'https://' | uri_escape }}";
+    s.parentNode.insertBefore(sn, s);
+  }());
+</script>
