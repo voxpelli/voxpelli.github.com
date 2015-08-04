@@ -50,7 +50,6 @@ input[type=url]{width:50%}
 .webmention-facepile{padding-left:0;margin-left:-5px;}
 .webmention-facepile:last-child{margin-bottom:-5px}
 .webmention-facepile > li {display: inline-block;position: relative;margin: 0 5px 5px 0;}
-.webmention-footer{color:inherit}
 .webmention-interaction-presentation:after {
   display: block;
   position: absolute;
