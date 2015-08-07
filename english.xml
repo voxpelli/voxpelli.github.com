@@ -4,8 +4,10 @@ subtitle: "English posts"
 html_url: "/"
 id: "/english.xml"
 ---
+{% assign postsleft=10 %}
 {% for post in site.posts %}
-  {% if post.lang == "en" and post.category == null %}
+  {% if post.lang == "en" and post.category == null and postsleft != '0' %}
+    {% capture postsleft %}{{ postsleft | minus:1 }}{% endcapture %}
     {% include rssentry.xml %}
   {% endif %}
 {% endfor %}

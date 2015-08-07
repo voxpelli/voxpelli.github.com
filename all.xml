@@ -3,8 +3,10 @@ layout: atom
 html_url: "/"
 id: "/"
 ---
+{% assign postsleft=10 %}
 {% for post in site.posts %}
-  {% if post.category == null %}
+  {% if post.category == null and postsleft != '0' %}
+    {% capture postsleft %}{{ postsleft | minus:1 }}{% endcapture %}
     {% include rssentry.xml %}
   {% endif %}
 {% endfor %}

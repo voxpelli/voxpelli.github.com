@@ -4,6 +4,6 @@ subtitle: "Links"
 html_url: "/links/"
 id: "/links/all.xml"
 ---
-{% for post in site.categories.links %}
+{% for post in site.categories.links limit:10 %}
   {% include rssentry.xml %}
 {% endfor %}
