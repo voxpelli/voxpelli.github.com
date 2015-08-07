@@ -1,6 +1,9 @@
 {% assign post = include.post %}
 {% assign standalone = include.standalone %}
 {% assign indieactions = include.indieactions %}
+{% assign container = include.container %}
+{% assign swedish = false %}
+{% assign nonenglish = false %}
 
 {% if post.lang == null or post.lang == 'sv' %}
   {% assign swedish = true %}
@@ -10,7 +13,26 @@
   {% assign nonenglish = true %}
 {% endif %}
 
-{% if post.mf-like-of != null %}
+{% if container == null %}
+  {% assign container = 'div' %}
+{% endif %}
+
+{% if post.category == null and standalone != true %}
+  <{{ container }} class="h-entry blog-article-summary">
+    <a
+      {% if swedish == true %}
+        lang="sv"
+      {% elsif nonenglish == true %}
+        lang="{{ post.lang }}"
+      {% endif %}
+      class="u-url u-uid p-name"
+      href="{{ post.url }}"
+    >{{ post.title }}</a>
+    <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+      - {{ post.date | date_to_string }}
+    </time>
+  </{{ container }}>
+{% elsif post.mf-like-of != null %}
   {% include post-like.html post=post standalone=standalone indieactions=indieactions %}
 {% else %}
   {% include post-content.html post=post standalone=standalone indieactions=indieactions %}

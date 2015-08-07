@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Archive – Pelle Wessman
+title: Blog Post Archive
 ---
 
 <nav>
-  <h2>Blog posts posted over the years</h2>
+  <h2>Blog posts written over the years</h2>
 
   <h3>Current year</h3>
   {% for post in site.posts %}
@@ -20,12 +20,7 @@ title: Archive – Pelle Wessman
       {% endif %}
     {% endunless %}
     {% if post.category == null %}
-      <li class="h-entry">
-        <a {% if post.lang == null %}lang="sv"{% endif %} class="p-name" href="{{ post.url }}">{{ post.title }}</a>
-        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-          - {{ post.date | date_to_string }}
-        </time>
-      </li>
+      {% include post.html post=post container='li' %}
     {% endif %}
   {% endfor %}
   </ul>

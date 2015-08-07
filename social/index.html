@@ -6,6 +6,10 @@ category: social
 
 <h2>Social</h2>
 
-{% for post in site.categories.social %}
+{% for post in site.categories.social limit:10 %}
   {% include post.html post=post %}
 {% endfor %}
+
+<ul class="posts-extras">
+  <li><a href="/archive/full">Archive</a></li>
+</ul>

@@ -6,9 +6,14 @@ category: links
 
 <h2>Links</h2>
 
-{% for post in site.categories.links %}
+{% for post in site.categories.links limit:5 %}
   {% include post.html post=post %}
 {% endfor %}
+
+
+<ul class="posts-extras">
+  <li><a href="/archive/full">Archive</a></li>
+</ul>
 
 <section>
   <h2>Subscribe to all links</h2>

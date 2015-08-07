@@ -13,13 +13,7 @@ webmentionable: true
     {% for post in site.posts %}
       {% if post.category == null and postsleft != '0' %}
         {% capture postsleft %}{{ postsleft | minus:1 }}{% endcapture %}
-
-        <li class="h-entry">
-          <a {% if post.lang == null %}lang="sv"{% endif %} class="u-url u-uid p-name" href="{{ post.url }}">{{ post.title }}</a>
-          <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-            - {{ post.date | date_to_string }}
-          </time>
-        </li>
+        {% include post.html post=post container='li' %}
       {% endif %}
     {% endfor %}
   </ul>

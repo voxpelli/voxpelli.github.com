@@ -1,8 +1,8 @@
 <article
   class="h-entry"
-  {% if post.lang == null %}
+  {% if swedish == true %}
     lang="sv"
-  {% elsif post.lang != 'en' %}
+  {% elsif nonenglish == true %}
     lang="{{ post.lang }}"
   {% endif %}
 >

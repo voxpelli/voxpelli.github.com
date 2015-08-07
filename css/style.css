@@ -42,6 +42,20 @@ blockquote {border-left: 5px solid #ccc; padding-left: 10px; margin-left: 20px; 
 .linklist ul, .linklist li {display:inline;padding:0;margin:0}
 .linklist li:not(:last-child):after {content:", "}
 .h-entry .media .u-photo,.h-entry .media .u-video {width:100%;display:block}
+div.blog-article-summary + div.blog-article-summary {
+  margin-top: -8px;
+  padding-top: 0;
+  position:relative;
+}
+div.blog-article-summary + div.blog-article-summary:before {
+  background: #fff;
+  position:absolute;
+  top: -3px;
+  height: 3px;
+  left: 0;
+  width: 100%;
+  content: "";
+}
 
 .webmention-mention{padding-left: 60px;position: relative}
 .webmention-mention:last-child{margin-bottom:0}
