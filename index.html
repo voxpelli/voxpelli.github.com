@@ -11,8 +11,8 @@ webmentionable: true
   <ul class="posts">
     {% assign postsleft=10 %}
     {% for post in site.posts %}
-      {% if post.category == null and postsleft != '0' %}
-        {% capture postsleft %}{{ postsleft | minus:1 }}{% endcapture %}
+      {% if post.category == null and postsleft != 0 %}
+        {% assign postsleft = postsleft | minus:1 %}
         {% include post.html post=post container='li' %}
       {% endif %}
     {% endfor %}

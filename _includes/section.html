@@ -1,0 +1,11 @@
+{% assign collectionsize = include.collection | size %}
+
+{% for post in include.collection limit:include.limit %}
+  {% include post.html post=post %}
+{% endfor %}
+
+{% if collectionsize > include.limit %}
+  <ul class="posts-extras">
+    <li><a href="/archive/full">Archive</a></li>
+  </ul>
+{% endif %}
