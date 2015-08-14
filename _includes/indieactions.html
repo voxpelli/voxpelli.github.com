@@ -1,11 +1,11 @@
 {% assign post = include.post %}
 
 <div class="indie-actions">
-  <indie-action do="tip" with="{{ post.url }}">
-    <a class="action tip" target="_blank" href="https://flattr.com/submit/auto?url={url}&amp;user_id=voxpelli{% if post.title != null %}&amp;title={{ post.title | cgi_escape }}{% endif %}&amp;category=text&amp;tags=blog&amp;language={% if post.lang != null %}{{ post.lang | cgi_escape }}{% else %}sv{% endif %}">Pay forward</a>
-  </indie-action>
   <indie-action do="like" with="{{ post.url }}">
     <a class="action like" target="_blank" href="https://plus.google.com/share?url={url}">Like</a>
+  </indie-action>
+  <indie-action do="repost" with="{{ post.url }}">
+    <a class="action repost" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Share</a>
   </indie-action>
   <indie-action do="reply" with="{{ post.url }}">
     <a class="action reply" target="_blank" href="https://twitter.com/intent/tweet?url={url}">Reply</a>

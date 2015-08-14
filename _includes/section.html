@@ -1,7 +1,7 @@
 {% assign collectionsize = include.collection | size %}
 
 {% for post in include.collection limit:include.limit %}
-  {% include post.html post=post %}
+  {% include post.html post=post indieactions=true %}
 {% endfor %}
 
 {% if collectionsize > include.limit %}

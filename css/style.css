@@ -27,8 +27,8 @@ time a,.webmention-footer a{color:#aaa}
 .indie-actions a{text-decoration: none}
 indie-action a:before {content: "";opacity:.7;background:no-repeat center center;background-size: auto 13px;display:inline-block;width:16px;height:16px;margin: 0 2px 0 0;vertical-align:text-top;}
 indie-action[do="reply"] a:before {background-image: url(img/reply.svg);}
-indie-action[do="like"] a:before {background-image: url(img/star.svg);}
-indie-action[do="tip"] a:before {background-image: url(img/badge.svg);}
+indie-action[do="repost"] a:before {background-image: url(img/loop.svg);}
+indie-action[do="like"] a:before {background-image: url(img/heart.svg);}
 indie-action.indieconfig-loading a:before {opacity:1;background-image: url(img/loader.gif);background-size: 16px 16px;}
 .subtome{text-align:center}
 .h-entry .h-card .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
