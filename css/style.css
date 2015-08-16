@@ -31,10 +31,10 @@ indie-action[do="repost"] a:before {background-image: url(img/loop.svg);}
 indie-action[do="like"] a:before {background-image: url(img/heart.svg);}
 indie-action.indieconfig-loading a:before {opacity:1;background-image: url(img/loader.gif);background-size: 16px 16px;}
 .subtome{text-align:center}
-.h-entry .h-card .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
-.h-feed .h-card .u-photo{width:97px;border-radius:80px;float:left;margin-right:20px;margin-bottom:10px}
-.h-feed .h-card{overflow:hidden;padding-bottom:10px;}
-.h-feed .h-card p{margin-bottom:10px;}
+.h-entry .h-card .u-photo,.h-card.summary-card .u-photo{width:20px;border-radius:20px;vertical-align:middle;position:relative;top:-2px;}
+.h-card.full-card .u-photo{width:97px;border-radius:80px;float:left;margin-right:20px;margin-bottom:10px}
+.h-card.full-card{overflow:hidden;padding-bottom:10px;}
+.h-card.full-card p{margin-bottom:10px;}
 .posts-extras {padding:0;margin:0}
 .posts-extras li {display:inline-block;margin:0;padding: 0 10px 0 0}
 blockquote {border-left: 5px solid #ccc; padding-left: 10px; margin-left: 20px; font-weight: 200}
