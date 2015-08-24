@@ -57,6 +57,7 @@ div.blog-article-summary + div.blog-article-summary:before {
   content: "";
 }
 
+.webmention-container{margin-top:1em}
 .webmention-mention{padding-left: 60px;position: relative}
 .webmention-mention:last-child{margin-bottom:0}
 .webmention-author img {position: absolute;top: 0;left: -5px;width: 50px;border-radius: 240px}
