@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="{{ page.classes }}{% if page.hfeed == true %} h-feed{% endif %}">
+<html lang="en" class="no-js {{ page.classes }}{% if page.hfeed == true %} h-feed{% endif %}">
 <head>
   <meta charset="utf-8" />
 
   <title{% if page.hfeed == true %} class="p-name"{% endif %}>{% if page.frontpage == null and page.title != null %}{{ page.title }} – {% endif %}{{ site.blog_name }}</title>
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/,'js');
+  </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
