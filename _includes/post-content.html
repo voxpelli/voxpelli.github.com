@@ -86,7 +86,23 @@
       <ul>
         {% for elsewhere in post.persontags %}
           <li><a href="{{ elsewhere }}" class="u-category h-card">
-            {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | split:'.' | first }}</a></li>
+            {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | remove_first:'.com' | split:'/' | first }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if post.submitto != null %}
+    <div class="submitted-to linklist">
+      {% if swedish == true %}
+        <h3>Inskickad till:</h3>
+      {% else %}
+        <h3{% if nonenglish == true %} lang="en"{% endif %}>Submitted to:</h3>
+      {% endif %}
+      <ul>
+        {% for elsewhere in post.submitto %}
+          <li><a href="{{ elsewhere }}" class="u-category">
+            {{ elsewhere | remove_first:'http://'  | remove_first:'https://' | remove_first:'www.' | remove_first:'.com' | split:'/' | first }}</a></li>
         {% endfor %}
       </ul>
     </div>
