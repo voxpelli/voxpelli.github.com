@@ -40,6 +40,10 @@ window.loadIndieConfig = (function () {
     }
   };
 
+  if (!window.navigator.registerProtocolHandler) {
+    config = {};
+  }
+
   return function (callback) {
     // If the config is already loaded, call callback right away
     if (config) {
