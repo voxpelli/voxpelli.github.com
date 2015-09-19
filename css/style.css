@@ -20,7 +20,7 @@ ul,ol{padding-left:1.5em}
 body > .page > *:not(header):not(address){background:#fff;box-shadow:0 0 2px #444;padding:15px 20px;margin-bottom:8px}
 address{font-style:normal;padding:0 10px 10px;text-align:center;font-size:.7em}
 ul.posts{list-style:none;padding:0}
-ul.posts time,article footer,.webmention-footer,.u-responses{color:#aaa;font-size:.8em}
+ul.posts time,ul.posts span.time-to-read,article footer,.webmention-footer,.u-responses{color:#aaa;font-size:.8em}
 time a,.webmention-footer a{color:#aaa}
 .indie-actions{float:right}
 .indie-actions > indie-action {margin:0 0 -1px 6px;float:right}

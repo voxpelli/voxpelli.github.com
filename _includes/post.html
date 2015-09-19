@@ -31,6 +31,9 @@
     <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
       - {{ post.date | date_to_string }}
     </time>
+    <span class="time-to-read">
+      - {{ post.content | strip_html | split: ' ' | size | divided_by: 275 | round }} min read
+    </span>
   </{{ container }}>
 {% elsif post.mf-like-of != null %}
   {% include post-like.html post=post standalone=standalone indieactions=indieactions %}
