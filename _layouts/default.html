@@ -19,7 +19,7 @@
   <link rel="{% if page.frontpage == null %}home {% endif %}alternate" type="application/atom+xml" href="/all.xml" title="All posts" />
   <link rel="{% if page.frontpage == null %}home {% endif %}alternate" type="application/atom+xml" href="/english.xml" title="English posts" />
 
-  <link rel="canonical" href="{% if page.frontpage == null %}{{ page.url }}{% else %}/{% endif %}"{% if page.hfeed == true %} class="u-url"{% endif %} />
+  <link rel="canonical" href="{{ site.base_url }}{% if page.frontpage == null %}{{ page.url | remove: 'index.html' }}{% else %}/{% endif %}"{% if page.hfeed == true %} class="u-url"{% endif %} />
   <meta name="twitter:site" content="@voxpelli" />
   {% if page.frontpage != null %}
     <link rel="self" href="{{ site.base_url }}" type="text/html" />
