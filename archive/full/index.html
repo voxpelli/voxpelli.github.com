@@ -12,7 +12,7 @@ hfeed: true
 
 <div class="pagination">
   {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" rel="prev">Previous</a>
+    <a href="{{ paginator.previous_page_path | replace: 'index.html' }}" rel="prev">Previous</a>
   {% endif %}
   <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
   {% if paginator.next_page %}
