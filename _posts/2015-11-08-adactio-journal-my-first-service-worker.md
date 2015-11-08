@@ -10,6 +10,6 @@ category: links
 ---
 > I’m really excited about the way that the Service Worker spec has been designed. Instead of being an all-or-nothing technology that you have to bet the farm on, it has been deliberately crafted to be used as an enhancement on top of existing sites
 
-I really agree with Jeremy Keith here, Service Workers brings some exciting new possibilities to the web and fits very well into a progressive and the enhancement flow which means we with ease can start to make use of it right now and users will gradually benefit from it as more and more browsers joins the party.
+I very much agree with Jeremy Keith here, Service Workers brings some exciting new possibilities to the web and fits very well into a progressive enhancement flow, which means we can start to make use of it right here and now. Users will then gradually benefit from the work as more and more browsers joins the party.
 
-Jeremy runs a great overview and introduction on how to get started, so be sure to give it a read!
+Jeremy runs a great overview and introduction on how to get started with Service Workers, so be sure to give it a read!
