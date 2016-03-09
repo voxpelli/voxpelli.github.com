@@ -11,7 +11,7 @@ The server defines regular forms for the AJAX-requests and then defines JSON-res
 
 All in all a clean and easy solution for keeping AJAX DRY in your regular server-side MVC site.
 
-{% highlight js %}
+```js
 (function () {
   var handleModifyResponse = function (data, statusText, xhr, $form) {
     if (data.targets) {
@@ -24,7 +24,7 @@ All in all a clean and easy solution for keeping AJAX DRY in your regular server
     success: handleModifyResponse
   });
 }());
-{% endhighlight %}
+```
 
 ### The long story where I write a lot and use cool words
 

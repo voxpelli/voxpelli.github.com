@@ -1,6 +1,6 @@
 permalink: /:categories/:year/:month/:title/
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 relative_permalinks: false
 base_url: http://voxpelli.com
 push_hub: http://voxpelli.superfeedr.com/

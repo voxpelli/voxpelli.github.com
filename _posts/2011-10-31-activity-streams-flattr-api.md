@@ -15,7 +15,7 @@ So what do an activity look like? Lets take two examples:
 
 Post activity from me ([source](https://api.flattr.com/rest/v2/users/voxpelli/things.as)):
 
-{% highlight js %}
+```json
 {
   "published":"2011-08-09T15:03:18+02:00",
   "title":"Moving to Jekyll and English",
@@ -34,11 +34,11 @@ Post activity from me ([source](https://api.flattr.com/rest/v2/users/voxpelli/th
   "url":"https:\/\/flattr.com\/thing\/370001",
   "id":"tag:flattr.com,2011:things\/370001"
 }
-{% endhighlight %}
+```
 
 Flattr activity from the Flattr student [Melpomene](https://flattr.com/profile/Melpomene) ([source](https://api.flattr.com/rest/v2/users/melpomene/flattrs.as)):
 
-{% highlight js %}
+```json
 {
   "published":"2011-10-30T18:20:46+01:00",
   "title":"Melpomene flattred \"Flattr: Problem #1 that's not really a problem\"",
@@ -62,6 +62,6 @@ Flattr activity from the Flattr student [Melpomene](https://flattr.com/profile/M
   },
   "id":"tag:flattr.com,2011-10-30:Melpomene\/flattr\/424979"
 }
-{% endhighlight %}
+```
 
 I hope we can extend these feeds in the future to make them even more useful. If you have any feedback or just want to tell how awesome these feeds are, then please contact me. I'm on [Twitter](http://twitter.com/voxpelli), [Google+](https://plus.google.com/114892733479367518317) and e-mail: [pelle@kodfabrik.se](mailto:pelle@kodfabrik.se)

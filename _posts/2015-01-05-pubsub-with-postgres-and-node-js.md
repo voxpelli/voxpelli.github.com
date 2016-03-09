@@ -42,7 +42,7 @@ I decided to utilise my newly created [promised-retry](https://www.npmjs.com/pac
 
 All in all that resulted all you needing to do to subscribe to Postgres notifications being:
 
-{% highlight javascript %}
+```js
 var PGPubsub = require('pg-pubsub');
 
 var pubsubInstance = new PGPubsub('postgres://username@localhost/tablename');
@@ -51,7 +51,7 @@ pubsubInstance.addChannel('channelName', function (channelPayload) {
   // Handle the notification and its payload
   // If the payload was JSON it has already been parsed for you
 });
-{% endhighlight %}
+```
 
 ## Conclusion
 
