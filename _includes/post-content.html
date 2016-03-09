@@ -53,10 +53,10 @@
   {% endif %}
 
   <div class="e-content">
-    {% if content %}
-      {{ content }}
-    {% else %}
+    {% if post.content %}
       {{ post.content }}
+    {% else %}
+      {{ content }}
     {% endif %}
   </div>
 
