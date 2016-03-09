@@ -9,3 +9,5 @@ author_email: pelle@kodfabrik.se
 blog_name: Pelle Wessman
 paginate: 10
 paginate_path: "/archive/full/:num/"
+gems:
+  - jekyll-paginate
