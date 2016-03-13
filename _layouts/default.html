@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
 
-  <title{% if page.hfeed == true %} class="p-name"{% endif %}>{% if page.frontpage == null and page.title != null %}{{ page.title }} – {% endif %}{{ site.blog_name }}</title>
+  <title{% if page.hfeed == true %} class="p-name"{% endif %}>{% if page.frontpage == null and page.title != null and page.title != '' %}{{ page.title }} – {% endif %}{{ site.blog_name }}</title>
 
   <script>
     document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/,'js');
