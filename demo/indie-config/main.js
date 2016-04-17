@@ -182,6 +182,7 @@
 
   var setupTable = function () {
     emptyElement(configTable);
+    isEdited = false;
 
     var tr = createChild(configTable, 'tr');
     createChild(tr, 'th', '', 'Config key');
@@ -228,5 +229,13 @@
 
     window.localStorage.setItem('indie-config', JSON.stringify(values));
     setupTable();
+  });
+
+  var isEdited = false;
+  configTable.addEventListener('input', function () {
+    if (!isEdited) {
+      createChild(createChild(createChild(configTable, 'tr'), 'td', { colspan: 2 }), 'small', false, 'Edited since saved');
+    }
+    isEdited = true;
   });
 }());
