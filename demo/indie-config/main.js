@@ -170,6 +170,16 @@
 
   var configTable = document.getElementById('indie-config-box');
 
+  var addEmptyRow = function () {
+    var tr = createChild(configTable, 'tr');
+    createChild(createChild(tr, 'td'), 'input', {
+      placeholder: 'reply'
+    });
+    createChild(createChild(tr, 'td'), 'input', {
+      placeholder: 'https://quill.p3k.io/new?reply={url}'
+    });
+  };
+
   var setupTable = function () {
     emptyElement(configTable);
 
@@ -198,22 +208,12 @@
       });
     });
 
-    var tr = createChild(configTable, 'tr');
-    createChild(createChild(tr, 'td'), 'input', {
-      placeholder: 'reply'
-    });
-    createChild(createChild(tr, 'td'), 'input', {
-      placeholder: 'https://quill.p3k.io/new?reply={url}'
-    });
+    addEmptyRow();
   };
 
   setupTable();
 
-  createChild(configTable.parentNode, 'button', { type: 'button', class: 'btn' }, 'Add row').addEventListener('click', function () {
-    var tr = createChild(configTable, 'tr');
-    createChild(createChild(tr, 'td'), 'input');
-    createChild(createChild(tr, 'td'), 'input');
-  });
+  createChild(configTable.parentNode, 'button', { type: 'button', class: 'btn' }, 'Add row').addEventListener('click', addEmptyRow);
   createChild(configTable.parentNode, 'button', { type: 'button', class: 'btn' }, 'Save').addEventListener('click', function () {
     var values = map($$('tr', configTable), function (row) {
       var inputs = $$('input', row);
