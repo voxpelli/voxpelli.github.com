@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The Indie-Config Loader</title>
+</head>
+<body>
+<script>
+(function () {
+  var settings;
+  try {
+    settings = JSON.parse(window.localStorage.getItem('indie-config'));
+  } catch (e) {}
+  settings = settings || {};
+
+  var config = {};
+  var value;
+
+  for (var key in settings) {
+    value = settings[key];
+    config[value.key] = value.value;
+  }
+
+  console.log('FOOBAR!', JSON.stringify(config));
+
+  if (window.parent !== window) {
+    window.parent.postMessage(JSON.stringify(config), '*');
+  }
+}());
+</script>
+</body>

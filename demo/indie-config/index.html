@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>The Indie-Config Demo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="header">
+    <h1><a href="/">The <em>Indie-Config</em> Demo</a></h1>
+    <div class="subtitle">Using localstorage to provide your settings</div>
+  </div>
+  <div id="main">
+    <div class="box">
+      <table id="indie-config-box">
+        <tr>
+          <th>Config key</th>
+          <th>Endpoint</th>
+        </tr>
+      </table>
+      <script src="main.js"></script>
+    </div>
+    <div class="box">
+      <form id="conf-form">
+        <div><button>Register this site as a web+indie handler</button></div>
+      </form>
+      <script>
+      (function () {
+        // Pick a way to invoke the registerProtocolHandler, through a submit handler in admin or something
+        document.getElementById('conf-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          window.navigator.registerProtocolHandler('web+action', 'config?url=%s', 'Indie Config Demo');
+        });
+      }());
+      </script>
+    </div>
+  </div>
+  <address>Powered by the skills of Malmö, Skåne</address>
+</body>
