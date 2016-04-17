@@ -209,12 +209,12 @@
 
   setupTable();
 
-  createChild(configTable.parentNode, 'button', { type: 'button' }, 'Add row').addEventListener('click', function () {
+  createChild(configTable.parentNode, 'button', { type: 'button', class: 'btn' }, 'Add row').addEventListener('click', function () {
     var tr = createChild(configTable, 'tr');
     createChild(createChild(tr, 'td'), 'input');
     createChild(createChild(tr, 'td'), 'input');
   });
-  createChild(configTable.parentNode, 'button', { type: 'button' }, 'Save').addEventListener('click', function () {
+  createChild(configTable.parentNode, 'button', { type: 'button', class: 'btn' }, 'Save').addEventListener('click', function () {
     var values = map($$('tr', configTable), function (row) {
       var inputs = $$('input', row);
       if (!inputs[0]) { return {}; }

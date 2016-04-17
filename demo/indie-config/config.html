@@ -21,8 +21,6 @@
     config[value.key] = value.value;
   }
 
-  console.log('FOOBAR!', JSON.stringify(config));
-
   if (window.parent !== window) {
     window.parent.postMessage(JSON.stringify(config), '*');
   }
