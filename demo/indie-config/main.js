@@ -183,9 +183,9 @@
     } catch (e) {}
 
     if (!settings) {
-      settings = {
-        reply: 'https://quill.p3k.io/new?reply={url}'
-      };
+      settings = [
+        { key: 'reply', value: 'https://quill.p3k.io/new?reply={url}' }
+      ];
     }
 
     find(settings, function (value) {

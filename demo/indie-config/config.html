@@ -11,7 +11,12 @@
   try {
     settings = JSON.parse(window.localStorage.getItem('indie-config'));
   } catch (e) {}
-  settings = settings || {};
+
+  if (!settings) {
+    settings = [
+      { key: 'reply', value: 'https://quill.p3k.io/new?reply={url}' }
+    ];
+  }
 
   var config = {};
   var value;
