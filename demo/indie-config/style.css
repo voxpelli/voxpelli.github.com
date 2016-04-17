@@ -4,6 +4,7 @@ html{
 	font-size:16px;line-height:1.4;font-family:"Helvetica neue",sans-serif;font-weight:300;color:#000;
 }
 body > div, body > address {margin:.625rem auto;max-width:800px;}
+strong{font-weight:700}
 a{color:#72604A}
 a:hover{color:#BFA98E}
 img{border:0}
@@ -15,6 +16,7 @@ h1 em{color:#3E6172;font-style:normal}
 h2{font-size:1rem}
 h2,p,li,#main .info,table{margin:.3125rem 0}
 ul{list-style:none}
+.real-list{list-style:disc inside}
 .subtitle,.box{margin-bottom:1rem}
 .subtitle{font-size:1rem;}
 .box{background:#fff;border-radius:3px;padding:1rem 1.25rem;}
