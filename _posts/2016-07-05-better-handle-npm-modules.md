@@ -76,4 +76,4 @@ Set them up to run:
 }
 ```
 
-Then profit from a more solid, lean, less annoying dependency workflow!
+Then profit from a more solid dependency workflow and a more happy development team!
