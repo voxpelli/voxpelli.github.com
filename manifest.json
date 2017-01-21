@@ -1,0 +1,15 @@
+{
+  "short_name": "Pelle Wessman",
+  "name": "Pelle Wessman's Blog",
+  "icons": [
+    {
+      "src": "images/launcher-icon.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#dedede",
+  "theme_color": "#dd3333",
+  "start_url": "/",
+  "display": "standalone"
+}
