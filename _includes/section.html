@@ -11,7 +11,12 @@
     {% endif %}
 
     {% for like in post.mf-like-of %}
-      <li class="h-entry"><a class="u-like-of" href="{{like}}">{{like}}</a></li>
+      <li class="h-entry">
+        <a class="u-like-of" href="{{like}}">{{like | truncate: 50 }}</a>
+        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+          <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_string }}</a>
+        </time>
+      </li>
     {% endfor %}
   {% else %}
     {% if isLikeList == true %}
