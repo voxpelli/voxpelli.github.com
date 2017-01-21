@@ -48,11 +48,13 @@ self.addEventListener('activate', event => {
 // It's time for the dance floor. Everyone is watching. Now is no time for failure. Lets do it! Dance moves: 💃
 self.addEventListener('fetch', event => {
   const request = event.request;
+  const url = new URL(request.url);
 
   // Ignore non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
+  if (request.method !== 'GET') { return; }
+
+  // Ignore requests from other hosts
+  if (url.hostname !== self.location.hostname) { return; }
 
   // For HTML requests, try the network first, fall back to the cache, finally the offline page
   if (request.headers.get('Accept').indexOf('text/html') !== -1) {
