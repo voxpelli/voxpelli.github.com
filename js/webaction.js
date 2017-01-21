@@ -59,9 +59,9 @@
     }
   };
 
-  // 
+  // Used to activate all webactions in a context
   var activateWebActionElements = function (context) {
-    var actions = document.querySelectorAll('indie-action'),
+    var actions = context.querySelectorAll('indie-action'),
       i,
       length = actions.length;
 
