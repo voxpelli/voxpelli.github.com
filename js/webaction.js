@@ -52,15 +52,15 @@
     e.preventDefault();
 
     // Make sure this tag hasn't already been queued for the indieconfig-load
-    if (!loadingClassRegexp.test(this.className)) {
+    if (window.loadIndieConfig && !loadingClassRegexp.test(this.className)) {
       this.className += ' indieconfig-loading';
       // Set "doTheAction" to be called when the indie-config has been loaded
       window.loadIndieConfig(doTheAction.bind(this));
     }
   };
 
-  // Once the page is loased add click event listeners to all indie-action tags
-  window.addEventListener('DOMContentLoaded', function () {
+  // 
+  var activateWebActionElements = function (context) {
     var actions = document.querySelectorAll('indie-action'),
       i,
       length = actions.length;
@@ -68,5 +68,16 @@
     for (i = 0; i < length; i++) {
       actions[i].addEventListener('click', handleTheAction);
     }
-  });
+  };
+
+  window.activateWebActionElements = activateWebActionElements;
+
+  // Once the page is loaded add click event listeners to all indie-action tags
+  if (document.body) {
+    activateWebActionElements(document);
+  } else {
+    window.addEventListener('DOMContentLoaded', function () {
+      activateWebActionElements(document);
+    });
+  }
 }());
