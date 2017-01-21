@@ -1,0 +1,10 @@
+{
+  "extends": "../env-less-semistandard.js",
+  "root": true,
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "no-unused-vars": 2
+  }
+}

@@ -1,4 +1,3 @@
-/*jslint browser: true, plusplus: true, vars: true, indent: 2 */
 window.loadIndieConfig = (function () {
   'use strict';
 
