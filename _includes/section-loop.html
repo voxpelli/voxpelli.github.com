@@ -1,0 +1,34 @@
+{% assign isLikeList = false %}
+
+{% for post in include.collection limit:include.limit %}
+  {% if post.mf-like-of != null %}
+    {% if isLikeList == false %}
+      {% assign isLikeList = true %}
+      <article>
+        <h2>Liked:</h2>
+        <ul>
+    {% endif %}
+
+    {% for like in post.mf-like-of %}
+      <li class="h-entry">
+        <a class="u-like-of" href="{{like}}">{{like | truncate: 50 }}</a>
+        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+          <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_string }}</a>
+        </time>
+      </li>
+    {% endfor %}
+  {% else %}
+    {% if isLikeList == true %}
+      {% assign isLikeList = false %}
+        </ul>
+      </article>
+    {% endif %}
+
+    {% include post.html post=post indieactions=true %}
+  {% endif %}
+{% endfor %}
+
+{% if isLikeList == true %}
+    </ul>
+  </article>
+{% endif %}

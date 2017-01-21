@@ -6,9 +6,7 @@ hfeed: true
 
 <h2>Full Archive</h2>
 
-{% for post in paginator.posts %}
-  {% include post.html post=post %}
-{% endfor %}
+{% include section-loop.html collection=paginator.posts %}
 
 <div class="pagination">
   {% if paginator.previous_page %}
