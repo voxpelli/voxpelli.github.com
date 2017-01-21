@@ -1,3 +1,5 @@
+{% assign indieactions = false %}
+
 <article class="h-entry">
   <h2>Liked:</h2>
   <ul>
@@ -5,4 +7,6 @@
       <li><a class="u-like-of" href="{{like}}">{{like}}</a></li>
     {% endfor %}
   </ul>
+
+  {% include post-footer.html post=post %}
 </article>

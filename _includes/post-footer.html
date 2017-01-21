@@ -1,0 +1,11 @@
+<footer{% if nonenglish == true %} lang="en"{% endif %}>
+  <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+    <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_long_string }}</a>
+  </time>
+    by
+  <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" width="20" height="20" /> {{ site.author_name }}</a>
+
+  {% if indieactions %}
+    {% include indieactions.html post=post %}
+  {% endif %}
+</footer>

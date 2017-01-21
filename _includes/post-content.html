@@ -123,18 +123,8 @@
     </div>
   {% endif %}
 
-  <footer{% if nonenglish == true %} lang="en"{% endif %}>
-    <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-      <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_long_string }}</a>
-    </time>
-      by
-    <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" width="20" height="20" /> {{ site.author_name }}</a>
-
-    {% if include.indieactions %}
-      {% include indieactions.html post=post %}
-    {% endif %}
-
-  </footer>
+  
+  {% include post-footer.html post=post %}
 
   <a class="u-responses" href="https://webmention.herokuapp.com/api/mentions?format=html&url={{ site.base_url | cgi_escape }}{{ page.url | cgi_escape }}">See mentions of this post</a>
 </article>
