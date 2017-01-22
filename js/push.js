@@ -205,9 +205,20 @@
     return { endpoint, key, authSecret, subscription };
   };
 
+  let pushIsUnsupported;
+
   const getSubscription = function () {
+    if (pushIsUnsupported) { return Promise.reject('unsupported'); }
+
     return navigator.serviceWorker.ready
-      .then(registration => registration.pushManager.getSubscription())
+      .then(registration => {
+        if ('pushManager' in registration && 'getSubscription' in registration.pushManager) {
+          return registration.pushManager.getSubscription();
+        } else {
+          pushIsUnsupported = true;
+          return Promise.reject('unsupported');
+        }
+      })
       .then(subscription => subscription ? getSubscriptionData(subscription) : false);
   };
 
@@ -286,7 +297,12 @@
 
     const existingBlock = $one('#push-block');
 
-    if (existingBlock) { removeElement(existingBlock); }
+    if (existingBlock) { 
+      removeElement(existingBlock);
+    } else {
+      createChild('#subscribe-section', 'h3', '', 'Push notifications');
+      createChild('#subscribe-section', 'p', '', 'You can subscribe to a variety of different push notifications on this page.');
+    }
 
     appendChild('#subscribe-section', pushBlock);
   };
@@ -300,7 +316,11 @@
     const sync = Promise.resolve()
       .then(() => getWebPushData())
       .then(webpushData => updateUI(webpushData))
-      .catch(err => { console.error('Encountered an error:', err); })
+      .catch(err => {
+        if (err !== 'unsupported') {
+          console.error('Encountered an error:', err);
+        }
+      })
       .then(() => {
         if (queuedSync) {
           isSyncing = queuedSync;
