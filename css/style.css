@@ -59,6 +59,15 @@ div.blog-article-summary + div.blog-article-summary:before {
   width: 100%;
   content: "";
 }
+.syncing > #push-block {
+  opacity: .5;
+}
+#push-block {
+  text-align: center;
+}
+#push-block .btn {
+  margin: 0 .5em;
+}
 
 .u-responses,.webmention-container > :first-child{margin-top:1em}
 .webmention-mention{padding-left: 60px;position: relative}

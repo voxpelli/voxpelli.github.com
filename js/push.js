@@ -202,7 +202,7 @@
 
     const endpoint = subscription.endpoint;
 
-    return { endpoint, key, authSecret };
+    return { endpoint, key, authSecret, subscription };
   };
 
   const getSubscription = function () {
@@ -246,18 +246,42 @@
   };
 
   const removeWebPushData = function () {
-    return Promise.reject(new Error('Unimplemented'));
+    return getSubscription()
+      .then(subscriptionData => {
+        if (!subscriptionData) { return; }
+
+        const { subscription, key } = subscriptionData;
+
+        return Promise.all([
+          subscription.unsubscribe(),
+          fetch(webpushEndpoint + encodeURIComponent(key), { method: 'delete' })
+        ]);
+      })
+      .catch(err => { console.error('Encountered an error:', err); })
+      .then(() => syncUI());
+  };
+
+  const blockWhileSyncing = function (callback) {
+    const section = $one('#subscribe-section');
+
+    if (!section || hasClass(section, 'syncing')) { return; }
+
+    addClass(section, 'syncing');
+
+    return callback()
+      .catch(err => { console.error('Encountered an error:', err); })
+      .then(() => { removeClass(section, 'syncing'); });
   };
 
   const updateUI = function (webpushData) {
     const pushBlock = createElement('p', { id: 'push-block'});
 
-    createChild(pushBlock, 'button', { type: 'button '}, webpushData ? 'Update subscription' : 'Subscribe')
-      .addEventListener('click', () => saveWebPushData());
+    createChild(pushBlock, 'button', { type: 'button', class: 'btn' }, webpushData ? 'Update push notifications' : 'Get push notifications')
+      .addEventListener('click', () => blockWhileSyncing(() => saveWebPushData()));
 
     if (webpushData) {
-      createChild(pushBlock, 'button', { type: 'button '}, 'Unsubscribe')
-        .addEventListener('click', () => removeWebPushData());
+      createChild(pushBlock, 'button', { type: 'button', class: 'btn' }, 'Unsubscribe from push')
+        .addEventListener('click', () => blockWhileSyncing(() => removeWebPushData()));
     }
 
     const existingBlock = $one('#push-block');
@@ -273,17 +297,23 @@
   const syncUI = function () {
     if (isSyncing && queuedSync) { return isSyncing; }
 
-    const sync = (isSyncing || Promise.resolve())
+    const sync = Promise.resolve()
       .then(() => getWebPushData())
       .then(webpushData => updateUI(webpushData))
       .catch(err => { console.error('Encountered an error:', err); })
       .then(() => {
-        isSyncing = queuedSync;
-        queuedSync = false;
+        if (queuedSync) {
+          isSyncing = queuedSync;
+          queuedSync = false;
+          return isSyncing;
+        }
+        isSyncing = false;
       });
 
     if (isSyncing) {
       queuedSync = sync;
+    } else {
+      isSyncing = sync;
     }
 
     isSyncing = sync;
