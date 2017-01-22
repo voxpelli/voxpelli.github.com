@@ -272,6 +272,18 @@
       .then(() => syncUI());
   };
 
+  const sendTestPush = function () {
+    return getSubscription()
+      .then(subscriptionData => {
+        if (!subscriptionData) { return; }
+
+        const { key } = subscriptionData;
+
+        return fetch(webpushEndpoint + encodeURIComponent(key) + '/test', { method: 'post' });
+      })
+      .catch(err => { console.error('Encountered an error:', err); });
+  };
+
   const blockWhileSyncing = function (callback) {
     const section = $one('#subscribe-section');
 
@@ -293,6 +305,9 @@
     if (webpushData) {
       createChild(pushBlock, 'button', { type: 'button', class: 'btn' }, 'Unsubscribe from push')
         .addEventListener('click', () => blockWhileSyncing(() => removeWebPushData()));
+
+      createChild(pushBlock, 'button', { type: 'button', class: 'btn' }, 'Send test push')
+        .addEventListener('click', () => blockWhileSyncing(() => sendTestPush()));
     }
 
     const existingBlock = $one('#push-block');

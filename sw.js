@@ -87,3 +87,42 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+if ('showNotification' in self.registration) {
+  self.addEventListener('push', event => {
+    const payload = event.data ? (event.data.json() || {}) : {};
+
+    event.waitUntil(self.registration.showNotification(
+      payload.title || "Pelle Wessman's Blog",
+      {
+        body: payload.message || '',
+        tag: payload.tag || '',
+        icon: payload.icon || '',
+        data: payload
+      }
+    ));
+  });
+
+  self.addEventListener('notificationclick', event => {
+    event.notification.close();
+
+    const url = event.notification.data.url;
+
+    if (url) {
+      event.waitUntil(self.clients.openWindow(url));
+    } else {
+      event.waitUntil(
+        self.clients.matchAll()
+          .then(function(clientList) {
+            // If there is at least one client, focus it.
+            if (clientList.length > 0) {
+              return clientList[0].focus();
+            }
+
+            // Otherwise, open a new page.
+            return self.clients.openWindow('/');
+          })
+      );
+    }
+  });
+}
