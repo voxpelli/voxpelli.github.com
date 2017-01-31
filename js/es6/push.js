@@ -170,6 +170,8 @@
 
   // *** Actual module ***
 
+  const subscribeToFeed = 'https://voxpelli.com/';
+
   const urlBase64ToUint8Array = function (base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
@@ -237,7 +239,7 @@
         headers: {
           'Content-type': 'application/json'
         },
-        body: JSON.stringify({ endpoint, key, authSecret }),
+        body: JSON.stringify({ endpoint, key, authSecret, options: { subscriptions: [subscribeToFeed] } }),
       }))
       .then(() => syncUI());
   };
