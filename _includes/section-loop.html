@@ -4,23 +4,23 @@
   {% if post.mf-like-of != null %}
     {% if isLikeList == false %}
       {% assign isLikeList = true %}
-      <article>
-        <h2>Liked:</h2>
-        <ul>
+      <article class="likelist">
     {% endif %}
 
-    {% for like in post.mf-like-of %}
-      <li class="h-entry">
-        <a class="u-like-of" href="{{like}}">{{like | truncate: 50 }}</a>
-        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-          <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_string }}</a>
-        </time>
-      </li>
-    {% endfor %}
+    <p class="h-entry">
+      <span class="p-name">
+        Liked
+        {% for like in post.mf-like-of %}
+          <a class="u-like-of" href="{{like}}">{{like | truncate: 50 }}</a>{% if forloop.rindex == 2 %} and {% elsif forloop.last != true %}, {% endif %}
+        {% endfor %}
+      </span>
+      <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" pubdate>
+        <a class="u-url u-uid" href="{{ post.url }}">{{ post.date | date_to_string }}</a>
+      </time>
+    </p>
   {% else %}
     {% if isLikeList == true %}
       {% assign isLikeList = false %}
-        </ul>
       </article>
     {% endif %}
 
@@ -29,6 +29,5 @@
 {% endfor %}
 
 {% if isLikeList == true %}
-    </ul>
   </article>
 {% endif %}

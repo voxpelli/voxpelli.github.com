@@ -59,6 +59,7 @@ div.blog-article-summary + div.blog-article-summary:before {
   width: 100%;
   content: "";
 }
+.likelist p.h-entry:last-of-type{margin-bottom:0}
 
 .u-responses,.webmention-container > :first-child{margin-top:1em}
 .webmention-mention{padding-left: 60px;position: relative}
