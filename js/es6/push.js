@@ -210,7 +210,7 @@
   let pushIsUnsupported;
 
   const getSubscription = function () {
-    if (pushIsUnsupported) { return Promise.reject('unsupported'); }
+    if (pushIsUnsupported || !window.isSecureContext) { return Promise.reject('unsupported'); }
 
     return navigator.serviceWorker.ready
       .then(registration => {
