@@ -8,7 +8,7 @@ slug: 007-oppna-sociala-natverk
 lang: sv
 category: links
 submitto:
-  - 'http://news.indiewebcamp.com/sv'
+  - 'https://news.indieweb.org/sv'
 ---
 Jag är med i en podd och snackar distribuerade sociala nätverk, IndieWeb och bhur det är hög tid för pendeln att svinga tillbaka till gamla miljön så som den var på bloggosfärstiden: Att alla har sitt egna krypin på webben, fast såklart med de moderna sociala funktioner vi förväntar oss idag.
 
