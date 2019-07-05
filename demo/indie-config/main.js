@@ -84,12 +84,6 @@
     return false;
   }, true);
 
-  var removeClass = ensureElement(function (elem, className) {
-    if (elem.className !== '') {
-      elem.className = elem.className.replace(classRegExp(className), ' ').trim();
-    }
-  });
-
   var addClass = ensureElement(function (elem, className) {
     className = [].concat(className);
 
@@ -100,14 +94,6 @@
         if (hasClass(elem, value)) { return; }
         elem.className += ' ' + value;
       });
-    }
-  });
-
-  var toggleClass = ensureElement(function (elem, className) {
-    if (hasClass(elem, className)) {
-      removeClass(elem, className);
-    } else {
-      addClass(elem, className);
     }
   });
 
@@ -145,15 +131,6 @@
     var child = createElement(tag, className, text);
     appendChild(elem, child);
     return child;
-  };
-
-  var closestByClass = function (elem, className) {
-    while (elem.parentNode) {
-      elem = elem.parentNode;
-      if (hasClass(elem, className)) {
-        return elem;
-      }
-    }
   };
 
   var removeElement = function (elem) {
