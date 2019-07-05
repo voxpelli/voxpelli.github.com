@@ -1,0 +1,45 @@
+---
+layout: micropubpost
+date: '2015-07-21T15:36:02.247Z'
+title: PostCSS or Sass? Future-syntax or stable syntax?
+mf-url:
+  - 'http://thepost.se/bookmark/2015/07/post-css-or-sass-future-syntax-or/'
+mf-bookmark-of:
+  - 'http://example.com/'
+slug: post-css-or-sass-future-syntax-or
+category: links
+---
+<p>Some good thoughts on PostCSS from: <a href="https://css-tricks.com/the-trouble-with-preprocessing-based-on-future-specs/">https://css-tricks.com/the-trouble-with-preprocessing-based-on-future-specs/</a></p>
+
+<blockquote>
+<p>If you’re a user of a future-syntax preprocessor, you have to accept that you’ll face breaking changes that come along somewhat randomly.</p>
+</blockquote>
+
+<p>​This is very true. When using eg. Sass you&#39;re working against a finalized syntax that&#39;s likely to supported for years to come. When working on future syntax that might still be early drafts, then you should expect it to change as no promise that it shouldn&#39;t has been made and it&#39;s important that the specifications of new features can be iterated on so that once they are final they are in the very best shape they can be as then we&#39;re stuck with them forever.</p>
+
+<blockquote>
+<p>Say you want to start actually shipping some future-syntax code because some browsers are starting to support it. But your preprocessor is still processing it, and you can’t remove the preprocessor because a lot of browsers aren’t supporting it yet.</p>
+</blockquote>
+
+<p>​Preprocessing  future-syntax stops you from using that syntax natively as a way to progressively enhance your site. As pointed out elsewhere in this article not all features can be fully preprocessed into existing CSS and by not being able to make use of the full features in the browsers that support them you&#39;re actually left with a less powerful and less forward looking stylesheet – compared to if you would instead adopt a progressive enhancement strategy.</p>
+
+<blockquote>
+<p>Preprocessor variables and native variables could co-exist and be useful in their own ways.</p>
+</blockquote>
+
+<p>​Exactly. Use of new features through progressive enhancement.</p>
+
+<blockquote>
+<p>If native CSS could do everything ever dreamed up in a preprocessor, it would be slow, complicated, and likely wouldn’t have seen the success that CSS has had as a language.</p>
+</blockquote>
+
+<p>​A beauty of eg. Sass is the <em>pre</em>-part of preprocessing. All execution and complexity are made before it reaches the browser and while we may complain about how that slows us down as front-end developers as we now has a self-imposed compilation step it makes it possible for us to do complex and costly things without the underlying standard having to support that itself. We can get the relative simplicity of CSS while still having the powerful features of something like Sass. That&#39;s not a bug, it&#39;s a feature.</p>
+
+<blockquote>
+<p>PostCSS is a large plugin ecosystem and you use it by piecemealing together plugins you’re interested in using. That means any given project is using a different configuration of plugins. Any given chunk of code may not work in a different project using different plugins.</p>
+</blockquote>
+
+<p>​The Unix philosophy is great. Have small modules that focus on just one thing and only on doing that one thing very well. But ecosystems are also good and in the case of preprocessors I feel that the ecosystem that eg. Sass have created, because everyone knows what features are available, has been great – especially since libsass pushed many to stop relying on Compass, something that when it was popular split the community in two and made some code hard to reuse.</p>
+
+<p>Sass has also been relatively stable over the years. There has been some rough update paths, but generally you can still use the same code today that you could use years ago with little or no changes and for the few breaking changes that has happened, there&#39;s clear and simple documentation of those in the Sass documents.</p>
+
