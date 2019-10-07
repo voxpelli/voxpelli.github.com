@@ -18,7 +18,7 @@ So, what about [TypeScript 3.7](https://devblogs.microsoft.com/typescript/announ
 
 ## How-to
 
-This is how I added it to a project which publishes a single `index.js` file ([bunyan-adaptor](https://github.com/voxpelli/node-bunyan-adaptor)):
+This is how I added it to a project which publishes a single `index.js` file, [bunyan-adaptor](https://github.com/voxpelli/node-bunyan-adaptor):
 
 ### 1. Create a new tsconfig file
 
