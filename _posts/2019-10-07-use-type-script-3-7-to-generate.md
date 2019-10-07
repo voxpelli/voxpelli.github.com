@@ -25,31 +25,19 @@ Add a new *tsconfig.json* with the sole purpose of generating your declaration. 
 
 I added a *declaration.tsconfig.json* containing:
 
-    {
-        
-    
-      "extends": "./tsconfig",
-        
-    
-      "exclude": ["test/**/*.js"],
-        
-    
-      "compilerOptions": {
-        
-    
-      "declaration": true,
-        
-    
-      "noEmit": false,
-        
-    
-      "emitDeclarationOnly": true
-        
-    
-      }
-        
-    
-      }
+```json
+{
+  "extends": "./tsconfig",
+  "exclude": [
+    "test/**/*.js"
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true
+  }
+}
+```
 
 ### 2. Add a npm script for generating the declaration
 
