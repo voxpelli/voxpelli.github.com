@@ -9,6 +9,8 @@
     "husky": "^3.0.0"
   },
   "scripts": {
+    "build": "ELEVENTY_ENV=production eleventy",
+    "watch": "ELEVENTY_ENV=development eleventy --serve",
     "test": "eslint ."
   },
   "husky": {
