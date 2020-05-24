@@ -14,6 +14,8 @@ module.exports = function (eleventyConfig) {
 
   // eleventyConfig.addShortcode('classmodifier', classModifierSimple);
 
+  // FIXME: Solve categories – "social", "links" etc – so oen can list the content there. See eg: https://github.com/11ty/eleventy-base-blog/blob/a1f875187d3cb8bd64e9439b77b979f7e5c489c6/_11ty/getTagList.js and https://www.raymondcamden.com/2020/02/27/raymondcamdencom-now-powered-by-eleventy
+
   return {
     dataTemplateEngine: false,
     dir: {
