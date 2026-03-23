@@ -25,18 +25,21 @@ export default function articleLayout ({ children, vars }) {
     nonenglish,
     authorName: /** @type {string} */ (vars.authorName),
     siteUrl: /** @type {string} */ (vars.siteUrl),
+    webmentionEndpoint: /** @type {string} */ (vars.webmentionEndpoint),
   });
+
+  const wmEndpoint = /** @type {string} */ (vars.webmentionEndpoint);
 
   const webmentionForm = `<div>
   Have you written a response to this? Let me know the URL:
-  <form action="https://webmention.herokuapp.com/api/webmention" method="post">
+  <form action="${wmEndpoint}/api/webmention" method="post">
     <input name="source" type="url" placeholder="http://example.com/my-cool-post" />
     <input name="target" value="http://voxpelli.com${vars.pageUrl || ''}" type="hidden">
     <input value="Send Webmention" type="submit">
   </form>
 </div>
 
-<script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>`;
+<script defer src="${wmEndpoint}/js/cutting-edge.js"></script>`;
 
   const layoutVars = {
     ...vars,

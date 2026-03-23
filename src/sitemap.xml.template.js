@@ -1,3 +1,5 @@
+import { escapeXml } from './lib/escape.js';
+
 /**
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string, outputRelname: string } }> }} options
  * @returns {Array<{outputName: string, content: string}>}
@@ -25,10 +27,3 @@ ${urls}
   }];
 }
 
-/** @param {string} str */
-function escapeXml (str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}

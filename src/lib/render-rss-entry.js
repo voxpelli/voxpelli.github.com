@@ -1,3 +1,5 @@
+import { escapeXml } from './escape.js';
+
 /**
  * Render a single Atom feed entry
  *
@@ -21,12 +23,3 @@ export function renderRssEntry ({ post, content, siteUrl }) {
  </entry>`;
 }
 
-/** @param {string} str */
-function escapeXml (str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}

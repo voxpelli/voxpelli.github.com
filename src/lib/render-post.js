@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape.js';
 import { renderPostContent } from './render-post-content.js';
 import { renderPostLike } from './render-post-like.js';
 
@@ -62,11 +63,3 @@ export function renderPost ({ post, content, standalone, indieactions, container
   });
 }
 
-/** @param {string} str */
-function escapeHtml (str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}

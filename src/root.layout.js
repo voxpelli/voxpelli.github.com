@@ -1,3 +1,5 @@
+import { escapeHtml } from './lib/escape.js';
+
 /** @param {{ children: string, vars: Record<string, unknown> }} options */
 export default function rootLayout ({ children, vars }) {
   const title = vars.frontpage
@@ -30,7 +32,7 @@ export default function rootLayout ({ children, vars }) {
   <link rel="micropub" href="http://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />` : ''}
   ${vars.author ? `<link rel="author" type="text/html" href="/" title="${escapeHtml(vars.authorName)}" />` : ''}
   ${vars.flattrable ? `<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=${encodeURIComponent(vars.siteUrl + pageUrl)}&amp;user_id=voxpelli${vars.title ? '&amp;title=' + encodeURIComponent(vars.title) : ''}&amp;category=text&amp;tags=blog&amp;language=${encodeURIComponent(vars.lang || 'sv')}" title="Flattr this post" />` : ''}
-  ${vars.webmentionable ? '<link rel="webmention" href="https://webmention.herokuapp.com/api/webmention" />' : ''}
+  ${vars.webmentionable ? `<link rel="webmention" href="${vars.webmentionEndpoint}/api/webmention" />` : ''}
 
   ${!vars.frontpage ? `<script defer src="/js/indieconfig.js"></script>
   <script defer src="/js/webaction.js"></script>` : ''}
@@ -54,11 +56,3 @@ export default function rootLayout ({ children, vars }) {
 </html>`;
 }
 
-/** @param {string} str */
-function escapeHtml (str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}

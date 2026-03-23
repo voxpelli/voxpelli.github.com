@@ -6,4 +6,5 @@ export default {
   pushHub: 'https://voxpelli.superfeedr.com/',
   themeColor: '#dd3333',
   uidBase: 'https://voxpelli.com',
+  webmentionEndpoint: 'https://webmention.herokuapp.com',
 };

@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape.js';
 import { renderPostFooter } from './render-post-footer.js';
 
 /**
@@ -12,9 +13,10 @@ import { renderPostFooter } from './render-post-footer.js';
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
  * @param {string} options.siteUrl
+ * @param {string} [options.webmentionEndpoint]
  * @returns {string}
  */
-export function renderPostContent ({ post, content, standalone, indieactions, swedish, nonenglish, authorName, siteUrl }) {
+export function renderPostContent ({ post, content, standalone, indieactions, swedish, nonenglish, authorName, siteUrl, webmentionEndpoint }) {
   const videos = /** @type {string[]|undefined} */ (post['mf-video']);
   const photos = /** @type {string[]|undefined} */ (post['mf-photo']);
   const bookmarkOf = /** @type {string[]|undefined} */ (post['mf-bookmark-of'] || post['mf-bookmark']);
@@ -126,7 +128,8 @@ export function renderPostContent ({ post, content, standalone, indieactions, sw
     </div>`;
   }
 
-  const mentionsUrl = `https://webmention.herokuapp.com/api/mentions?format=html&url=${encodeURIComponent(siteUrl + pageUrl)}`;
+  const wmBase = webmentionEndpoint || 'https://webmention.herokuapp.com';
+  const mentionsUrl = `${wmBase}/api/mentions?format=html&url=${encodeURIComponent(siteUrl + pageUrl)}`;
 
   return `<article class="h-entry"${langAttr}>
 
@@ -152,15 +155,6 @@ export function renderPostContent ({ post, content, standalone, indieactions, sw
 
   <a class="u-responses" href="${mentionsUrl}">See mentions of this post</a>
 </article>`;
-}
-
-/** @param {string} str */
-function escapeHtml (str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 /** @param {string} str */
