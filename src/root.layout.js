@@ -52,7 +52,8 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <div class="page">
       <header>
         <h1><a href="/">${blogName}</a></h1>
-        <div class="subtitle">Things <a rel=${vars.frontpage ? 'me' : false} href="/about/">about me</a> and the world around us</div>
+        <p class="subtitle">Things <a rel=${vars.frontpage ? 'me' : false} href="/about/">about me</a> and the world around us</p>
+        <theme-toggle><button type="button" aria-label="Toggle theme">\u2600\uFE0F</button></theme-toggle>
       </header>
 
       ${rawHtml(children)}

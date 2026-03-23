@@ -35,9 +35,9 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
     return renderToStringSync(html`
       <${tag} class="h-entry blog-article-summary">
           <a lang=${lang} class="u-url u-uid p-name" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a>
-          <time class="dt-published" datetime=${isoDate} pubdate>
+          <relative-time><time class="dt-published" datetime=${isoDate}>
             - ${shortDate}
-          </time>
+          </time></relative-time>
           <span class="time-to-read">
             - ${readTime} min read
           </span>
