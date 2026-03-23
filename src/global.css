@@ -521,7 +521,9 @@ blockquote {
   border-left: 5px solid var(--color-stone);
   padding-left: 10px;
   margin-left: 20px;
-  font-weight: 200;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* === Inline link lists === */
@@ -707,12 +709,21 @@ relative-time .relative-label {
   margin-bottom: var(--space-sm);
 }
 
-.content-area > .h-entry footer {
+.content-area > .h-entry > footer {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   padding-top: var(--space-md);
   border-top: var(--border-structural);
   margin-top: var(--space-lg);
+}
+
+.content-area > .h-entry > footer a {
+  color: var(--color-ink-light);
+  transition: color 0.2s var(--ease-out);
+}
+
+.content-area > .h-entry > footer a:hover {
+  color: var(--color-falu-red);
 }
 
 /* Tags as badges */
