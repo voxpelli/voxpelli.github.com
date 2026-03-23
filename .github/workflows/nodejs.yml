@@ -1,0 +1,12 @@
+name: Node.js
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    uses: voxpelli/ghatemplates/.github/workflows/nodejs.yml@main
+    with:
+      node-versions: 20,22
