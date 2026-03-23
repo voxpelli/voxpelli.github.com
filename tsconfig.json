@@ -1,0 +1,14 @@
+{
+  "extends": "@voxpelli/tsconfig/node20.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": [
+    "src/**/*.js",
+    "test/**/*.js"
+  ],
+  "exclude": [
+    "src/global.client.js"
+  ]
+}

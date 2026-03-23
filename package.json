@@ -1,18 +1,35 @@
 {
   "private": true,
-  "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "husky": "^3.0.0"
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "test": "eslint ."
+    "build": "domstack --copy images --copy media && cp sw.js public/sw.js",
+    "dev": "domstack --watch --copy images --copy media",
+    "build:drafts": "domstack --drafts --copy images --copy media",
+    "check:lint": "eslint --report-unused-disable-directives .",
+    "check:tsc": "tsc",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
+    "check": "run-p check:* --continue-on-error",
+    "test:build": "node --test 'test/**/*.spec.js'",
+    "test": "run-s check build test:build",
+    "husky-enable": "husky",
+    "husky-disable": "git config --unset core.hooksPath",
+    "prepare": "husky"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm test"
-    }
+  "devDependencies": {
+    "@domstack/static": "^11",
+    "@types/node": "^20.19.0",
+    "@voxpelli/eslint-config": "^23",
+    "@voxpelli/tsconfig": "^16",
+    "eslint": "^9",
+    "husky": "^9",
+    "npm-run-all2": "^8",
+    "type-coverage": "^2.29.7",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "async-htm-to-string": "^5.0.2"
   }
 }

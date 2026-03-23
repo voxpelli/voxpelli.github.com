@@ -1,5 +1,6 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "@voxpelli"
+    "github>voxpelli/renovate-config:app"
   ]
 }

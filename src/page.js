@@ -1,0 +1,35 @@
+import { renderPost } from './lib/render-post.js';
+
+export const vars = {
+  layout: 'root',
+  title: 'Pelle Wessman',
+  frontpage: true,
+  webmentionable: true,
+  hfeed: true,
+};
+
+/**
+ * @param {{ vars: Record<string, unknown> }} options
+ * @returns {string}
+ */
+export default function homePage ({ vars: pageVars }) {
+  const recentPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.recentPosts) || [];
+
+  const postListItems = recentPosts.map(post =>
+    renderPost({
+      post,
+      content: /** @type {string} */ (post.content) || '',
+      container: 'article',
+      authorName: /** @type {string} */ (pageVars.authorName),
+      siteUrl: /** @type {string} */ (pageVars.siteUrl),
+    })
+  ).join('\n    ');
+
+  return `<div class="content-header">
+  <h2>Index // Recent Writings</h2>
+</div>
+
+<div class="post-list">
+    ${postListItems}
+</div>`;
+}
