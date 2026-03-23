@@ -1,4 +1,5 @@
-import { escapeHtml } from './escape.js';
+import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
+
 import { renderPostFooter } from './render-post-footer.js';
 
 /**
@@ -29,131 +30,145 @@ export function renderPostContent ({ authorName, content, nonenglish, post, site
   const title = /** @type {string} */ (post.title);
   const pageUrl = /** @type {string} */ (post.pageUrl) || '';
 
-  let langAttr = '';
-  if (swedish) langAttr = ' lang="sv"';
-  else if (nonenglish) langAttr = ` lang="${post.lang}"`;
+  const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
+  const headingLang = !swedish && nonenglish ? 'en' : false;
 
-  let mediaHtml = '';
-  if (videos && videos.length > 0) {
-    mediaHtml = `<div class="media">
-      ${videos.map(v => `<video class="u-video" src="${v}" controls loop>
-          <div lang="en">Looks like you can't see this video. <a href="${v}" download>Download it</a> instead.</div>
-        </video>`).join('\n      ')}
-    </div>`;
-  } else if (photos && photos.length > 0) {
-    mediaHtml = `<div class="media">
-      ${photos.map(p => `<img class="u-photo" src="${p}" alt="" />`).join('\n      ')}
-    </div>`;
-  }
+  const mediaHtml = videos && videos.length > 0
+    ? html`
+      <div class="media">
+            ${videos.map(v => html`
+              <video class="u-video" src=${v} controls loop>
+                        <div lang="en">Looks like you can't see this video. <a href=${v} download>Download it</a> instead.</div>
+                      </video>
+            `)}
+          </div>
+    `
+    : (photos && photos.length > 0
+        ? html`
+          <div class="media">
+                ${photos.map(p => html`<img class="u-photo" src=${p} alt="" />`)}
+              </div>
+        `
+        : '');
 
   let headerHtml = '';
   if (title) {
-    let titleContent = title;
     if (bookmarkOf && bookmarkOf[0]) {
-      titleContent = `<a class="u-bookmark-of" href="${bookmarkOf[0]}">${escapeHtml(title)}</a>`;
+      headerHtml = renderToStringSync(html`<header><h2 class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></h2></header>`);
     } else if (repostOf && repostOf[0]) {
-      titleContent = `<a class="u-repost-of" href="${repostOf[0]}">${escapeHtml(title)}</a>`;
+      headerHtml = renderToStringSync(html`<header><h2 class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></h2></header>`);
     } else {
-      titleContent = escapeHtml(title);
+      headerHtml = renderToStringSync(html`<header><h2 class="p-name">${title}</h2></header>`);
     }
-    headerHtml = `<header><h2 class="p-name">${titleContent}</h2></header>`;
   }
 
-  let replyHtml = '';
-  if (inReplyTo && inReplyTo.length > 0) {
-    const heading = swedish ? 'Svar p\u00E5:' : 'In reply to:';
-    const langTag = !swedish && nonenglish ? ' lang="en"' : '';
-    replyHtml = `${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
-    <ul>
-      ${inReplyTo.map(r => `<li><a class="u-in-reply-to" rel="in-reply-to" href="${r}">${r}</a></li>`).join('\n      ')}
-    </ul>`;
-  }
+  const replyHtml = inReplyTo && inReplyTo.length > 0
+    ? renderToStringSync(html`
+      <h3 lang=${headingLang}>${swedish ? 'Svar p\u00E5:' : 'In reply to:'}</h3>
+          <ul>
+            ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${r}</a></li>`)}
+          </ul>
+    `)
+    : '';
 
-  let syndicationHtml = '';
-  if (syndication && syndication.length > 0) {
-    const heading = swedish ? 'Ocks\u00E5 postat p\u00E5:' : 'Also posted on:';
-    const langTag = !swedish && nonenglish ? ' lang="en"' : '';
-    syndicationHtml = `<div class="elsewhere linklist">
-      ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
-      <ul>
-        ${syndication.map(url => {
-    const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0] || '';
-    const relAttr = standalone ? ' rel="syndication"' : '';
-    return `<li><a href="${url}" class="u-syndication"${relAttr}>${capitalize(domain)}</a></li>`;
-  }).join('\n        ')}
-      </ul>
-    </div>`;
-  }
+  const syndicationHtml = syndication && syndication.length > 0
+    ? renderToStringSync(html`
+      <div class="elsewhere linklist">
+            <h3 lang=${headingLang}>${swedish ? 'Ocks\u00E5 postat p\u00E5:' : 'Also posted on:'}</h3>
+            <ul>
+              ${syndication.map(url => {
+    const domain = extractDomain(url);
+    return html`<li><a href=${url} class="u-syndication" rel=${standalone ? 'syndication' : false}>${capitalize(domain)}</a></li>`;
+  })}
+            </ul>
+          </div>
+    `)
+    : '';
 
-  let persontagsHtml = '';
-  if (persontags && persontags.length > 0) {
-    const heading = swedish ? 'N\u00E4mnda:' : 'Mentioned:';
-    const langTag = !swedish && nonenglish ? ' lang="en"' : '';
-    persontagsHtml = `<div class="persons linklist">
-      ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
-      <ul>
-        ${persontags.map(url => {
-    const name = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\.com$/, '').split('/')[0] || '';
-    return `<li><a href="${url}" class="u-category h-card">${name}</a></li>`;
-  }).join('\n        ')}
-      </ul>
-    </div>`;
-  }
+  const persontagsHtml = persontags && persontags.length > 0
+    ? renderToStringSync(html`
+      <div class="persons linklist">
+            <h3 lang=${headingLang}>${swedish ? 'N\u00E4mnda:' : 'Mentioned:'}</h3>
+            <ul>
+              ${persontags.map(url => {
+    const name = extractName(url);
+    return html`<li><a href=${url} class="u-category h-card">${name}</a></li>`;
+  })}
+            </ul>
+          </div>
+    `)
+    : '';
 
-  let submittoHtml = '';
-  if (submitto && submitto.length > 0) {
-    const heading = swedish ? 'Inskickad till:' : 'Submitted to:';
-    const langTag = !swedish && nonenglish ? ' lang="en"' : '';
-    submittoHtml = `<div class="submitted-to linklist">
-      ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
-      <ul>
-        ${submitto.map(url => {
-    const name = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\.com$/, '').split('/')[0] || '';
-    return `<li><a href="${url}" class="u-category">${name}</a></li>`;
-  }).join('\n        ')}
-      </ul>
-    </div>`;
-  }
+  const submittoHtml = submitto && submitto.length > 0
+    ? renderToStringSync(html`
+      <div class="submitted-to linklist">
+            <h3 lang=${headingLang}>${swedish ? 'Inskickad till:' : 'Submitted to:'}</h3>
+            <ul>
+              ${submitto.map(url => {
+    const name = extractName(url);
+    return html`<li><a href=${url} class="u-category">${name}</a></li>`;
+  })}
+            </ul>
+          </div>
+    `)
+    : '';
 
-  let tagsHtml = '';
-  if (tags && tags.length > 0) {
-    const heading = swedish ? 'Taggar:' : 'Tags:';
-    const langTag = !swedish && nonenglish ? ' lang="en"' : '';
-    tagsHtml = `<div class="tags linklist">
-      ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
-      <ul>
-        ${tags.map(tag => `<li class="p-category">${escapeHtml(String(tag))}</li>`).join('\n        ')}
-      </ul>
-    </div>`;
-  }
+  const tagsHtml = tags && tags.length > 0
+    ? renderToStringSync(html`
+      <div class="tags linklist">
+            <h3 lang=${headingLang}>${swedish ? 'Taggar:' : 'Tags:'}</h3>
+            <ul>
+              ${tags.map(tag => html`<li class="p-category">${String(tag)}</li>`)}
+            </ul>
+          </div>
+    `)
+    : '';
 
   const wmBase = webmentionEndpoint || 'https://webmention.herokuapp.com';
   const mentionsUrl = `${wmBase}/api/mentions?format=html&url=${encodeURIComponent(siteUrl + pageUrl)}`;
 
-  return `<article class="h-entry"${langAttr}>
+  return renderToStringSync(html`
+    <article class="h-entry" lang=${lang}>
 
-  ${mediaHtml}
+      ${rawHtml(typeof mediaHtml === 'string' ? mediaHtml : renderToStringSync(mediaHtml))}
 
-  ${headerHtml}
+      ${rawHtml(headerHtml)}
 
-  ${replyHtml}
+      ${rawHtml(replyHtml)}
 
-  <div class="e-content">
-    ${content || ''}
-  </div>
+      <div class="e-content">
+        ${rawHtml(content || '')}
+      </div>
 
-  ${syndicationHtml}
+      ${rawHtml(syndicationHtml)}
 
-  ${persontagsHtml}
+      ${rawHtml(persontagsHtml)}
 
-  ${submittoHtml}
+      ${rawHtml(submittoHtml)}
 
-  ${tagsHtml}
+      ${rawHtml(tagsHtml)}
 
-  ${renderPostFooter({ authorName, nonenglish, post })}
+      ${rawHtml(renderPostFooter({ authorName, nonenglish, post }))}
 
-  <a class="u-responses" href="${mentionsUrl}">See mentions of this post</a>
-</article>`;
+      <a class="u-responses" href=${mentionsUrl}>See mentions of this post</a>
+    </article>
+  `);
+}
+
+/**
+ * @param {string} url
+ * @returns {string}
+ */
+function extractDomain (url) {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0] || '';
+}
+
+/**
+ * @param {string} url
+ * @returns {string}
+ */
+function extractName (url) {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\.com$/, '').split('/')[0] || '';
 }
 
 /**

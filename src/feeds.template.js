@@ -14,7 +14,7 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const blogName = /** @type {string} */ (vars.blogName);
   const authorName = /** @type {string} */ (vars.authorName);
   const authorEmail = /** @type {string} */ (vars.authorEmail);
-  const pushHub = /** @type {string} */ (vars.pushHub);
+  const pushHub = /** @type {string} */ (vars.pushHub) || '';
   const now = new Date().toISOString();
 
   // Extract and sort posts from pages (same logic as global.data.js)
@@ -79,7 +79,7 @@ export default async function * feedsTemplate ({ pages, vars }) {
 
  <title>${escapeXml(blogName)}${subtitle ? ` \u2013 ${escapeXml(subtitle)}` : ''}</title>
  <link href="${escapeXml(siteUrl + selfUrl)}" rel="self" type="application/atom+xml" />
- <link href="${escapeXml(pushHub)}" rel="hub" />
+ ${pushHub ? `<link href="${escapeXml(pushHub)}" rel="hub" />` : ''}
  ${htmlUrl ? `<link href="${escapeXml(siteUrl + htmlUrl)}" type="text/html" />` : ''}
  <updated>${now}</updated>
  <id>${escapeXml(siteUrl + (htmlUrl || selfUrl))}</id>

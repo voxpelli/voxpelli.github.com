@@ -1,5 +1,7 @@
-import rootLayout from './root.layout.js';
+import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
+
 import { renderPostContent } from './lib/render-post-content.js';
+import rootLayout from './root.layout.js';
 
 /**
  * Article/post layout - extends root layout with webmention form and post rendering
@@ -17,41 +19,42 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
   };
 
   const articleHtml = renderPostContent({
-    post: postVars,
+    authorName: /** @type {string} */ (vars.authorName),
     content: children,
+    nonenglish,
+    post: postVars,
+    siteUrl: /** @type {string} */ (vars.siteUrl),
     standalone: true,
     swedish,
-    nonenglish,
-    authorName: /** @type {string} */ (vars.authorName),
-    siteUrl: /** @type {string} */ (vars.siteUrl),
     webmentionEndpoint: /** @type {string} */ (vars.webmentionEndpoint),
   });
 
   const wmEndpoint = /** @type {string} */ (vars.webmentionEndpoint);
 
-  const webmentionForm = `<div>
-  Have you written a response to this? Let me know the URL:
-  <form action="${wmEndpoint}/api/webmention" method="post">
-    <input name="source" type="url" placeholder="http://example.com/my-cool-post" />
-    <input name="target" value="${vars.siteUrl}${vars.pageUrl || ''}" type="hidden">
-    <input value="Send Webmention" type="submit">
-  </form>
-</div>
+  const webmentionForm = renderToStringSync(html`
+    <div>
+      Have you written a response to this? Let me know the URL:
+      <form action=${`${wmEndpoint}/api/webmention`} method="post">
+        <input name="source" type="url" placeholder="http://example.com/my-cool-post" />
+        <input name="target" value=${`${vars.siteUrl}${vars.pageUrl || ''}`} type="hidden" />
+        <input value="Send Webmention" type="submit" />
+      </form>
+    </div>
 
-<script defer src="${wmEndpoint}/js/cutting-edge.js"></script>`;
+    ${rawHtml(`<script defer src="${wmEndpoint}/js/cutting-edge.js"></script>`)}
+  `);
 
   const layoutVars = {
     ...vars,
     author: true,
-    flattrable: true,
-    webmentionable: true,
     hfeed: true,
+    webmentionable: true,
   };
 
   return rootLayout({
     children: articleHtml + '\n' + webmentionForm,
-    vars: layoutVars,
     scripts,
     styles,
+    vars: layoutVars,
   });
 }

@@ -1,3 +1,5 @@
+import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
+
 import { renderPostFooter } from './render-post-footer.js';
 
 /**
@@ -13,15 +15,17 @@ export function renderPostLike ({ authorName, post }) {
     const isSecondToLast = i === likes.length - 2;
     const isLast = i === likes.length - 1;
     const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
-    return `<a class="u-like-of" href="${like}">${like}</a>${suffix}`;
-  }).join('');
+    return html`<a class="u-like-of" href=${like}>${like}</a>${rawHtml(suffix)}`;
+  });
 
-  return `<article class="h-entry">
-  <p class="p-name">
-    Liked
-    ${likeLinks}
-  </p>
+  return renderToStringSync(html`
+    <article class="h-entry">
+      <p class="p-name">
+        Liked
+        ${likeLinks}
+      </p>
 
-  ${renderPostFooter({ authorName, nonenglish: false, post })}
-</article>`;
+      ${rawHtml(renderPostFooter({ authorName, nonenglish: false, post }))}
+    </article>
+  `);
 }

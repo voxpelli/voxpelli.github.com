@@ -1,4 +1,5 @@
-import { escapeHtml } from './escape.js';
+import { html, renderToStringSync } from 'async-htm-to-string';
+
 import { renderPostContent } from './render-post-content.js';
 import { renderPostLike } from './render-post-like.js';
 
@@ -29,34 +30,34 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
       : 0;
     const readTime = Math.round(wordCount / 275);
 
-    let langAttr = '';
-    if (swedish) langAttr = ' lang="sv"';
-    else if (nonenglish) langAttr = ` lang="${post.lang}"`;
+    const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
-    return `<${tag} class="h-entry blog-article-summary">
-    <a${langAttr} class="u-url u-uid p-name" href="${post.pageUrl || ''}">${escapeHtml(String(post.title || ''))}</a>
-    <time class="dt-published" datetime="${isoDate}" pubdate>
-      - ${shortDate}
-    </time>
-    <span class="time-to-read">
-      - ${readTime} min read
-    </span>
-  </${tag}>`;
+    return renderToStringSync(html`
+      <${tag} class="h-entry blog-article-summary">
+          <a lang=${lang} class="u-url u-uid p-name" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a>
+          <time class="dt-published" datetime=${isoDate} pubdate>
+            - ${shortDate}
+          </time>
+          <span class="time-to-read">
+            - ${readTime} min read
+          </span>
+        </${tag}>
+    `);
   }
 
   // Like post
   if (post['mf-like-of']) {
-    return renderPostLike({ post, authorName });
+    return renderPostLike({ authorName, post });
   }
 
   // Full content post
   return renderPostContent({
-    post,
+    authorName,
     content,
+    nonenglish,
+    post,
+    siteUrl,
     standalone,
     swedish,
-    nonenglish,
-    authorName,
-    siteUrl,
   });
 }

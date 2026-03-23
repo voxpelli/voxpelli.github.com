@@ -10,6 +10,7 @@
     "build:drafts": "domstack --drafts --copy images --copy media",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
     "check": "run-p check:* --continue-on-error",
     "test": "run-s check",
     "husky-enable": "husky",
@@ -24,6 +25,10 @@
     "eslint": "^9",
     "husky": "^9",
     "npm-run-all2": "^8",
+    "type-coverage": "^2.29.7",
     "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "async-htm-to-string": "^5.0.2"
   }
 }
