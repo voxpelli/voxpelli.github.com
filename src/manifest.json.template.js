@@ -1,9 +1,9 @@
 /**
  * @param {{ vars: Record<string, unknown> }} _options
- * @returns {Array<{outputName: string, content: string}>}
+ * @returns {{outputName: string, content: string}}
  */
 export default function manifestTemplate (_options) {
-  return [{
+  return {
     outputName: 'manifest.json',
     content: JSON.stringify({
       short_name: 'Pelle Wessman',
@@ -21,5 +21,5 @@ export default function manifestTemplate (_options) {
       scope: '/',
       display: 'standalone',
     }, undefined, 2) + '\n',
-  }];
+  };
 }

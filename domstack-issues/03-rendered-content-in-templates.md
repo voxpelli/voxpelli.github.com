@@ -1,4 +1,4 @@
-# Provide rendered HTML content in `global.data.js` and document `renderInnerPage()` API
+# Formally document `renderInnerPage()` API and rendered content architecture
 
 `Labels: enhancement, documentation, dx`
 
@@ -6,238 +6,156 @@
 
 ## Problem
 
-DomStack users frequently need access to **rendered HTML content** from other pages -- for RSS/Atom feeds, search indexes, archive previews, and more. The `renderInnerPage()` method on `PageData` objects provides this capability in templates, but it is undocumented and unavailable in `global.data.js`.
+The `renderInnerPage()` method on `PageData` objects is the primary mechanism for accessing **rendered HTML content** from other pages — essential for RSS/Atom feeds, search indexes, and archive previews. The method is demonstrated in the README's "RSS Feed Template Example" but lacks formal dedicated documentation explaining its behavior, parameters, return value, and limitations.
 
-This creates a two-tier experience:
-- **Templates** can call `page.renderInnerPage({ pages })` to get rendered HTML (works today, undocumented)
-- **`global.data.js`** has no way to access rendered content at all, because it runs before the rendering stage of the build pipeline
-
-Users who need rendered content in page functions (e.g., for archive pages that show post excerpts) must work around this by duplicating rendering logic or restructuring their data flow.
+This creates a discoverability gap: users who read the template documentation linearly may encounter `renderInnerPage()` in the RSS example, but there is no reference section explaining:
+- What the method does (renders inner page content without layout wrapper)
+- That `renderFullPage()` also exists (renders with layout applied)
+- That both methods require passing the full `pages` array
+- Performance considerations (parallel rendering, caching)
+- That these methods are designed for templates, not `global.data.js`
 
 ---
 
-## Current behavior
+## What the README already covers
 
-### In templates: `renderInnerPage()` works but is undocumented
-
-The `PageData` class exposes `renderInnerPage()` as a public method:
+The README's "RSS Feed Template Example" shows a working usage of `renderInnerPage()`:
 
 ```typescript
-// From @domstack/static/lib/build-pages/page-data.d.ts
-class PageData<T, U, V> {
-  renderInnerPage({ pages }: { pages: PageData<T, U, V>[] }): Promise<string>;
-  renderFullPage({ pages }: { pages: PageData<T, U, V>[] }): Promise<any>;
-  // ...
-}
-```
-
-The implementation (from `page-data.js`) shows it invokes the page's builder and layout function:
-
-```js
-async renderInnerPage ({ pages }) {
-  if (!this.#initialized) throw new Error('Must be initialized before rendering inner pages')
-  const { pageInfo, styles, scripts, vars, builderOptions, workers } = this
-  if (!pageInfo) throw new Error('A page is required to render')
-  const builder = pageBuilders[pageInfo.type]
-  const { pageLayout } = await builder({ pageInfo, options: builderOptions })
-  const results = await pageLayout({ vars, styles, scripts, pages, page: pageInfo, workers })
-  return results
-}
-```
-
-This codebase uses it successfully in `src/feeds.template.js` to render post content for Atom feeds:
-
-<details>
-<summary>Working renderInnerPage() usage from src/feeds.template.js</summary>
-
-```js
-export default async function * feedsTemplate ({ pages, vars }) {
-  const siteUrl = vars.siteUrl;
-  // ...
-
-  // Build page index for O(1) lookup
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
-  // Pre-render all unique feed posts in parallel
-  const allFeedPosts = [...new Map(
-    [...recentPosts, ...recentEnglishPosts, ...recentLinks]
-      .map(p => [p.path, p])
-  ).values()];
-
-  const renderCache = new Map();
-  await Promise.all(allFeedPosts.map(async (post) => {
-    const page = pagesByPath.get(post.path);
-    const html = page ? await page.renderInnerPage({ pages }) : '';
-    renderCache.set(post.path, html);
-  }));
-
-  // Use cached rendered HTML in feed entries
-  function buildFeed ({ posts, selfUrl, subtitle }) {
-    const entries = posts.map(post => {
-      const html = renderCache.get(post.path) || '';
-      return renderRssEntry({ content: html, post, siteUrl });
-    });
-    // ...
+items: await pMap(blogPosts, async (page) => {
+  return {
+    date_published: page.vars['publishDate'],
+    title: page.vars['title'],
+    url: `${homePageUrl}/${page.pageInfo.path}/`,
+    id: `${homePageUrl}/${page.pageInfo.path}/#${page.vars['publishDate']}`,
+    content_html: await page.renderInnerPage({ pages })
   }
-
-  yield { outputName: 'all.xml', content: await buildFeed({ /* ... */ }) };
-  yield { outputName: 'english.xml', content: await buildFeed({ /* ... */ }) };
-  yield { outputName: 'links/all.xml', content: await buildFeed({ /* ... */ }) };
-}
+}, { concurrency: 4 })
 ```
 
-</details>
-
-This pattern works well, but the user must discover `renderInnerPage()` by reading the type definitions or source code. There is no documentation explaining:
-- That the method exists
-- That it requires passing the full `pages` array
-- That it returns the inner page content (without the layout wrapper)
-- That `renderFullPage()` also exists (returns content with layout applied)
-- Performance considerations (parallel rendering, caching)
-- That it only works in templates, not in `global.data.js`
+This demonstrates the method signature and shows it being called with `{ pages }` and used in a concurrency-limited parallel context. The `global.data.js` section also documents that it "runs once per build, after all pages are initialized and **before rendering begins**" — implicitly explaining why `renderInnerPage()` is a template-stage API.
 
 ---
 
-### In `global.data.js`: no access to rendered content
+## What's missing
 
-`global.data.js` runs during the `resolveGlobalData()` phase, which occurs **before** page rendering. At this point, `PageData` objects are initialized but their `renderInnerPage()` method depends on the build pipeline state that may not be fully ready.
+### 1. Formal API reference for `renderInnerPage()` and `renderFullPage()`
 
-This means that code like the following -- which would be the natural approach -- does not work:
+A brief reference section documenting:
 
-```js
-// src/global.data.js -- THIS DOES NOT WORK
-export default async function globalData ({ pages }) {
-  const posts = pages.filter(p => {
-    try { return p.vars.layout === 'article'; }
-    catch { return false; }
-  });
-
-  // Cannot reliably call renderInnerPage() here -- we're in the wrong pipeline stage
-  for (const post of posts) {
-    const html = await post.renderInnerPage({ pages }); // May fail or produce incomplete results
-  }
-}
+```typescript
+// Available on PageData objects in templates
+page.renderInnerPage({ pages }): Promise<string>   // Content without layout
+page.renderFullPage({ pages }): Promise<any>        // Content with layout applied
 ```
 
-As a result, `global.data.js` can only access `vars.content`, which for markdown pages is the **raw markdown source**, not rendered HTML. Pages that need rendered content (archive pages showing excerpts, search indexes) must either:
-1. Move their logic into a template (which has access to `renderInnerPage()`)
-2. Bring their own markdown renderer as a dependency
+### 2. Architecture explanation: when rendered content is available
 
----
+The build pipeline has a clear ordering that determines when rendered content can be accessed:
 
-## Expected behavior
+| Build stage | `renderInnerPage()` available? | Why |
+|---|---|---|
+| `global.data.js` | No | Runs before rendering stage |
+| Page functions (`page.js`) | No | Pages receive vars, not other pages' rendered output |
+| Templates (`.template.js`) | Yes | Run after page initialization and global data |
+| Layouts | No | Receive already-rendered `children` for their own page |
 
-1. `renderInnerPage()` should be **documented** as the official API for accessing rendered content in templates.
-2. There should be a **documented path** for accessing rendered content in `global.data.js`, or clear documentation explaining why it is not possible and what the recommended architecture is.
+### 3. Performance guidance
+
+For feeds and other outputs that render multiple pages:
+- Use `Promise.all()` for parallel rendering
+- Cache results in a `Map` when the same page appears in multiple outputs
+- Use `new Map(pages.map(p => [p.pageInfo.path, p]))` for O(1) page lookup
 
 ---
 
 ## Workaround
 
-The current workaround has two parts:
-
-**For templates (feeds, standalone generated pages):** Use `renderInnerPage()` directly, as shown in `src/feeds.template.js` above. This works today but requires reading source code to discover.
-
-**For page functions (archives, indexes):** Accept raw markdown from `vars.content` and either render it client-side or accept unrendered content. This codebase's `src/archive/page.js` and `src/page.js` use the raw `content` field from `global.data.js`:
+This codebase's `src/feeds.template.js` demonstrates the complete pattern — page lookup index, parallel rendering with caching, and cache reuse across multiple feed outputs:
 
 ```js
-// src/page.js -- uses raw content from global.data.js
-export default function homePage ({ vars: pageVars }) {
-  const recentPosts = pageVars.recentPosts || [];
-  const postListItems = recentPosts.map(post =>
-    renderPost({
-      post,
-      content: post.content || '',  // This is raw markdown for .md pages
-      // ...
-    })
-  ).join('\n    ');
-  // ...
+// Build page index for O(1) lookup
+const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
+
+// Pre-render all unique feed posts in parallel, with cache
+const renderCache = new Map();
+await Promise.all(allFeedPosts.map(async (post) => {
+  const page = pagesByPath.get(post.path);
+  const html = page ? await page.renderInnerPage({ pages }) : '';
+  renderCache.set(post.path, html);
+}));
+
+// Use cached rendered HTML in feed entries
+function buildFeed ({ posts }) {
+  return posts.map(post => {
+    const html = renderCache.get(post.path) || '';
+    return renderRssEntry({ content: html, post, siteUrl });
+  });
 }
 ```
+
+This pattern works well but was assembled through source-code reading and experimentation.
 
 ---
 
 ## Proposed solution
 
-### Part 1: Document `renderInnerPage()` (immediate, no code changes)
+### Part 1: Add a "Rendered Content" reference to the docs
 
-Add a "Rendered Content" section to the docs:
+Add a brief section near the Templates documentation:
 
 ```markdown
-## Accessing rendered page content
-
-### In templates
+### Accessing rendered page content
 
 Templates can render any page's inner content using `renderInnerPage()`:
 
-\`\`\`js
-export default async function * feedTemplate ({ pages, vars }) {
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
+    const html = await page.renderInnerPage({ pages });
 
-  for (const post of recentPosts) {
-    const page = pagesByPath.get(post.path);
-    const html = page ? await page.renderInnerPage({ pages }) : '';
-    yield { outputName: `feed/${post.path}.html`, content: html };
-  }
-}
-\`\`\`
-
-**Key points:**
 - `renderInnerPage({ pages })` returns the page content rendered by its builder
   (e.g., markdown-to-HTML), **without** the layout wrapper.
 - `renderFullPage({ pages })` returns the complete page with layout applied.
-- Both methods are async and return Promises.
-- You must pass the full `pages` array as a parameter.
+- Both methods are async and require passing the full `pages` array.
 - For performance, render in parallel with `Promise.all()` and cache results
-  when multiple feeds or outputs need the same rendered content.
+  when multiple outputs need the same rendered content.
 
-### In global.data.js
-
-`global.data.js` runs before the rendering stage. Rendered HTML is **not available**
-in this context. Use `vars.content` for raw source content, or move rendering
-logic to a template.
-
-### Architecture recommendation
-
-If you need rendered content in multiple outputs (feeds + archive + search):
-1. Use a **template** (async generator) to generate all outputs that need rendered HTML.
-2. Use `global.data.js` for metadata aggregation (titles, dates, paths, tags)
-   that doesn't require rendered content.
+**Note:** `renderInnerPage()` is available in templates only. `global.data.js`
+runs before the rendering stage and cannot access rendered content. Use
+`vars.content` for raw source content, or move rendering logic to a template.
 ```
 
-### Part 2: Consider making `renderInnerPage()` available in `global.data.js` (future enhancement)
+### Part 2: Consider making `renderInnerPage()` available in `global.data.js` (future)
 
 Three possible approaches, in order of feasibility:
 
 | Approach | Description | Trade-offs |
 |----------|-------------|------------|
-| **Lazy `renderedContent` property** | Add a `get renderedContent()` getter to `PageData` that lazily renders and caches the result | Simplest API; risk of circular dependencies if global data affects rendering |
-| **Two-pass `global.data.js`** | Run `global.data.js` twice: once before rendering (metadata), once after (with rendered content) | Complex; ordering semantics unclear |
-| **Document the architecture** | Officially document that rendered content belongs in templates, not global data | No code changes; may disappoint users wanting rendered content in page functions |
+| **Lazy `renderedContent` getter** | Lazily renders and caches on first access | Simplest API; risk of circular dependencies |
+| **Two-pass global.data** | Run once for metadata, once after rendering | Complex ordering semantics |
+| **Document the architecture** | Officially document that rendered content belongs in templates | No code changes; may not satisfy all use cases |
 
-The third option (documentation) is the pragmatic immediate fix. The first option (lazy getter) would be the best long-term DX improvement if the pipeline ordering can be resolved.
+The documentation approach (Part 1) is the pragmatic immediate fix.
 
 ---
 
 ## Real-world impact
 
-This codebase demonstrates the split perfectly:
+This codebase demonstrates the split:
 
 | File | Needs rendered HTML? | Current approach |
 |------|---------------------|------------------|
-| `src/feeds.template.js` | Yes (Atom feed entries) | Uses `renderInnerPage()` -- works |
+| `src/feeds.template.js` | Yes (Atom feed entries) | Uses `renderInnerPage()` — works |
 | `src/page.js` (homepage) | Ideally yes (post previews) | Uses raw `content` from global.data |
 | `src/archive/page.js` | Ideally yes (archive entries) | Uses raw `content` from global.data |
 | `src/links/page.js` | Ideally yes (link descriptions) | Uses raw `content` from global.data |
 | `src/social/page.js` | Ideally yes (social posts) | Uses raw `content` from global.data |
 | `src/sitemap.xml.template.js` | No (URLs only) | N/A |
 
-Five out of six consumer files would benefit from rendered HTML access. Currently only the feeds template has it, because it is the only template that discovered the undocumented `renderInnerPage()` API.
+The feeds template is the only consumer with access to rendered HTML because it is the only template that uses `renderInnerPage()`. The other consumers receive raw markdown from `global.data.js`, which is a design trade-off rather than a bug.
 
 ---
 
 ## Related issues
 
 - **#01** -- Exporting `PageData` types would make `renderInnerPage()` discoverable via autocompletion.
-- **#02** -- The `global.data.js` documentation should cross-reference this issue's caveat about `vars.content` being raw source.
-- **#05** -- Template return type documentation should include examples using `renderInnerPage()` since that is a primary template use case.
+- **#02** -- The `global.data.js` caveats documentation should cross-reference this issue's explanation of why rendered content is unavailable there.
+- **#09** -- Template `vars` not including `global.data.js` output means templates must re-derive post data even when using `renderInnerPage()`, compounding the complexity.
