@@ -10,15 +10,11 @@ const updateStaticCache = () => {
     .then(cache => {
       // Do not wait for these
       cache.addAll([
-        '/css/img/loader.gif',
         '/about/'
       ]);
 
       // But please, do wait for these
       return cache.addAll([
-        '/js/indieconfig.js',
-        '/js/webaction.js',
-        '/css/style.css',
         '/avatar.jpg',
         '/offline/',
         '/'

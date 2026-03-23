@@ -1,5 +1,7 @@
-/_site
-
+/coverage
+/coverage-ts
 /node_modules
+/public
+/.env
 npm-debug.log
 yarn-error.log

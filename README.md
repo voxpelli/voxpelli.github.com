@@ -1,17 +1,36 @@
-To start local Jekyll server do:
+# voxpelli.com
 
-	jekyll server --watch
+Personal blog built with [DomStack](https://github.com/bcomnes/domstack) (`@domstack/static`).
 
-Or:
+## Setup
 
-	bundle exec jekyll server --watch
+```bash
+npm install
+```
 
-To ping Superfeedr after you have added a new post - run this in terminal:
+## Development
 
-	curl -X POST  http://voxpelli.superfeedr.com/ -d "hub.mode=publish" -d"hub.url=http://voxpelli.com/all.xml"
-	curl -X POST  http://voxpelli.superfeedr.com/ -d "hub.mode=publish" -d"hub.url=http://voxpelli.com/english.xml"
+```bash
+npm run dev
+```
 
-To install and build:
+## Build
 
-	bundle install
-	bundle exec jekyll build
+```bash
+npm run build
+```
+
+## Test
+
+```bash
+npm test
+```
+
+## Ping Superfeedr
+
+After adding a new post:
+
+```bash
+curl -X POST http://voxpelli.superfeedr.com/ -d "hub.mode=publish" -d "hub.url=http://voxpelli.com/all.xml"
+curl -X POST http://voxpelli.superfeedr.com/ -d "hub.mode=publish" -d "hub.url=http://voxpelli.com/english.xml"
+```
