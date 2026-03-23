@@ -1,0 +1,8 @@
+---
+layout: article
+date: '2017-08-21T15:53:14.592Z'
+category: social
+mf-like-of:
+  - 'https://seblog.nl/2017/08/19/6/micropub-irc-bot'
+---
+

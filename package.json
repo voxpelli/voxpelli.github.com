@@ -1,18 +1,21 @@
 {
   "private": true,
-  "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "husky": "^3.0.0"
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "test": "eslint ."
+    "build": "domstack --copy images --copy media --copy static && cp sw.js public/sw.js",
+    "dev": "domstack --watch --copy images --copy media --copy static",
+    "build:drafts": "domstack --drafts --copy images --copy media --copy static",
+    "test": "npm run check:lint",
+    "check:lint": "eslint ."
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm test"
-    }
+  "devDependencies": {
+    "@domstack/static": "^11",
+    "@voxpelli/eslint-config": "^22",
+    "eslint": "^9",
+    "gray-matter": "^4.0.3",
+    "husky": "^9"
   }
 }
