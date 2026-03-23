@@ -10,7 +10,7 @@ import { renderPostLike } from './render-post-like.js';
  * @param {Record<string, unknown>} options.post - Post frontmatter/vars
  * @param {string} [options.content] - Rendered content
  * @param {boolean} [options.standalone]
- * @param {string} [options.container] - Container element tag (default: 'div')
+ * @param {string} [options.container] - Container element tag (default: 'article')
  * @param {string} options.authorName
  * @param {string} options.siteUrl
  * @returns {string}
@@ -18,13 +18,13 @@ import { renderPostLike } from './render-post-like.js';
 export function renderPost ({ authorName, container, content, post, siteUrl, standalone }) {
   const swedish = !post.lang || post.lang === 'sv';
   const nonenglish = post.lang !== 'en';
-  const tag = container || 'div';
+  const tag = container || 'article';
 
   // Blog article summary (no category, not standalone)
   if (!post.category && !standalone) {
     const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
     const isoDate = dateObj.toISOString();
-    const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const isoDateShort = isoDate.slice(0, 10).replaceAll('-', '.');
     const wordCount = typeof content === 'string'
       ? content.replaceAll(/<[^>]*>/g, '').split(/\s+/).length
       : 0;
@@ -33,14 +33,12 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
     const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
     return renderToStringSync(html`
-      <${tag} class="h-entry blog-article-summary">
-          <a lang=${lang} class="u-url u-uid p-name" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a>
-          <relative-time><time class="dt-published" datetime=${isoDate}>
-            - ${shortDate}
-          </time></relative-time>
-          <span class="time-to-read">
-            - ${readTime} min read
-          </span>
+      <${tag} class="post-card h-entry">
+          <div class="post-meta">
+            <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
+            <span class="badge">${readTime} MIN READ</span>
+          </div>
+          <h3 class="post-title p-name"><a lang=${lang} class="u-url u-uid" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a></h3>
         </${tag}>
     `);
   }

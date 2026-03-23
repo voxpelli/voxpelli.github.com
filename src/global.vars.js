@@ -4,6 +4,6 @@ export default {
   authorName: 'Pelle Wessman',
   authorEmail: 'pelle@kodfabrik.se',
   pushHub: 'https://voxpelli.superfeedr.com/',
-  themeColor: '#dd3333',
+  themeColor: '#8c2121',
   webmentionEndpoint: 'https://webmention.herokuapp.com',
 };

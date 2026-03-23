@@ -19,6 +19,14 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   const pageUrl = String(vars.pageUrl || '') || '/';
   const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 
+  // Determine active nav item
+  const navItems = [
+    { label: 'Blog Posts', href: '/', active: !!vars.frontpage },
+    { label: 'Social Feed', href: '/social/', active: vars.category === 'social' || pageUrl === '/social/' },
+    { label: 'Links', href: '/links/', active: vars.category === 'links' || pageUrl === '/links/' },
+    { label: 'About', href: '/about/', active: pageUrl === '/about/' },
+  ];
+
   const headContent = renderToStringSync(html`
     <meta charset="utf-8" />
 
@@ -28,6 +36,9 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
 
     <meta name="theme-color" content=${themeColor} />
     <link rel="manifest" href="/manifest.json" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500,700|newsreader:400,400i,500,600,700|public-sans:400,500,600" rel="stylesheet" />
 
     ${styles.map(href => html`<link rel="stylesheet" href=${href} />`)}
 
@@ -48,23 +59,41 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     ${vars.webmentionable ? html`<link rel="webmention" href=${`${webmentionEndpoint}/api/webmention`} />` : ''}
   `);
 
+  const navHtml = navItems.map(item => renderToStringSync(html`
+    <a href=${item.href} class=${`nav-item${item.active ? ' active' : ''}`}>
+      <span>${item.label}</span>
+      <span aria-hidden="true" style=${item.active ? '' : 'opacity: 0;'}>\u2192</span>
+    </a>
+  `)).join('\n        ');
+
   const bodyContent = renderToStringSync(html`
-    <div class="page">
-      <header>
-        <h1><a href="/">${blogName}</a></h1>
-        <p class="subtitle">Things <a rel=${vars.frontpage ? 'me' : false} href="/about/">about me</a> and the world around us</p>
+    <div class="layout-wrapper">
+      <aside class="sidebar h-card p-author">
+        <header class="brand-header">
+          <h1 class="title"><a href="/" class="p-name">${authorName}</a></h1>
+          <p class="subtitle p-summary">Things <a rel=${vars.frontpage ? 'me' : false} href="/about/">about me</a> & the world</p>
+        </header>
+
+        <div class="profile-widget">
+          <img src="/avatar.jpg" alt=${authorName} class="u-photo" width="56" height="56" loading="lazy" />
+          <div class="profile-info p-note">
+            <strong>voxpelli</strong>
+            Developer. IndieWeb advocate.
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          ${rawHtml(navHtml)}
+        </nav>
+
+        <button class="btn" type="button" onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()">Subscribe to RSS</button>
+
         <theme-toggle><button type="button" aria-label="Toggle theme">\u2600\uFE0F</button></theme-toggle>
-      </header>
+      </aside>
 
-      ${rawHtml(children)}
-
-      ${!vars.frontpage && vars.hfeed
-      ? html`
-        <section class="p-author h-card summary-card">
-                  Hi! Thanks for reading my blog. Lots of words, right? Yeah, that's just me, <a class="p-name u-url" href="/"><img class="u-photo" src="/avatar.jpg" alt="" width="20" height="20" /> Pelle Wessman</a>, that sometimes likes to put a lot of words in certain orders to try to make sense of the world. Hope you enjoyed it!
-                </section>
-      `
-      : ''}
+      <main class="content-area">
+        ${rawHtml(children)}
+      </main>
     </div>
     ${scripts.map(src => html`<script type="module" src=${src}></script>`)}
   `);

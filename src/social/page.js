@@ -17,7 +17,7 @@ export default function socialPage ({ vars: pageVars }) {
   const socialPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.socialPosts) || [];
   const recentSocial = socialPosts.slice(0, 10);
 
-  let result = '<h2>Social</h2>\n\n';
+  let result = '<div class="content-header">\n  <h2>Social // Interactions</h2>\n</div>\n\n';
   let isLikeList = false;
 
   for (const post of recentSocial) {

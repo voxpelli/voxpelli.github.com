@@ -24,7 +24,9 @@ export default function linksPage ({ vars: pageVars }) {
     })
   ).join('\n');
 
-  return `<h2>Links</h2>
+  return `<div class="content-header">
+  <h2>Links // Recommendations</h2>
+</div>
 
 ${postsHtml}
 
@@ -34,11 +36,5 @@ ${linkPosts.length > 5
 </ul>`
 : ''}
 
-<script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>
-
-<section>
-  <h2>Subscribe to all links</h2>
-  <p>There's a <a href="/links/all.xml" type="application/atom+xml">links feed</a> where you can get all the links I recommend here.</p>
-  <p class="subtome"><input class="btn" type="button" onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()" value="Subscribe to links"></p>
-</section>`;
+<script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>`;
 }
