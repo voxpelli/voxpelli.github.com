@@ -42,11 +42,6 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   ${vars.author ? `<link rel="author" type="text/html" href="/" title="${escapeHtml(/** @type {string} */ (vars.authorName))}" />` : ''}
   ${vars.flattrable ? `<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=${encodeURIComponent(siteUrl + pageUrl)}&amp;user_id=voxpelli${vars.title ? '&amp;title=' + encodeURIComponent(/** @type {string} */ (vars.title)) : ''}&amp;category=text&amp;tags=blog&amp;language=${encodeURIComponent(/** @type {string} */ (vars.lang) || 'sv')}" title="Flattr this post" />` : ''}
   ${vars.webmentionable ? `<link rel="webmention" href="${vars.webmentionEndpoint}/api/webmention" />` : ''}
-
-  ${!vars.frontpage
-? `<script defer src="/js/indieconfig.js"></script>
-  <script defer src="/js/webaction.js"></script>`
-: ''}
 </head>
 <body>
   <div class="page">

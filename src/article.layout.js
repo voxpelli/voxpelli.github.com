@@ -20,7 +20,6 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
     post: postVars,
     content: children,
     standalone: true,
-    indieactions: true,
     swedish,
     nonenglish,
     authorName: /** @type {string} */ (vars.authorName),

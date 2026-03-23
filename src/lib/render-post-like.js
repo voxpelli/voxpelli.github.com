@@ -22,6 +22,6 @@ export function renderPostLike ({ authorName, post }) {
     ${likeLinks}
   </p>
 
-  ${renderPostFooter({ post, indieactions: false, authorName, nonenglish: false })}
+  ${renderPostFooter({ authorName, nonenglish: false, post })}
 </article>`;
 }

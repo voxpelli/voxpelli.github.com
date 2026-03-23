@@ -8,7 +8,6 @@
     "src/**/*.js"
   ],
   "exclude": [
-    "src/sw.js",
     "src/global.client.js"
   ]
 }

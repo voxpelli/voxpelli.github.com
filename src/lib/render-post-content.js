@@ -8,7 +8,6 @@ import { renderPostFooter } from './render-post-footer.js';
  * @param {Record<string, unknown>} options.post
  * @param {string} [options.content] - Rendered markdown content
  * @param {boolean} [options.standalone]
- * @param {boolean} [options.indieactions]
  * @param {boolean} [options.swedish]
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
@@ -16,7 +15,7 @@ import { renderPostFooter } from './render-post-footer.js';
  * @param {string} [options.webmentionEndpoint]
  * @returns {string}
  */
-export function renderPostContent ({ authorName, content, indieactions, nonenglish, post, siteUrl, standalone, swedish, webmentionEndpoint }) {
+export function renderPostContent ({ authorName, content, nonenglish, post, siteUrl, standalone, swedish, webmentionEndpoint }) {
   const videos = /** @type {string[]|undefined} */ (post['mf-video']);
   const photos = /** @type {string[]|undefined} */ (post['mf-photo']);
   const bookmarkOf = /** @type {string[]|undefined} */ (post['mf-bookmark-of'] || post['mf-bookmark']);
@@ -151,7 +150,7 @@ export function renderPostContent ({ authorName, content, indieactions, nonengli
 
   ${tagsHtml}
 
-  ${renderPostFooter({ post, nonenglish, indieactions, authorName })}
+  ${renderPostFooter({ authorName, nonenglish, post })}
 
   <a class="u-responses" href="${mentionsUrl}">See mentions of this post</a>
 </article>`;

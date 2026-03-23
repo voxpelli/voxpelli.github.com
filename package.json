@@ -5,9 +5,9 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "build": "domstack --copy images --copy media --copy static",
-    "dev": "domstack --watch --copy images --copy media --copy static",
-    "build:drafts": "domstack --drafts --copy images --copy media --copy static",
+    "build": "domstack --copy images --copy media && cp sw.js public/sw.js",
+    "dev": "domstack --watch --copy images --copy media",
+    "build:drafts": "domstack --drafts --copy images --copy media",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
     "check": "run-p check:* --continue-on-error",
@@ -22,7 +22,6 @@
     "@voxpelli/eslint-config": "^23",
     "@voxpelli/tsconfig": "^16",
     "eslint": "^9",
-    "gray-matter": "^4.0.3",
     "husky": "^9",
     "npm-run-all2": "^8",
     "typescript": "~5.9.3"

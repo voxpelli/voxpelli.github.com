@@ -55,7 +55,6 @@ export default function socialPage ({ vars: pageVars }) {
       html += renderPost({
         post,
         content: /** @type {string} */ (post.content) || '',
-        indieactions: true,
         authorName: /** @type {string} */ (pageVars.authorName),
         siteUrl: /** @type {string} */ (pageVars.siteUrl),
       }) + '\n';

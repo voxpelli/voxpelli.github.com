@@ -1,15 +1,13 @@
 import { escapeHtml } from './escape.js';
-import { renderIndieActions } from './render-indie-actions.js';
 
 /**
  * @param {object} options
  * @param {Record<string, unknown>} options.post - Post frontmatter/vars
  * @param {boolean} [options.nonenglish]
- * @param {boolean} [options.indieactions]
  * @param {string} options.authorName
  * @returns {string}
  */
-export function renderPostFooter ({ authorName, indieactions, nonenglish, post }) {
+export function renderPostFooter ({ authorName, nonenglish, post }) {
   const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
   const isoDate = dateObj.toISOString();
   const longDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -20,7 +18,5 @@ export function renderPostFooter ({ authorName, indieactions, nonenglish, post }
   </time>
     by
   <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" width="20" height="20" /> ${escapeHtml(authorName)}</a>
-
-  ${indieactions ? renderIndieActions(/** @type {string} */ (post.pageUrl) || '') : ''}
 </footer>`;
 }
