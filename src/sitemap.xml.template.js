@@ -2,7 +2,7 @@ import { escapeXml } from './lib/escape.js';
 
 /**
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string, outputRelname: string } }> }} options
- * @returns {Array<{outputName: string, content: string}>}
+ * @returns {{outputName: string, content: string}}
  */
 export default function sitemapTemplate ({ pages, vars }) {
   const siteUrl = /** @type {string} */ (vars.siteUrl);
@@ -17,12 +17,12 @@ export default function sitemapTemplate ({ pages, vars }) {
     })
     .join('\n');
 
-  return [{
+  return {
     outputName: 'sitemap.xml',
     content: `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
 </urlset>
 `,
-  }];
+  };
 }
