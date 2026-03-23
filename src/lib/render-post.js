@@ -15,7 +15,7 @@ import { renderPostLike } from './render-post-like.js';
  * @param {string} options.siteUrl
  * @returns {string}
  */
-export function renderPost ({ post, content, standalone, indieactions, container, authorName, siteUrl }) {
+export function renderPost ({ authorName, container, content, indieactions, post, siteUrl, standalone }) {
   const swedish = !post.lang || post.lang === 'sv';
   const nonenglish = post.lang !== 'en';
   const tag = container || 'div';
@@ -26,7 +26,7 @@ export function renderPost ({ post, content, standalone, indieactions, container
     const isoDate = dateObj.toISOString();
     const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     const wordCount = typeof content === 'string'
-      ? content.replace(/<[^>]*>/g, '').split(/\s+/).length
+      ? content.replaceAll(/<[^>]*>/g, '').split(/\s+/).length
       : 0;
     const readTime = Math.round(wordCount / 275);
 
@@ -62,4 +62,3 @@ export function renderPost ({ post, content, standalone, indieactions, container
     siteUrl,
   });
 }
-

@@ -6,7 +6,7 @@ import { renderPostFooter } from './render-post-footer.js';
  * @param {string} options.authorName
  * @returns {string}
  */
-export function renderPostLike ({ post, authorName }) {
+export function renderPostLike ({ authorName, post }) {
   const likes = /** @type {string[]} */ (post['mf-like-of']) || [];
 
   const likeLinks = likes.map((like, i) => {

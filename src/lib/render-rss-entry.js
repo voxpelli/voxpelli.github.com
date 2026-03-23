@@ -9,7 +9,7 @@ import { escapeXml } from './escape.js';
  * @param {string} options.siteUrl
  * @returns {string}
  */
-export function renderRssEntry ({ post, content, siteUrl }) {
+export function renderRssEntry ({ content, post, siteUrl }) {
   const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
   const isoDate = dateObj.toISOString();
   const postUrl = `${siteUrl}${post.pageUrl || ''}`;
@@ -22,4 +22,3 @@ export function renderRssEntry ({ post, content, siteUrl }) {
   <content type="html">${escapeXml(content || '')}</content>
  </entry>`;
 }
-

@@ -4,7 +4,7 @@ import { escapeXml } from './lib/escape.js';
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string, outputRelname: string } }> }} options
  * @returns {Array<{outputName: string, content: string}>}
  */
-export default function sitemapTemplate ({ vars, pages }) {
+export default function sitemapTemplate ({ pages, vars }) {
   const siteUrl = /** @type {string} */ (vars.siteUrl);
 
   const urls = pages
@@ -26,4 +26,3 @@ ${urls}
 `,
   }];
 }
-

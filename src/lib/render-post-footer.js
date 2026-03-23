@@ -8,7 +8,7 @@ import { renderIndieActions } from './render-indie-actions.js';
  * @param {string} options.authorName
  * @returns {string}
  */
-export function renderPostFooter ({ post, nonenglish, indieactions, authorName }) {
+export function renderPostFooter ({ authorName, indieactions, nonenglish, post }) {
   const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
   const isoDate = dateObj.toISOString();
   const longDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -27,8 +27,8 @@ export function renderPostFooter ({ post, nonenglish, indieactions, authorName }
 /** @param {string} str */
 function escapeHtml (str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }

@@ -26,9 +26,11 @@ export default function linksPage ({ vars: pageVars }) {
 
 ${postsHtml}
 
-${linkPosts.length > 5 ? `<ul class="posts-extras">
+${linkPosts.length > 5
+? `<ul class="posts-extras">
   <li><a href="/archive/full/">Archive</a></li>
-</ul>` : ''}
+</ul>`
+: ''}
 
 <script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>
 

@@ -27,6 +27,7 @@ export default function globalData ({ pages }) {
         lang: vars.lang,
         category: vars.category,
         content: vars.content || '',
+        path: pagePath,
         pageUrl,
         // Preserve all mf-* fields
         ...Object.fromEntries(

@@ -1,13 +1,15 @@
 import { escapeHtml } from './lib/escape.js';
 
-/** @param {{ children: string, vars: Record<string, unknown> }} options */
-export default function rootLayout ({ children, vars }) {
+/** @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options */
+export default function rootLayout ({ children, scripts = [], styles = [], vars }) {
+  const blogName = /** @type {string} */ (vars.blogName);
+  const siteUrl = /** @type {string} */ (vars.siteUrl);
   const title = vars.frontpage
-    ? vars.blogName
-    : (vars.title ? `${vars.title} – ${vars.blogName}` : vars.blogName);
+    ? blogName
+    : (vars.title ? `${vars.title} – ${blogName}` : blogName);
 
-  const pageUrl = vars.pageUrl || '/';
-  const canonicalUrl = `${vars.siteUrl}${vars.frontpage ? '/' : pageUrl}`;
+  const pageUrl = /** @type {string} */ (vars.pageUrl) || '/';
+  const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 
   return `<!DOCTYPE html>
 <html lang="en" class="no-js ${vars.classes || ''}${vars.hfeed ? ' h-feed' : ''}">
@@ -21,26 +23,32 @@ export default function rootLayout ({ children, vars }) {
   <meta name="theme-color" content="${vars.themeColor}">
   <link rel="manifest" href="/manifest.json">
 
+  ${styles.map(href => `<link rel="stylesheet" href="${escapeHtml(href)}">`).join('\n  ')}
+
   ${vars.category === 'links' ? '<link rel="alternate" type="application/atom+xml" href="/links/all.xml" title="All links" />' : ''}
   <link rel="${vars.frontpage ? '' : 'home '}alternate" type="application/atom+xml" href="/all.xml" title="All posts" />
   <link rel="${vars.frontpage ? '' : 'home '}alternate" type="application/atom+xml" href="/english.xml" title="English posts" />
 
   <link rel="canonical" href="${escapeHtml(canonicalUrl)}"${vars.hfeed ? ' class="u-url"' : ''} />
   <meta name="twitter:site" content="@voxpelli" />
-  ${vars.frontpage ? `<link rel="self" href="${vars.siteUrl}" type="text/html" />
+  ${vars.frontpage
+? `<link rel="self" href="${vars.siteUrl}" type="text/html" />
   <link rel="hub" href="${vars.pushHub}" />
-  <link rel="micropub" href="http://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />` : ''}
-  ${vars.author ? `<link rel="author" type="text/html" href="/" title="${escapeHtml(vars.authorName)}" />` : ''}
-  ${vars.flattrable ? `<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=${encodeURIComponent(vars.siteUrl + pageUrl)}&amp;user_id=voxpelli${vars.title ? '&amp;title=' + encodeURIComponent(vars.title) : ''}&amp;category=text&amp;tags=blog&amp;language=${encodeURIComponent(vars.lang || 'sv')}" title="Flattr this post" />` : ''}
+  <link rel="micropub" href="http://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />`
+: ''}
+  ${vars.author ? `<link rel="author" type="text/html" href="/" title="${escapeHtml(/** @type {string} */ (vars.authorName))}" />` : ''}
+  ${vars.flattrable ? `<link rel="payment" type="text/html" href="https://flattr.com/submit/auto?url=${encodeURIComponent(siteUrl + pageUrl)}&amp;user_id=voxpelli${vars.title ? '&amp;title=' + encodeURIComponent(/** @type {string} */ (vars.title)) : ''}&amp;category=text&amp;tags=blog&amp;language=${encodeURIComponent(/** @type {string} */ (vars.lang) || 'sv')}" title="Flattr this post" />` : ''}
   ${vars.webmentionable ? `<link rel="webmention" href="${vars.webmentionEndpoint}/api/webmention" />` : ''}
 
-  ${!vars.frontpage ? `<script defer src="/js/indieconfig.js"></script>
-  <script defer src="/js/webaction.js"></script>` : ''}
+  ${!vars.frontpage
+? `<script defer src="/js/indieconfig.js"></script>
+  <script defer src="/js/webaction.js"></script>`
+: ''}
 </head>
 <body>
   <div class="page">
     <header>
-      <h1><a href="/">${escapeHtml(vars.blogName)}</a></h1>
+      <h1><a href="/">${escapeHtml(blogName)}</a></h1>
       <div class="subtitle">Things <a ${vars.frontpage ? 'rel="me"' : ''} href="/about/">about me</a> and the world around us</div>
     </header>
 
@@ -52,7 +60,7 @@ export default function rootLayout ({ children, vars }) {
         </section>`
       : ''}
   </div>
+  ${scripts.map(src => `<script type="module" src="${escapeHtml(src)}"></script>`).join('\n  ')}
 </body>
 </html>`;
 }
-

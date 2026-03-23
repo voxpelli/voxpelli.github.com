@@ -16,7 +16,7 @@ import { renderPostFooter } from './render-post-footer.js';
  * @param {string} [options.webmentionEndpoint]
  * @returns {string}
  */
-export function renderPostContent ({ post, content, standalone, indieactions, swedish, nonenglish, authorName, siteUrl, webmentionEndpoint }) {
+export function renderPostContent ({ authorName, content, indieactions, nonenglish, post, siteUrl, standalone, swedish, webmentionEndpoint }) {
   const videos = /** @type {string[]|undefined} */ (post['mf-video']);
   const photos = /** @type {string[]|undefined} */ (post['mf-photo']);
   const bookmarkOf = /** @type {string[]|undefined} */ (post['mf-bookmark-of'] || post['mf-bookmark']);
@@ -62,7 +62,7 @@ export function renderPostContent ({ post, content, standalone, indieactions, sw
 
   let replyHtml = '';
   if (inReplyTo && inReplyTo.length > 0) {
-    const heading = swedish ? 'Svar p\u00e5:' : 'In reply to:';
+    const heading = swedish ? 'Svar p\u00E5:' : 'In reply to:';
     const langTag = !swedish && nonenglish ? ' lang="en"' : '';
     replyHtml = `${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
     <ul>
@@ -72,7 +72,7 @@ export function renderPostContent ({ post, content, standalone, indieactions, sw
 
   let syndicationHtml = '';
   if (syndication && syndication.length > 0) {
-    const heading = swedish ? 'Ocks\u00e5 postat p\u00e5:' : 'Also posted on:';
+    const heading = swedish ? 'Ocks\u00E5 postat p\u00E5:' : 'Also posted on:';
     const langTag = !swedish && nonenglish ? ' lang="en"' : '';
     syndicationHtml = `<div class="elsewhere linklist">
       ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}
@@ -88,7 +88,7 @@ export function renderPostContent ({ post, content, standalone, indieactions, sw
 
   let persontagsHtml = '';
   if (persontags && persontags.length > 0) {
-    const heading = swedish ? 'N\u00e4mnda:' : 'Mentioned:';
+    const heading = swedish ? 'N\u00E4mnda:' : 'Mentioned:';
     const langTag = !swedish && nonenglish ? ' lang="en"' : '';
     persontagsHtml = `<div class="persons linklist">
       ${swedish ? `<h3>${heading}</h3>` : `<h3${langTag}>${heading}</h3>`}

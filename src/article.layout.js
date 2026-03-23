@@ -4,10 +4,10 @@ import { renderPostContent } from './lib/render-post-content.js';
 /**
  * Article/post layout - extends root layout with webmention form and post rendering
  *
- * @param {{ children: string, vars: Record<string, unknown> }} options
+ * @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
-export default function articleLayout ({ children, vars }) {
+export default function articleLayout ({ children, scripts = [], styles = [], vars }) {
   const swedish = !vars.lang || vars.lang === 'sv';
   const nonenglish = vars.lang !== 'en';
 
@@ -52,5 +52,7 @@ export default function articleLayout ({ children, vars }) {
   return rootLayout({
     children: articleHtml + '\n' + webmentionForm,
     vars: layoutVars,
+    scripts,
+    styles,
   });
 }

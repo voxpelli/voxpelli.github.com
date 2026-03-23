@@ -1,3 +1,6 @@
-import voxpelli from '@voxpelli/eslint-config';
+import { voxpelli } from '@voxpelli/eslint-config';
 
-export default voxpelli({ noMocha: true });
+export default [
+  { ignores: ['demo/', 'js/', 'static/', 'scripts/', 'src/sw.js'] },
+  ...voxpelli({ noMocha: true }),
+];

@@ -2,15 +2,14 @@ import { escapeXml } from './lib/escape.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
 /**
- * Generate multiple Atom feeds.
+ * Generate multiple Atom feeds using async generator pattern.
  *
  * Templates receive { vars, pages } where vars is global.vars only (not global.data).
- * We must filter/sort pages ourselves to extract recent posts for feeds.
+ * Pages are full PageData objects with renderInnerPage() available for getting rendered HTML.
  *
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown> }> }} options
- * @returns {Array<{ outputName: string, content: string }>}
+ * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
  */
-export default function feedsTemplate ({ vars, pages }) {
+export default async function * feedsTemplate ({ pages, vars }) {
   const siteUrl = /** @type {string} */ (vars.siteUrl);
   const blogName = /** @type {string} */ (vars.blogName);
   const authorName = /** @type {string} */ (vars.authorName);
@@ -36,7 +35,7 @@ export default function feedsTemplate ({ vars, pages }) {
         date: pageVars.date,
         lang: pageVars.lang,
         category: pageVars.category,
-        content: /** @type {string} */ (pageVars.content) || '',
+        path: pagePath,
         pageUrl,
       };
     })
@@ -53,14 +52,16 @@ export default function feedsTemplate ({ vars, pages }) {
    * @param {string} [options.htmlUrl]
    * @param {string} [options.subtitle]
    * @param {Array<Record<string, unknown>>} options.posts
-   * @returns {string}
+   * @returns {Promise<string>}
    */
-  function buildFeed ({ selfUrl, htmlUrl, subtitle, posts }) {
-    // Note: DomStack doesn't expose rendered HTML or raw markdown body in templates.
-    // page.vars.content is undefined for md pages. See domstack-issues/03-rendered-content-in-templates.md
-    const entries = posts
-      .map(post => renderRssEntry({ post, content: /** @type {string} */ (post.content) || '', siteUrl }))
-      .join('\n');
+  async function buildFeed ({ htmlUrl, posts, selfUrl, subtitle }) {
+    const entries = [];
+    for (const post of posts) {
+      // Find the matching PageData object to get rendered HTML via renderInnerPage
+      const page = pages.find(p => p.pageInfo.path === post.path);
+      const html = page ? await page.renderInnerPage({ pages }) : '';
+      entries.push(renderRssEntry({ post, content: /** @type {string} */ (html), siteUrl }));
+    }
 
     return `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -76,37 +77,37 @@ export default function feedsTemplate ({ vars, pages }) {
    <email>${escapeXml(authorEmail)}</email>
  </author>
 
-${entries}
+${entries.join('\n')}
 
 </feed>`;
   }
 
-  return [
-    {
-      outputName: 'all.xml',
-      content: buildFeed({
-        selfUrl: '/all.xml',
-        htmlUrl: '/',
-        posts: recentPosts,
-      }),
-    },
-    {
-      outputName: 'english.xml',
-      content: buildFeed({
-        selfUrl: '/english.xml',
-        htmlUrl: '/',
-        subtitle: 'English posts',
-        posts: recentEnglishPosts,
-      }),
-    },
-    {
-      outputName: 'links/all.xml',
-      content: buildFeed({
-        selfUrl: '/links/all.xml',
-        htmlUrl: '/links/',
-        subtitle: 'Links',
-        posts: recentLinks,
-      }),
-    },
-  ];
+  yield {
+    outputName: 'all.xml',
+    content: await buildFeed({
+      selfUrl: '/all.xml',
+      htmlUrl: '/',
+      posts: recentPosts,
+    }),
+  };
+
+  yield {
+    outputName: 'english.xml',
+    content: await buildFeed({
+      selfUrl: '/english.xml',
+      htmlUrl: '/',
+      subtitle: 'English posts',
+      posts: recentEnglishPosts,
+    }),
+  };
+
+  yield {
+    outputName: 'links/all.xml',
+    content: await buildFeed({
+      selfUrl: '/links/all.xml',
+      htmlUrl: '/links/',
+      subtitle: 'Links',
+      posts: recentLinks,
+    }),
+  };
 }
