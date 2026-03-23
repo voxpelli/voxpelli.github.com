@@ -1,13 +1,10 @@
 /**
  * @param {{ vars: Record<string, unknown> }} _options
- * @returns {Array<{outputName: string, content: string}>}
+ * @returns {string}
  */
 export default function robotsTemplate (_options) {
-  return [{
-    outputName: 'robots.txt',
-    content: `User-agent: *
+  return `User-agent: *
 Disallow: /webpage-kodfabrik-se/
 Disallow: /webpage-svpt-nu/
-`,
-  }];
+`;
 }
