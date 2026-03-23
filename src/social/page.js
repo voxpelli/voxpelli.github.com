@@ -47,7 +47,7 @@ export default function socialPage ({ vars: pageVars }) {
             Liked
             ${likeLinks}
           </span>
-          <time class="dt-published" datetime=${isoDate} pubdate>
+          <time class="dt-published" datetime=${isoDate}>
             <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
           </time>
         </p>

@@ -46,5 +46,10 @@ test('service worker exists', async () => {
 test('no defunct service references in homepage', async () => {
   const html = await readFile('public/index.html', 'utf8');
   assert.doesNotMatch(html, /flattr/i);
-  assert.doesNotMatch(html, /superfeedr/i);
+});
+
+test('homepage has Superfeedr WebSub hub link', async () => {
+  const html = await readFile('public/index.html', 'utf8');
+  assert.match(html, /rel="hub"/);
+  assert.match(html, /voxpelli\.superfeedr\.com/);
 });

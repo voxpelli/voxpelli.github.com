@@ -18,9 +18,9 @@ export function PostFooter ({ authorName, nonenglish, post }) {
 
   return html`
     <footer lang=${nonenglish ? 'en' : false}>
-        <time class="dt-published" datetime=${isoDate} pubdate>
+        <relative-time><time class="dt-published" datetime=${isoDate}>
           <a class="u-url u-uid" href=${pageUrl}>${longDate}</a>
-        </time>
+        </time></relative-time>
           by
         <a class="p-author h-card" href="/"><img class="u-photo" src="/avatar.jpg" alt="" width="20" height="20" /> ${authorName}</a>
       </footer>
