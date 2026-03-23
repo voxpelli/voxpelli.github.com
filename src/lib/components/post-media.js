@@ -1,0 +1,30 @@
+import { html } from 'async-htm-to-string';
+
+/**
+ * Render video or photo media block.
+ *
+ * @param {object} options
+ * @param {string[]|undefined} [options.photos]
+ * @param {string[]|undefined} [options.videos]
+ * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ */
+export function PostMedia ({ photos, videos }) {
+  if (videos && videos.length > 0) {
+    return html`
+      <div class="media">
+            ${videos.map(v => html`
+              <video class="u-video" src=${v} controls loop>
+                      <div lang="en">Looks like you can't see this video. <a href=${v} download>Download it</a> instead.</div>
+                    </video>
+            `)}
+          </div>
+    `;
+  }
+  if (photos && photos.length > 0) {
+    return html`
+      <div class="media">
+            ${photos.map(p => html`<img class="u-photo" src=${p} alt="" />`)}
+          </div>
+    `;
+  }
+}

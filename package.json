@@ -12,7 +12,8 @@
     "check:tsc": "tsc",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
     "check": "run-p check:* --continue-on-error",
-    "test": "run-s check",
+    "test:build": "node --test 'test/**/*.spec.js'",
+    "test": "run-s check build test:build",
     "husky-enable": "husky",
     "husky-disable": "git config --unset core.hooksPath",
     "prepare": "husky"

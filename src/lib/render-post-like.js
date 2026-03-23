@@ -1,6 +1,6 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
-import { renderPostFooter } from './render-post-footer.js';
+import { PostFooter } from './render-post-footer.js';
 
 /**
  * @param {object} options
@@ -24,8 +24,7 @@ export function renderPostLike ({ authorName, post }) {
         Liked
         ${likeLinks}
       </p>
-
-      ${rawHtml(renderPostFooter({ authorName, nonenglish: false, post }))}
+      ${PostFooter({ authorName, nonenglish: false, post })}
     </article>
   `);
 }

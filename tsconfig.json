@@ -5,7 +5,8 @@
     "noPropertyAccessFromIndexSignature": false
   },
   "include": [
-    "src/**/*.js"
+    "src/**/*.js",
+    "test/**/*.js"
   ],
   "exclude": [
     "src/global.client.js"
