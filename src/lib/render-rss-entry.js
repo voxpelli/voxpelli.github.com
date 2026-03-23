@@ -18,7 +18,7 @@ export function renderRssEntry ({ content, post, siteUrl }) {
   <title>${escapeXml(String(post.title || ''))}</title>
   <link href="${escapeXml(postUrl)}"/>
   <updated>${isoDate}</updated>
-  <id>${escapeXml(`${siteUrl}${post.pageUrl || ''}`)}</id>
+  <id>${escapeXml(postUrl)}</id>
   <content type="html">${escapeXml(content || '')}</content>
  </entry>`;
 }

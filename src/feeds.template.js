@@ -46,22 +46,33 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = allPosts.filter(p => p.category === 'links').slice(0, 10);
 
+  // Build page index for O(1) lookup instead of O(n) pages.find() per post
+  /** @type {Map<string, typeof pages[0]>} */
+  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
+
+  // Pre-render all unique feed posts in parallel, with cache to avoid duplicates
+  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks].map(p => [p.path, p])).values()];
+  /** @type {Map<string, string>} */
+  const renderCache = new Map();
+  await Promise.all(allFeedPosts.map(async (post) => {
+    const page = pagesByPath.get(/** @type {string} */ (post.path));
+    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    renderCache.set(/** @type {string} */ (post.path), html);
+  }));
+
   /**
    * @param {object} options
    * @param {string} options.selfUrl
    * @param {string} [options.htmlUrl]
    * @param {string} [options.subtitle]
    * @param {Array<Record<string, unknown>>} options.posts
-   * @returns {Promise<string>}
+   * @returns {string}
    */
-  async function buildFeed ({ htmlUrl, posts, selfUrl, subtitle }) {
-    const entries = [];
-    for (const post of posts) {
-      // Find the matching PageData object to get rendered HTML via renderInnerPage
-      const page = pages.find(p => p.pageInfo.path === post.path);
-      const html = page ? await page.renderInnerPage({ pages }) : '';
-      entries.push(renderRssEntry({ post, content: /** @type {string} */ (html), siteUrl }));
-    }
+  function buildFeed ({ htmlUrl, posts, selfUrl, subtitle }) {
+    const entries = posts.map(post => {
+      const html = renderCache.get(/** @type {string} */ (post.path)) || '';
+      return renderRssEntry({ content: html, post, siteUrl });
+    });
 
     return `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">

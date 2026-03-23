@@ -15,10 +15,5 @@ export function escapeHtml (str) {
  * @returns {string}
  */
 export function escapeXml (str) {
-  return String(str)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
+  return escapeHtml(str).replaceAll("'", '&apos;');
 }

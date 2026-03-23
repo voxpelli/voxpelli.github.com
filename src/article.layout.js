@@ -34,7 +34,7 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
   Have you written a response to this? Let me know the URL:
   <form action="${wmEndpoint}/api/webmention" method="post">
     <input name="source" type="url" placeholder="http://example.com/my-cool-post" />
-    <input name="target" value="http://voxpelli.com${vars.pageUrl || ''}" type="hidden">
+    <input name="target" value="${vars.siteUrl}${vars.pageUrl || ''}" type="hidden">
     <input value="Send Webmention" type="submit">
   </form>
 </div>
