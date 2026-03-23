@@ -271,11 +271,6 @@ img {
   box-shadow: 0 0 0 var(--color-ink);
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--color-falu-red);
-  outline-offset: 2px;
-}
-
 /* === Content Area === */
 .content-area {
   display: flex;
@@ -670,15 +665,20 @@ theme-toggle button:hover {
   color: var(--color-ink);
 }
 
-theme-toggle button:focus-visible {
-  outline: 2px solid var(--color-falu-red);
-  outline-offset: 2px;
-}
+/* theme-toggle button inherits global focus-visible */
 
 /* === Relative time === */
 relative-time .relative-label {
   color: var(--color-ink-light);
   font-size: 0.85em;
+}
+
+/* === Focus states === */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-falu-red);
+  outline-offset: 2px;
 }
 
 /* === Article content === */
@@ -726,6 +726,27 @@ relative-time .relative-label {
   color: var(--color-falu-red);
 }
 
+/* Content links: underlines for readability */
+.e-content a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-stone);
+  text-underline-offset: 2px;
+}
+
+.e-content a:hover {
+  text-decoration-color: var(--color-falu-red);
+  color: var(--color-falu-red);
+}
+
+/* Metadata section headings: mono uppercase */
+.linklist h3 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+}
+
 /* Tags as badges */
 .tags .p-category {
   display: inline-block;
@@ -735,6 +756,11 @@ relative-time .relative-label {
   background-color: var(--color-canvas);
   font-family: var(--font-mono);
   font-size: 0.8rem;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.tags .p-category:hover {
+  border-color: var(--color-falu-red);
 }
 
 /* === Syntax highlighting (preserved as-is) === */
