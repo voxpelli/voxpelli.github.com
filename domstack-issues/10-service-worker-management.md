@@ -1,28 +1,32 @@
-# Service workers are not managed by the build system
+# Allow `--copy` to handle individual files, not just directories
 
 ## Problem
 
-Service workers (`sw.js`) live at the site root and aren't processed by DomStack because `.js` files in `src/` are treated as potential page files. Users must manually copy sw.js in a post-build step:
+The `--copy` flag only accepts directories. Individual root-level files that need to end up in the output directory require a manual post-build step:
 
 ```json
 "build": "domstack --copy images --copy media && cp sw.js public/sw.js"
 ```
 
-The sw.js is also excluded from linting and type-checking configs since it uses browser globals (`self`, `caches`, `fetch`, `Response`).
+This affects any file that lives outside `src/` but needs to be in the build output — service workers, `_redirects` (Netlify), `_headers`, `.well-known/*` files, etc. These can't live in `src/` because `.js` files there are treated as page modules.
 
 ## Impact
 
-Any static site with PWA/offline support needs a service worker. The manual copy is fragile (easy to forget), doesn't integrate with watch mode, and means the SW can't benefit from DomStack's asset pipeline (e.g., cache-busting, content hashing).
+The manual `cp` step is fragile (easy to forget), doesn't integrate with watch mode, and means these files can't participate in any build pipeline processing.
 
 ## Suggested improvements
 
-### Option A: Recognize sw.js as a special static file
-If `sw.js` exists at project root, automatically copy it to the output directory.
-
-### Option B: Add a `--static-copy` flag for individual files
+### Option A: Let `--copy` accept files too
 ```bash
-domstack --copy images --static-copy sw.js
+domstack --copy images --copy media --copy sw.js --copy _redirects
 ```
+Detect whether the argument is a file or directory and handle accordingly.
 
-### Option C: Document the recommended pattern
-Add a "Service Workers" section to the docs showing the `cp sw.js public/sw.js` pattern and explaining why sw.js can't live in `src/`.
+### Option B: Add a separate `--copy-file` flag
+```bash
+domstack --copy images --copy-file sw.js --copy-file _redirects
+```
+Keeps the semantics explicit.
+
+### Option C: Support a static files convention
+A `static/` or `public/` directory whose contents are copied verbatim to the output root, similar to Astro's `public/` or Vite's `public/`.
