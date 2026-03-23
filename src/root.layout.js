@@ -68,8 +68,11 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     ${scripts.map(src => html`<script type="module" src=${src}></script>`)}
   `);
 
+  // Classes from page vars are sanitized to prevent attribute breakout
+  const classes = String(vars.classes || '').replaceAll('"', '');
+
   return `<!DOCTYPE html>
-<html lang="en" class="no-js${vars.classes ? ` ${vars.classes}` : ''}${vars.hfeed ? ' h-feed' : ''}">
+<html lang="en" class="no-js${classes ? ` ${classes}` : ''}${vars.hfeed ? ' h-feed' : ''}">
 <head>${headContent}</head>
 <body>${bodyContent}</body>
 </html>`;

@@ -1,4 +1,4 @@
-import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
+import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { renderPostContent } from './lib/render-post-content.js';
 import rootLayout from './root.layout.js';
@@ -41,7 +41,7 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
       </form>
     </div>
 
-    ${rawHtml(`<script defer src="${wmEndpoint}/js/cutting-edge.js"></script>`)}
+    <script defer src=${`${wmEndpoint}/js/cutting-edge.js`}></script>
   `);
 
   const layoutVars = {
