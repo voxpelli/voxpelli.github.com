@@ -2,8 +2,7 @@
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
     "types": ["node"],
-    "noPropertyAccessFromIndexSignature": false,
-    "skipLibCheck": true
+    "noPropertyAccessFromIndexSignature": false
   },
   "include": [
     "src/**/*.js"

@@ -6,7 +6,10 @@ export const vars = {
   hfeed: true,
 };
 
-/** @param {{ vars: Record<string, unknown> }} options */
+/**
+ * @param {{ vars: Record<string, unknown> }} options
+ * @returns {string}
+ */
 export default function archivePage ({ vars: pageVars }) {
   const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.postsByYear) || {};
   const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));

@@ -7,7 +7,10 @@ export const vars = {
   hfeed: true,
 };
 
-/** @param {{ vars: Record<string, unknown> }} options */
+/**
+ * @param {{ vars: Record<string, unknown> }} options
+ * @returns {string}
+ */
 export default function linksPage ({ vars: pageVars }) {
   const linkPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.linkPosts) || [];
   const recentLinks = linkPosts.slice(0, 5);

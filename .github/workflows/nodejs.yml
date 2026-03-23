@@ -9,4 +9,4 @@ jobs:
   test:
     uses: voxpelli/ghatemplates/.github/workflows/nodejs.yml@main
     with:
-      node-versions: 20,22
+      node-versions: 20,22,24

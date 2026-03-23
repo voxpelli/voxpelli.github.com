@@ -1,6 +1,9 @@
 import { escapeHtml } from './lib/escape.js';
 
-/** @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options */
+/**
+ * @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
+ * @returns {string}
+ */
 export default function rootLayout ({ children, scripts = [], styles = [], vars }) {
   const blogName = /** @type {string} */ (vars.blogName);
   const siteUrl = /** @type {string} */ (vars.siteUrl);

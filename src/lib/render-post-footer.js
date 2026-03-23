@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape.js';
 import { renderIndieActions } from './render-indie-actions.js';
 
 /**
@@ -22,13 +23,4 @@ export function renderPostFooter ({ authorName, indieactions, nonenglish, post }
 
   ${indieactions ? renderIndieActions(/** @type {string} */ (post.pageUrl) || '') : ''}
 </footer>`;
-}
-
-/** @param {string} str */
-function escapeHtml (str) {
-  return String(str)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
 }

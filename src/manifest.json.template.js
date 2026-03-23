@@ -1,4 +1,7 @@
-/** @param {{ vars: Record<string, unknown> }} _options */
+/**
+ * @param {{ vars: Record<string, unknown> }} _options
+ * @returns {Array<{outputName: string, content: string}>}
+ */
 export default function manifestTemplate (_options) {
   return [{
     outputName: 'manifest.json',

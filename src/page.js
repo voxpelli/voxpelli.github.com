@@ -8,7 +8,10 @@ export const vars = {
   hfeed: true,
 };
 
-/** @param {{ vars: Record<string, unknown> }} options */
+/**
+ * @param {{ vars: Record<string, unknown> }} options
+ * @returns {string}
+ */
 export default function homePage ({ vars: pageVars }) {
   const recentPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.recentPosts) || [];
 
