@@ -32,14 +32,14 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
   const wmEndpoint = /** @type {string} */ (vars.webmentionEndpoint);
 
   const webmentionForm = renderToStringSync(html`
-    <div>
+    <section class="webmention-form">
       <form action=${`${wmEndpoint}/api/webmention`} method="post">
         <label for="webmention-source">Have you written a response to this? Let me know the URL:</label>
         <input id="webmention-source" name="source" type="url" placeholder="http://example.com/my-cool-post" />
         <input name="target" value=${`${vars.siteUrl}${vars.pageUrl || ''}`} type="hidden" />
         <input value="Send Webmention" type="submit" />
       </form>
-    </div>
+    </section>
 
     <script defer src=${`${wmEndpoint}/js/cutting-edge.js`}></script>
   `);
@@ -47,7 +47,7 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
   const layoutVars = {
     ...vars,
     author: true,
-    hfeed: true,
+    hfeed: false,
     webmentionable: true,
   };
 
