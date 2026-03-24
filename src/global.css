@@ -120,6 +120,25 @@ body {
   grid-template-columns: 1fr;
 }
 
+@media (min-width: 768px) and (max-width: 1023px) {
+  .layout-wrapper {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-bottom: none;
+    border-right: var(--border-heavy);
+    overflow-y: auto;
+  }
+
+  .brand-header .title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  }
+}
+
 @media (min-width: 1024px) {
   .layout-wrapper {
     grid-template-columns: 340px 1fr;
@@ -234,7 +253,7 @@ img {
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .nav-item {
@@ -441,7 +460,7 @@ ol {
 
 /* === Code highlighting === */
 .highlight {
-  font-size: 18px;
+  font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
   overflow: auto;
 }
 
@@ -542,7 +561,7 @@ html.js .u-responses {
 
 /* === Blockquote === */
 blockquote {
-  border-left: 5px solid var(--color-stone);
+  border-left: 4px solid var(--color-stone);
   padding-left: var(--space-sm);
   margin-left: var(--space-md);
   font-family: var(--font-serif);
@@ -553,7 +572,6 @@ blockquote {
 /* === Inline link lists === */
 .linklist h3 {
   display: inline;
-  font-weight: inherit;
   font-size: inherit;
   font-weight: 400;
 }
@@ -628,7 +646,7 @@ input[type=url] {
 .webmention-facepile > li {
   display: inline-block;
   position: relative;
-  margin: 0 5px 5px 0;
+  margin: 0 var(--space-xs) var(--space-xs) 0;
 }
 
 .webmention-interaction-presentation::after {
@@ -918,8 +936,8 @@ input:focus-visible {
 .highlight .kt { color: var(--hl-name); font-weight: bold }
 .highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il { color: var(--hl-number) }
 .highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .s1 { color: var(--hl-string) }
-.highlight .sr { color: #009926 }
-.highlight .ss { color: #990073 }
+.highlight .sr { color: var(--hl-number) }
+.highlight .ss { color: var(--color-cloudberry) }
 .highlight .na, .highlight .no, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi { color: var(--hl-name) }
 .highlight .nb { color: var(--hl-name) }
 .highlight .nc { color: var(--hl-name); font-weight: bold }
