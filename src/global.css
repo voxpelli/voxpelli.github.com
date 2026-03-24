@@ -78,8 +78,8 @@
   --color-ink-light: #b0aba4;
   --color-falu-red: #c84040;
   --color-cloudberry: #e8941f;
-  --color-stone: #524e48;
-  --color-stone-light: #33312e;
+  --color-stone: #605b55;
+  --color-stone-light: #3d3a36;
   --hl-bg: #2a2826;
   --hl-comment: #8a8580;
   --hl-string: #e8941f;
@@ -615,7 +615,7 @@ div.blog-article-summary + div.blog-article-summary {
 }
 
 .webmention-mention {
-  padding-left: 60px;
+  padding-left: var(--space-xl);
   position: relative;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -628,7 +628,7 @@ div.blog-article-summary + div.blog-article-summary {
 .webmention-author img {
   position: absolute;
   top: 0;
-  left: -5px;
+  left: calc(-1 * var(--space-xs));
   width: 50px;
   border-radius: 50%;
 }
@@ -677,11 +677,11 @@ form:has(#webmention-source) {
 
 .webmention-facepile {
   padding-left: 0;
-  margin-left: -5px;
+  margin-left: calc(-1 * var(--space-xs));
 }
 
 .webmention-facepile:last-child {
-  margin-bottom: -5px;
+  margin-bottom: calc(-1 * var(--space-xs));
 }
 
 .webmention-facepile > li {
