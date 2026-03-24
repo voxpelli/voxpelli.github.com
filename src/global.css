@@ -342,7 +342,8 @@ img {
   align-items: baseline;
 }
 
-.content-header h2 {
+.content-header h2,
+.content-header h3 {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -411,6 +412,7 @@ img {
   font-weight: 500;
   line-height: 1.2;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .post-title a {
@@ -581,6 +583,10 @@ blockquote {
 }
 
 /* === Inline link lists === */
+.linklist {
+  overflow-wrap: break-word;
+}
+
 .linklist h3 {
   display: inline;
   font-size: inherit;
@@ -661,14 +667,21 @@ input[type=submit] {
   cursor: pointer;
   background: var(--color-canvas);
   color: var(--color-ink);
-  border-radius: 4px;
-  transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring);
+  box-shadow: 4px 4px 0 var(--color-ink);
+  transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
 }
 
 input[type=submit]:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--color-ink);
   background-color: var(--color-falu-red);
   color: var(--color-canvas);
   border-color: var(--color-falu-red);
+}
+
+input[type=submit]:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-ink);
 }
 
 form label[for="webmention-source"] {
@@ -816,6 +829,7 @@ input:focus-visible {
   font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
   line-height: 1.7;
   max-width: 65ch;
+  overflow-wrap: break-word;
 }
 
 .content-area > .h-entry .e-content h2 {
