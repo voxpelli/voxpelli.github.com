@@ -2,6 +2,7 @@
 /coverage-ts
 /node_modules
 /public
+/_site
 /.env
 npm-debug.log
 yarn-error.log
