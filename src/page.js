@@ -42,5 +42,9 @@ export default function homePage ({ vars: pageVars }) {
 
 <div class="post-list">
     ${postListItems}
-</div>`;
+</div>
+
+<p class="posts-extras">
+  <a href="/archive/">Browse the archive</a>
+</p>`;
 }
