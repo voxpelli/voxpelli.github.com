@@ -19,13 +19,7 @@
  */
 export function filterAndSortPosts (pages) {
   return pages
-    .filter(p => {
-      try {
-        return p.vars && p.vars.layout === 'article' && p.vars.date;
-      } catch {
-        return false;
-      }
-    })
+    .filter(p => p.vars && p.vars.layout === 'article' && p.vars.date)
     .map(p => {
       const vars = p.vars;
       const pagePath = p.pageInfo.path;
