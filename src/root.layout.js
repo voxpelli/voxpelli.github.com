@@ -74,7 +74,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
       <aside class="sidebar h-card p-author">
         <header class="brand-header">
           <h1 class="title"><a href="/" class="p-name">${authorName}</a></h1>
-          <p class="subtitle p-summary">Things <a rel=${vars.frontpage ? 'me' : false} href="/about/">about me</a> & the world</p>
+          <p class="subtitle p-summary">Things <a rel="me" href="/about/">about me</a> and the world around us</p>
         </header>
 
         <div class="profile-widget">
