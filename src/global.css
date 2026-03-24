@@ -54,7 +54,7 @@
     --color-canvas: #1e1d1b;
     --color-canvas-alt: #2a2826;
     --color-ink: #e0ddd8;
-    --color-ink-light: #b0aba4;
+    --color-ink-light: #c4bfb8;
     --color-falu-red: #c84040;
     --color-cloudberry: #e8941f;
     --color-stone: #605b55;
@@ -75,7 +75,7 @@
   --color-canvas: #1e1d1b;
   --color-canvas-alt: #2a2826;
   --color-ink: #e0ddd8;
-  --color-ink-light: #b0aba4;
+  --color-ink-light: #c4bfb8;
   --color-falu-red: #c84040;
   --color-cloudberry: #e8941f;
   --color-stone: #605b55;
@@ -131,7 +131,6 @@ body {
     height: 100vh;
     border-bottom: none;
     border-right: var(--border-heavy);
-    overflow-y: auto;
   }
 
   .brand-header .title {
@@ -189,7 +188,6 @@ img {
     height: 100vh;
     border-bottom: none;
     border-right: var(--border-heavy);
-    overflow-y: auto;
   }
 }
 
@@ -311,13 +309,13 @@ img {
   font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
-  box-shadow: 4px 4px 0 var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-stone);
   text-decoration: none;
 }
 
 .btn:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-ink);
+  box-shadow: 2px 2px 0 var(--color-stone);
   background-color: var(--color-falu-red);
   border-color: var(--color-falu-red);
   color: var(--color-canvas);
@@ -325,7 +323,7 @@ img {
 
 .btn:active {
   transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--color-ink);
+  box-shadow: 0 0 0 var(--color-stone);
 }
 
 /* === Content Area === */
@@ -687,13 +685,13 @@ input[type=submit] {
   cursor: pointer;
   background: var(--color-canvas);
   color: var(--color-ink);
-  box-shadow: 4px 4px 0 var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-stone);
   transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
 }
 
 input[type=submit]:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-ink);
+  box-shadow: 2px 2px 0 var(--color-stone);
   background-color: var(--color-falu-red);
   color: var(--color-canvas);
   border-color: var(--color-falu-red);
@@ -701,7 +699,7 @@ input[type=submit]:hover {
 
 input[type=submit]:active {
   transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--color-ink);
+  box-shadow: 0 0 0 var(--color-stone);
 }
 
 form label[for="webmention-source"] {
@@ -1086,10 +1084,11 @@ input:focus-visible {
   text-decoration-color: var(--color-stone);
 }
 
-/* Replies: conversational — left border accent */
+/* Replies: conversational — subtle background tint instead of left border (avoids clash with sidebar border) */
 .h-entry:has(.u-in-reply-to) {
-  border-inline-start: 3px solid var(--color-stone);
-  padding-inline-start: calc(var(--space-lg) - 3px);
+  background-color: var(--color-canvas-alt);
+  border-radius: 4px;
+  margin-inline: var(--space-xs);
 }
 
 /* Reply verb heading: mono uppercase */
@@ -1101,10 +1100,11 @@ input:focus-visible {
   color: var(--color-ink-light);
 }
 
-/* Bookmarks: curated link — subtle left accent */
+/* Bookmarks: curated link — subtle background tint */
 .h-entry:has(.u-bookmark-of) {
-  border-inline-start: 3px solid var(--color-stone-light);
-  padding-inline-start: calc(var(--space-lg) - 3px);
+  background-color: var(--color-canvas-alt);
+  border-radius: 4px;
+  margin-inline: var(--space-xs);
 }
 
 /* Bookmark title: serif, slightly smaller than articles */

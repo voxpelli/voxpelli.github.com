@@ -46,9 +46,9 @@ export default async function linksPage ({ pages, vars: pageVars }) {
 ${postsHtml}
 
 ${linkPosts.length > 5
-? `<ul class="posts-extras">
-  <li><a href="/archive/full/">Full Archive</a></li>
-</ul>`
+? `<p class="posts-extras">
+  <a href="/archive/full/">Full Archive</a>
+</p>`
 : ''}
 
 <script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>`;

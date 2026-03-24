@@ -51,10 +51,10 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/all.xml" title="All posts" />
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/english.xml" title="English posts" />
 
-    <link rel="canonical" href=${canonicalUrl} />
+    ${!vars.noCanonical ? html`<link rel="canonical" href=${canonicalUrl} />` : ''}
 
     <meta property="og:title" content=${title} />
-    <meta property="og:url" content=${canonicalUrl} />
+    ${!vars.noCanonical ? html`<meta property="og:url" content=${canonicalUrl} />` : ''}
     <meta property="og:site_name" content=${blogName} />
     <meta property="og:type" content=${vars.layout === 'article' ? 'article' : 'website'} />
     <meta property="og:locale" content=${lang === 'sv' ? 'sv_SE' : 'en_US'} />
