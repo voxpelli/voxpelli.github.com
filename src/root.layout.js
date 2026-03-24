@@ -16,6 +16,8 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     ? blogName
     : (vars.title ? `${vars.title} \u2013 ${blogName}` : blogName);
 
+  const lang = String(vars.lang || 'en');
+
   const pageUrl = String(vars.pageUrl || '') || '/';
   const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 
@@ -37,6 +39,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
 
     <meta name="theme-color" content=${themeColor} />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/launcher-icon.png" />
 
     ${rawHtml("<script>(function(){var s=localStorage.getItem('theme')||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'})()</script>")}
 
@@ -50,6 +53,13 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/english.xml" title="English posts" />
 
     <link rel="canonical" href=${canonicalUrl} />
+
+    <meta property="og:title" content=${title} />
+    <meta property="og:url" content=${canonicalUrl} />
+    <meta property="og:site_name" content=${blogName} />
+    <meta property="og:type" content=${vars.frontpage ? 'website' : 'article'} />
+    <meta property="og:locale" content=${lang === 'sv' ? 'sv_SE' : 'en_US'} />
+
     ${vars.frontpage
 ? html`
   <link rel="self" href=${siteUrl} type="text/html" />
@@ -105,8 +115,6 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
 
   // Classes from page vars are sanitized to prevent attribute breakout
   const classes = String(vars.classes || '').replaceAll('"', '');
-
-  const lang = String(vars.lang || 'en');
 
   return `<!DOCTYPE html>
 <html lang="${lang}" class="no-js${classes ? ` ${classes}` : ''}">
