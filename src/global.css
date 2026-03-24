@@ -633,8 +633,46 @@ div.blog-article-summary + div.blog-article-summary {
   border-radius: 50%;
 }
 
+/* === Webmention form === */
 input[type=url] {
   width: min(100%, 30rem);
+  border: var(--border-structural);
+  padding: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  border-radius: 4px;
+}
+
+input[type=submit] {
+  border: var(--border-heavy);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  border-radius: 4px;
+  transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring);
+}
+
+input[type=submit]:hover {
+  background-color: var(--color-falu-red);
+  color: var(--color-canvas);
+  border-color: var(--color-falu-red);
+}
+
+form label[for="webmention-source"] {
+  font-family: var(--font-serif);
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+form:has(#webmention-source) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
 .webmention-facepile {
