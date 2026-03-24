@@ -766,7 +766,7 @@ input:focus-visible {
   margin-top: 1.5em;
 }
 
-.content-area > .h-entry > header h2 {
+.content-area > .h-entry > header h1 {
   font-family: var(--font-serif);
   font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
   font-weight: 500;

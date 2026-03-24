@@ -13,10 +13,10 @@ export function PostHeader ({ bookmarkOf, repostOf, title }) {
   if (!title) return;
 
   if (bookmarkOf && bookmarkOf[0]) {
-    return html`<header><h2 class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></h2></header>`;
+    return html`<header><h1 class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></h1></header>`;
   }
   if (repostOf && repostOf[0]) {
-    return html`<header><h2 class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></h2></header>`;
+    return html`<header><h1 class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></h1></header>`;
   }
-  return html`<header><h2 class="p-name">${title}</h2></header>`;
+  return html`<header><h1 class="p-name">${title}</h1></header>`;
 }
