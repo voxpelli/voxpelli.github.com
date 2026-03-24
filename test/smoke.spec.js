@@ -143,9 +143,9 @@ test('links page has bookmark posts', async () => {
 
 test('archive page has year headings', async () => {
   const html = await readFile('public/archive/index.html', 'utf8');
-  assert.match(html, /<h2>20\d{2}<\/h2>/, 'archive page should contain year headings');
+  assert.match(html, /<h3>20\d{2}<\/h3>/, 'archive page should contain year headings');
 
-  const yearPattern = /<h2>(20\d{2})<\/h2>/g;
+  const yearPattern = /<h3>(20\d{2})<\/h3>/g;
   const years = [...html.matchAll(yearPattern)].map(m => m[1]);
 
   assert.ok(years.length >= 2, 'archive page should have at least two year headings');

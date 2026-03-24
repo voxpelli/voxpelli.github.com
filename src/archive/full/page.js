@@ -38,7 +38,7 @@ export default async function fullArchivePage ({ pages, vars: pageVars }) {
 
   for (const year of years) {
     const posts = postsByYear[year] || [];
-    result += `<div class="content-header"><h2>${year}</h2></div>\n`;
+    result += `<div class="content-header"><h3>${year}</h3></div>\n`;
 
     for (const post of posts) {
       const content = renderCache.get(/** @type {string} */ (post.path)) || '';

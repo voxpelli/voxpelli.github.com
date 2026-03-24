@@ -16,11 +16,11 @@ export default function archivePage ({ vars: pageVars }) {
   const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.postsByYear) || {};
   const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 
-  let result = '<div class="content-header">\n  <h2>Archive // All Writings</h2>\n</div>\n\n<nav class="post-list">\n';
+  let result = '<div class="content-header">\n  <h2>Archive // All Writings</h2>\n</div>\n\n<div class="post-list">\n';
 
   for (const year of years) {
     const posts = postsByYear[year] || [];
-    result += `  <div class="content-header"><h2>${year}</h2></div>\n`;
+    result += `  <div class="content-header"><h3>${year}</h3></div>\n`;
 
     for (const post of posts) {
       result += '    ' + renderPost({
@@ -33,6 +33,6 @@ export default function archivePage ({ vars: pageVars }) {
     }
   }
 
-  result += '</nav>';
+  result += '</div>';
   return result;
 }

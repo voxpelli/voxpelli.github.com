@@ -40,7 +40,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
     if (post['mf-like-of']) {
       if (!isLikeList) {
         isLikeList = true;
-        result += '<article class="likelist">\n';
+        result += '<section class="likelist">\n';
       }
 
       const likes = /** @type {string[]} */ (post['mf-like-of']);
@@ -71,7 +71,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
     } else {
       if (isLikeList) {
         isLikeList = false;
-        result += '</article>\n';
+        result += '</section>\n';
       }
       result += renderPost({
         authorName: String(pageVars.authorName || ''),
@@ -83,7 +83,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
   }
 
   if (isLikeList) {
-    result += '</article>\n';
+    result += '</section>\n';
   }
 
   if (socialPosts.length > 10) {

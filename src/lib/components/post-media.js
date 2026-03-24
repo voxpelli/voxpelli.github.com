@@ -14,7 +14,7 @@ export function PostMedia ({ photos, videos }) {
       <div class="media">
             ${videos.map(v => html`
               <video class="u-video" src=${v} controls loop>
-                      <div lang="en">Looks like you can't see this video. <a href=${v} download>Download it</a> instead.</div>
+                      <p lang="en">Looks like you can't see this video. <a href=${v} download>Download it</a> instead.</p>
                     </video>
             `)}
           </div>
