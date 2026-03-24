@@ -828,6 +828,87 @@ input:focus-visible {
   border-color: var(--color-falu-red);
 }
 
+/* === About page === */
+.about-page {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
+  line-height: 1.7;
+  max-width: 65ch;
+}
+
+.about-page h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+
+.about-lede {
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.about-page .p-nickname {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+.about-page a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-stone);
+  text-underline-offset: 2px;
+}
+
+.about-page a:hover {
+  text-decoration-color: var(--color-falu-red);
+  color: var(--color-falu-red);
+}
+
+/* Elsewhere link list */
+.elsewhere-links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.elsewhere-links li {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: 0;
+}
+
+.elsewhere-links li:hover {
+  background-color: var(--color-canvas-alt);
+  border-color: var(--color-stone);
+  transform: translateX(4px);
+}
+
+.elsewhere-links a {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.elsewhere-links a:hover {
+  color: var(--color-falu-red);
+}
+
+.elsewhere-desc {
+  color: var(--color-ink-light);
+  font-size: 0.85rem;
+}
+
 /* === Syntax highlighting (theme-aware) === */
 .highlight { background: var(--hl-bg); border-radius: 4px; padding: var(--space-xs); }
 .highlight .c, .highlight .cm, .highlight .c1, .highlight .cs { color: var(--hl-comment); font-style: italic }
