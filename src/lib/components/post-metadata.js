@@ -101,7 +101,7 @@ export function PostSubmitTo ({ headingLang, submitto, swedish }) {
     <div class="submitted-to linklist">
         ${LocalizedHeading({ enText: 'Submitted to:', headingLang, svText: 'Inskickad till:', swedish })}
         <ul>
-          ${submitto.map(url => html`<li><a href=${url} class="u-category">${extractName(url)}</a></li>`)}
+          ${submitto.map(url => html`<li><a href=${url} class="u-category">${extractFullDomain(url)}</a></li>`)}
         </ul>
       </div>
   `;
