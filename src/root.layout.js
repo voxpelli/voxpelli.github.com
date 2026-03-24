@@ -22,6 +22,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   // Determine active nav item
   const navItems = [
     { label: 'Blog Posts', href: '/', active: !!vars.frontpage },
+    { label: 'Archive', href: '/archive/', active: pageUrl === '/archive/' },
     { label: 'Social Feed', href: '/social/', active: vars.category === 'social' || pageUrl === '/social/' },
     { label: 'Links', href: '/links/', active: vars.category === 'links' || pageUrl === '/links/' },
     { label: 'About', href: '/about/', active: pageUrl === '/about/' },
