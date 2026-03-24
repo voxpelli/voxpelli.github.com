@@ -73,7 +73,9 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <div class="layout-wrapper">
       <aside class="sidebar h-card p-author">
         <header class="brand-header">
-          <h1 class="title"><a href="/" class="p-name">${authorName}</a></h1>
+          ${vars.frontpage
+? html`<h1 class="title"><a href="/" class="p-name">${authorName}</a></h1>`
+: html`<p class="title"><a href="/" class="p-name">${authorName}</a></p>`}
           <p class="subtitle p-summary">Things <a rel="me" href="/about/">about me</a> and the world around us</p>
         </header>
 
