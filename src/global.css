@@ -705,6 +705,26 @@ relative-time .relative-label {
   font-size: 0.85em;
 }
 
+/* === Skip-to-content link === */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-lg);
+  z-index: 100;
+  padding: var(--space-xs) var(--space-sm);
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+}
+
+.skip-link:focus {
+  top: 0;
+  color: var(--color-canvas);
+}
+
 /* === Focus states === */
 a:focus-visible,
 button:focus-visible,

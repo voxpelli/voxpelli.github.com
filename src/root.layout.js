@@ -69,6 +69,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   `)).join('\n        ');
 
   const bodyContent = renderToStringSync(html`
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <div class="layout-wrapper">
       <aside class="sidebar h-card p-author">
         <header class="brand-header">
@@ -93,7 +94,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
         <theme-toggle><button type="button" aria-label="Toggle theme">\u2600\uFE0F</button></theme-toggle>
       </aside>
 
-      <main class="content-area">
+      <main id="main-content" class="content-area">
         ${rawHtml(children)}
       </main>
     </div>
