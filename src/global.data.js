@@ -1,3 +1,5 @@
+import { filterAndSortPosts } from './lib/posts.js';
+
 /**
  * Aggregate page data for indexes, feeds, and archives.
  * Pages are DomStack PageData objects with .pageInfo and .vars properties.
@@ -6,39 +8,21 @@
  * @returns {Record<string, unknown>}
  */
 export default function globalData ({ pages }) {
-  // Filter pages that are blog posts (have a date and article layout)
-  const allPosts = pages
-    .filter(p => {
-      try {
-        return p.vars && p.vars.layout === 'article' && p.vars.date;
-      } catch {
-        return false;
-      }
-    })
-    .map(p => {
-      const vars = p.vars;
-      const pagePath = p.pageInfo.path;
-      // DomStack pageInfo.path is the directory path (e.g., "2015/01/pubsub-with-postgres-and-node-js")
-      const pageUrl = pagePath ? '/' + pagePath + '/' : '/';
+  // Build page index for enriching base posts with extra fields
+  /** @type {Map<string, Record<string, unknown>>} */
+  const varsByPath = new Map(pages.map(p => [p.pageInfo.path, p.vars]));
 
-      return {
-        title: vars.title || '',
-        date: vars.date,
-        lang: vars.lang,
-        category: vars.category,
-        content: vars.content || '',
-        path: pagePath,
-        pageUrl,
-        // Preserve all mf-* fields
-        ...Object.fromEntries(
-          Object.entries(vars).filter(([k]) => k.startsWith('mf-'))
-        ),
-        tags: vars.tags,
-        persontags: vars.persontags,
-        submitto: vars.submitto,
-      };
-    })
-    .sort((a, b) => new Date(/** @type {string} */ (b.date)).getTime() - new Date(/** @type {string} */ (a.date)).getTime());
+  // Filter and sort posts using shared helper, then enrich with extra fields
+  const allPosts = filterAndSortPosts(pages).map(post => {
+    const vars = varsByPath.get(post.path);
+    return {
+      ...post,
+      content: vars?.content || '',
+      tags: vars?.tags,
+      persontags: vars?.persontags,
+      submitto: vars?.submitto,
+    };
+  });
 
   // Categorize posts
   const blogPosts = allPosts.filter(p => !p.category);

@@ -1,4 +1,5 @@
 import { escapeXml } from './lib/escape.js';
+import { filterAndSortPosts } from './lib/posts.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
 /**
@@ -17,29 +18,8 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const pushHub = /** @type {string} */ (vars.pushHub) || '';
   const now = new Date().toISOString();
 
-  // Extract and sort posts from pages (same logic as global.data.js)
-  const allPosts = pages
-    .filter(p => {
-      try {
-        return p.vars && p.vars.layout === 'article' && p.vars.date;
-      } catch {
-        return false;
-      }
-    })
-    .map(p => {
-      const pageVars = p.vars;
-      const pagePath = p.pageInfo.path;
-      const pageUrl = pagePath ? '/' + pagePath + '/' : '/';
-      return {
-        title: pageVars.title || '',
-        date: pageVars.date,
-        lang: pageVars.lang,
-        category: pageVars.category,
-        path: pagePath,
-        pageUrl,
-      };
-    })
-    .sort((a, b) => new Date(/** @type {string} */ (b.date)).getTime() - new Date(/** @type {string} */ (a.date)).getTime());
+  // Filter and sort posts using shared helper
+  const allPosts = filterAndSortPosts(pages);
 
   const blogPosts = allPosts.filter(p => !p.category);
   const recentPosts = blogPosts.slice(0, 10);
