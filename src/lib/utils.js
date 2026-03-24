@@ -9,13 +9,28 @@ export function extractDomain (url) {
 }
 
 /**
- * Extract site name from a URL (strips protocol, www, .com, and path).
+ * Extract the registrable domain from a URL for human-readable display.
+ * Returns "aaronparecki.com", "brid.gy", "news.indieweb.org" etc.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export function extractFullDomain (url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0] || url;
+  }
+}
+
+/**
+ * Extract site name from a URL (strips protocol, www, TLD, and path).
  *
  * @param {string} url
  * @returns {string}
  */
 export function extractName (url) {
-  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\.com$/, '').split('/')[0] || '';
+  return extractFullDomain(url).split('.')[0] || '';
 }
 
 /**

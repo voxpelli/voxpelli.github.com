@@ -1067,3 +1067,67 @@ input:focus-visible {
 .highlight .gt, .highlight .gr { color: var(--color-falu-red) }
 .highlight .bp { color: var(--hl-comment) }
 .highlight .w { color: var(--color-stone) }
+
+/* === Social Stream Type Detection via :has() === */
+
+/* Likes: lightest weight — mono, muted, compact */
+.h-entry:has(.u-like-of) {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-ink-light);
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-lg);
+  line-height: 1.4;
+}
+
+.h-entry:has(.u-like-of) a {
+  color: var(--color-ink-light);
+  text-decoration: underline;
+  text-decoration-color: var(--color-stone);
+}
+
+/* Replies: conversational — left border accent */
+.h-entry:has(.u-in-reply-to) {
+  border-inline-start: 3px solid var(--color-stone);
+  padding-inline-start: calc(var(--space-lg) - 3px);
+}
+
+/* Reply verb heading: mono uppercase */
+.h-entry:has(.u-in-reply-to) h3 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+}
+
+/* Bookmarks: curated link — subtle left accent */
+.h-entry:has(.u-bookmark-of) {
+  border-inline-start: 3px solid var(--color-stone-light);
+  padding-inline-start: calc(var(--space-lg) - 3px);
+}
+
+/* Bookmark title: serif, slightly smaller than articles */
+.h-entry:has(.u-bookmark-of) .p-name {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  font-weight: 500;
+}
+
+/* Bookmark commentary: sans, subordinate to title */
+.h-entry:has(.u-bookmark-of) .e-content {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+
+/* Like grouping: shared border, tight spacing */
+.likelist {
+  padding: var(--space-sm) 0;
+  border-bottom: var(--border-structural);
+}
+
+.likelist .h-entry + .h-entry {
+  margin-top: var(--space-xs);
+}
