@@ -37,7 +37,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <meta name="theme-color" content=${themeColor} />
     <link rel="manifest" href="/manifest.json" />
 
-    <script>(function(){var s=localStorage.getItem('theme')||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'})()</script>
+    ${rawHtml("<script>(function(){var s=localStorage.getItem('theme')||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'})()</script>")}
 
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500,700|newsreader:400,400i,500,600,700|public-sans:400,500,600&display=swap" rel="stylesheet" />

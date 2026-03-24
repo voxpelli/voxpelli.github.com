@@ -8,17 +8,30 @@ export const vars = {
 };
 
 /**
- * @param {{ vars: Record<string, unknown> }} options
- * @returns {string}
+ * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
+ * @returns {Promise<string>}
  */
-export default function linksPage ({ vars: pageVars }) {
+export default async function linksPage ({ pages, vars: pageVars }) {
   const linkPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.linkPosts) || [];
   const recentLinks = linkPosts.slice(0, 5);
+
+  // Build page index for O(1) lookup
+  /** @type {Map<string, typeof pages[0]>} */
+  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
+
+  // Pre-render all link posts in parallel
+  /** @type {Map<string, string>} */
+  const renderCache = new Map();
+  await Promise.all(recentLinks.map(async (post) => {
+    const page = pagesByPath.get(/** @type {string} */ (post.path));
+    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    renderCache.set(/** @type {string} */ (post.path), html);
+  }));
 
   const postsHtml = recentLinks.map(post =>
     renderPost({
       post,
-      content: /** @type {string} */ (post.content) || '',
+      content: renderCache.get(/** @type {string} */ (post.path)) || /** @type {string} */ (post.content) || '',
       authorName: /** @type {string} */ (pageVars.authorName),
       siteUrl: /** @type {string} */ (pageVars.siteUrl),
     })

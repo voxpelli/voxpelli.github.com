@@ -10,12 +10,26 @@ export const vars = {
 };
 
 /**
- * @param {{ vars: Record<string, unknown> }} options
- * @returns {string}
+ * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
+ * @returns {Promise<string>}
  */
-export default function socialPage ({ vars: pageVars }) {
+export default async function socialPage ({ pages, vars: pageVars }) {
   const socialPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.socialPosts) || [];
   const recentSocial = socialPosts.slice(0, 10);
+
+  // Build page index for O(1) lookup
+  /** @type {Map<string, typeof pages[0]>} */
+  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
+
+  // Pre-render non-like posts in parallel (likes work from frontmatter alone)
+  /** @type {Map<string, string>} */
+  const renderCache = new Map();
+  const nonLikePosts = recentSocial.filter(post => !post['mf-like-of']);
+  await Promise.all(nonLikePosts.map(async (post) => {
+    const page = pagesByPath.get(/** @type {string} */ (post.path));
+    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    renderCache.set(/** @type {string} */ (post.path), html);
+  }));
 
   let result = '<div class="content-header">\n  <h2>Social // Interactions</h2>\n</div>\n\n';
   let isLikeList = false;
@@ -59,7 +73,7 @@ export default function socialPage ({ vars: pageVars }) {
       }
       result += renderPost({
         authorName: String(pageVars.authorName || ''),
-        content: String(post.content || ''),
+        content: renderCache.get(/** @type {string} */ (post.path)) || String(post.content || ''),
         post,
         siteUrl: String(pageVars.siteUrl || ''),
       }) + '\n';
