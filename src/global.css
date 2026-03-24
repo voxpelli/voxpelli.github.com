@@ -169,6 +169,8 @@ a[lang="sv"]::before {
 /* === Images === */
 img {
   border: 0;
+  max-width: 100%;
+  height: auto;
 }
 
 /* === Sidebar === */
@@ -400,6 +402,7 @@ img {
   font-size: clamp(1.5rem, 1.364rem + 0.682vw, 1.875rem);
   font-weight: 500;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 .post-title a {
@@ -790,6 +793,7 @@ input:focus-visible {
   font-weight: 500;
   line-height: 1.15;
   margin-bottom: var(--space-sm);
+  text-wrap: balance;
 }
 
 .content-area > .h-entry > footer {
