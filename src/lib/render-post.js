@@ -44,14 +44,15 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
     `);
   }
 
-  // Like post
+  // Like post — compact in listings, full on standalone pages
   if (post['mf-like-of']) {
-    return renderPostLike({ authorName, post });
+    return renderPostLike({ authorName, compact: !standalone, post });
   }
 
-  // Full content post
+  // Full content post — compact in listings (suppress author, webmention link)
   return renderPostContent({
     authorName,
+    compact: !standalone,
     content,
     nonenglish,
     post,
