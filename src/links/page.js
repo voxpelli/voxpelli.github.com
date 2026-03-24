@@ -45,7 +45,7 @@ ${postsHtml}
 
 ${linkPosts.length > 5
 ? `<ul class="posts-extras">
-  <li><a href="/archive/">Archive</a></li>
+  <li><a href="/archive/full/">Full Archive</a></li>
 </ul>`
 : ''}
 

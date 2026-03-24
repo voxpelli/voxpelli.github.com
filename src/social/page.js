@@ -84,5 +84,9 @@ export default async function socialPage ({ pages, vars: pageVars }) {
     result += '</article>\n';
   }
 
+  if (socialPosts.length > 10) {
+    result += '<ul class="posts-extras">\n  <li><a href="/archive/full/">Full Archive</a></li>\n</ul>\n';
+  }
+
   return result;
 }
