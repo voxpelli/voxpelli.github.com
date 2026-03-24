@@ -1,12 +1,23 @@
 import { renderPost } from './lib/render-post.js';
 
-export const vars = {
+/**
+ * @typedef {{
+ *   layout: 'root' | 'article',
+ *   title?: string,
+ *   category?: 'social' | 'links',
+ *   frontpage?: boolean,
+ *   hfeed?: boolean,
+ *   webmentionable?: boolean,
+ * }} PageVars
+ */
+
+export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Pelle Wessman',
   frontpage: true,
   webmentionable: true,
   hfeed: true,
-};
+}));
 
 /**
  * @param {{ vars: Record<string, unknown> }} options

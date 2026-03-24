@@ -1,11 +1,13 @@
+/** @import { PageVars } from '../page.js' */
+
 import { renderPost } from '../lib/render-post.js';
 
-export const vars = {
+export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Links',
   category: 'links',
   hfeed: true,
-};
+}));
 
 /**
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options

@@ -1,10 +1,12 @@
+/** @import { PageVars } from '../page.js' */
+
 import { renderPost } from '../lib/render-post.js';
 
-export const vars = {
+export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Blog Post Archive',
   hfeed: true,
-};
+}));
 
 /**
  * @param {{ vars: Record<string, unknown> }} options

@@ -1,13 +1,15 @@
 import { html as h, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
+/** @import { PageVars } from '../page.js' */
+
 import { renderPost } from '../lib/render-post.js';
 
-export const vars = {
+export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Social',
   category: 'social',
   hfeed: true,
-};
+}));
 
 /**
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
