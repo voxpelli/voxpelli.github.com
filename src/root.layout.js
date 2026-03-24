@@ -74,7 +74,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   const navHtml = navItems.map(item => renderToStringSync(html`
     <a href=${item.href} class=${`nav-item${item.active ? ' active' : ''}`} aria-current=${item.active ? 'page' : false}>
       <span>${item.label}</span>
-      <span aria-hidden="true" style=${item.active ? '' : 'opacity: 0;'}>\u2192</span>
+      <span class="nav-arrow" aria-hidden="true">\u2192</span>
     </a>
   `)).join('\n        ');
 
@@ -93,7 +93,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
           <img src="/avatar.jpg" alt=${authorName} class="u-photo" width="56" height="56" loading="lazy" />
           <div class="profile-info p-note">
             <strong>voxpelli</strong>
-            Developer. IndieWeb advocate.
+            <span>Developer. IndieWeb advocate.</span>
           </div>
         </div>
 
