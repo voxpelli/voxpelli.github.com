@@ -10,7 +10,7 @@ export default function manifestTemplate ({ vars }) {
       name: "Pelle Wessman's Blog",
       icons: [
         {
-          src: 'images/launcher-icon.png',
+          src: '/launcher-icon.png',
           sizes: '192x192',
           type: 'image/png',
         },
