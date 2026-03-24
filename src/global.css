@@ -698,28 +698,8 @@ input[type=url] {
 }
 
 /* === Theme toggle === */
-theme-toggle {
-  display: inline-block;
-}
-
-theme-toggle button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.25rem;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 8px;
-  line-height: 1;
-  color: var(--color-ink-light);
-  transition: color 0.15s ease;
-}
-
-theme-toggle button:hover {
-  color: var(--color-ink);
-}
-
-/* theme-toggle button inherits global focus-visible */
+/* Styles handled by Shadow DOM inside the <theme-toggle> web component.
+   The element is display:none by default; connectedCallback sets display:flex. */
 
 /* === Relative time === */
 relative-time .relative-label {

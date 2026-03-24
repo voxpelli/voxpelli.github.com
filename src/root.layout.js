@@ -92,7 +92,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
 
         <button class="btn" type="button" onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()">Subscribe to RSS</button>
 
-        <theme-toggle><button type="button" aria-label="Toggle theme">\u2600\uFE0F</button></theme-toggle>
+        <theme-toggle></theme-toggle>
       </aside>
 
       <main id="main-content" class=${`content-area${vars.hfeed ? ' h-feed' : ''}`}>
