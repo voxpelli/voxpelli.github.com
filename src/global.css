@@ -759,8 +759,20 @@ input:focus-visible {
   max-width: 65ch;
 }
 
-.content-area > .h-entry .e-content h2,
-.content-area > .h-entry .e-content h3,
+.content-area > .h-entry .e-content h2 {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
+.content-area > .h-entry .e-content h3 {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
 .content-area > .h-entry .e-content h4 {
   font-family: var(--font-sans);
   font-weight: 600;
