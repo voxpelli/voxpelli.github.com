@@ -595,6 +595,8 @@ div.blog-article-summary + div.blog-article-summary {
 .webmention-mention {
   padding-left: 60px;
   position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .webmention-mention:last-child {

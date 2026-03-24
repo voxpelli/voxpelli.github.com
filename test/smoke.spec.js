@@ -46,6 +46,40 @@ test('feed entries have non-empty titles', async () => {
   }
 });
 
+test('feed entries have valid ISO datetime in <updated>', async () => {
+  const xml = await readFile('public/all.xml', 'utf8');
+  const updatedPattern = /<updated>([^<]*)<\/updated>/g;
+  const dates = [...xml.matchAll(updatedPattern)].map(m => m[1]);
+
+  assert.ok(dates.length > 0, 'feed should have at least one <updated> element');
+
+  const isoPattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+
+  for (const date of dates) {
+    assert.ok(date && date.length > 0, '<updated> must not be empty');
+    assert.match(date, isoPattern, `<updated> value "${date}" must be a valid ISO datetime`);
+  }
+});
+
+test('feed has top-level <id> and entry <id> tags', async () => {
+  const xml = await readFile('public/all.xml', 'utf8');
+
+  // Top-level feed <id>
+  const feedIdPattern = /<feed[^>]*>[\s\S]*?<id>([^<]*)<\/id>/;
+  const feedIdMatch = xml.match(feedIdPattern);
+  assert.ok(feedIdMatch, 'feed should have a top-level <id> element');
+  assert.ok(feedIdMatch && feedIdMatch[1] && feedIdMatch[1].length > 0, 'top-level <id> must not be empty');
+
+  // Entry <id> tags
+  const entryIdPattern = /<entry>[\s\S]*?<id>([^<]*)<\/id>/g;
+  const entryIds = [...xml.matchAll(entryIdPattern)].map(m => m[1]);
+  assert.ok(entryIds.length > 0, 'feed entries should have <id> elements');
+
+  for (const id of entryIds) {
+    assert.ok(id && id.length > 0, 'entry <id> must not be empty');
+  }
+});
+
 test('article page has webmention form', async () => {
   const html = await readFile('public/2019/10/use-type-script-3-7-to-generate/index.html', 'utf8');
   assert.match(html, /webmention/);

@@ -2,7 +2,7 @@
  * @param {{ vars: Record<string, unknown> }} _options
  * @returns {{outputName: string, content: string}}
  */
-export default function manifestTemplate (_options) {
+export default function manifestTemplate ({ vars }) {
   return {
     outputName: 'manifest.json',
     content: JSON.stringify({
@@ -16,7 +16,7 @@ export default function manifestTemplate (_options) {
         },
       ],
       background_color: '#dedede',
-      theme_color: '#dd3333',
+      theme_color: vars.themeColor,
       start_url: '/',
       scope: '/',
       display: 'standalone',
