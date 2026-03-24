@@ -193,3 +193,45 @@ The homepage (`src/page.js`) and archive page (`src/archive/page.js`) both consu
 
 - **#09 — Templates should receive `global.data` output in vars**: Templates currently re-iterate all pages (duplicating try/catch boilerplate) because they do not receive `globalDataVars`. If templates received aggregated data, they would not need to access `.vars` on individual pages at all, reducing the blast radius of this bug.
 - **#08 — Programmatic API for testing**: Better error messages from the `build()` API would make test failures actionable. Currently the `DomStackAggregateError` loses page context across the worker boundary.
+
+---
+
+## External Research
+
+### DeepWiki findings (bcomnes/domstack)
+
+The `PageData.vars` getter merges `globalVars`, `globalDataVars`, `pageVars`, and `builderVars` in that order -- so page-level vars override global vars, and builder vars override both. The getter can only be accessed after `PageData.init()` has resolved `pageVars` via `resolveVars()` (a dynamic `import()` of the `page.vars.js` file).
+
+When `page.vars.js` has a syntax error or throws at import time, the error is caught in `buildPagesDirect()` and wrapped as `new Error('Error resolving page vars', { cause: { message, stack } })`. The `cause` is deliberately serialized to a plain `{ message, stack }` object (not an `Error` instance) because of structured-clone limitations across the worker thread boundary. The `errorData` containing `{ page: pageInfo }` is attached separately and re-assigned to the error object on the main thread side via `for (const [key, val] of Object.entries(errorData)) { error[key] = val }`.
+
+Key detail: `resolveVars()` itself does **no** error wrapping -- it calls `import(varsPath)` and invokes the exported function directly. Any thrown error propagates up to the `try/catch` in `buildPagesDirect()`, which is the only error boundary. The `vars` getter itself has **no** try/catch -- it simply spreads the already-resolved objects. This means errors at vars *access* time (e.g., a getter on one of the spread objects) would propagate uncaught to the caller (such as `global.data.js`).
+
+### Existing test coverage in domstack
+
+DomStack has a dedicated test case directory `test-cases/page-build-errors/` that verifies error aggregation. The test:
+- Instantiates `DomStack` programmatically and calls `build()`
+- Expects a `DomStackAggregateError` with message matching `/Build finished but there were errors/`
+- Asserts that `err.errors` contains an entry with message `'Error resolving page vars'`
+- Checks that the error has a `cause` property
+
+There is also a unit test at `lib/build-pages/resolve-vars.test.js` that tests the `resolveVars()` function in isolation.
+
+The `postVars` export is no longer supported -- `resolvePostVars()` throws explicitly if it detects a `postVars` export, directing users to `global.data.js` instead.
+
+### Source code analysis (installed @domstack/static)
+
+**`resolve-vars.js`**: The `resolveVars()` function does `await import(varsPath)`, extracts the `default` export, and either returns it directly (if object) or calls it (if function). No error wrapping -- any import or runtime error propagates raw.
+
+**`page-data.js` (lines 139-149)**: The `vars` getter is a simple property spread with no try/catch. It relies entirely on the upstream `init()` having succeeded.
+
+**`build-pages/index.js` (lines 215-224)**: The `init()` catch block serializes the error's `message` and `stack` as plain properties on a new object (not as an `Error` instance) for structured-clone compatibility. The comment `"I can't put stuff on the error, the worker swallows it for some reason"` confirms this is a known limitation.
+
+**`build-pages/index.js` (lines 118-127)**: On the main thread side, `errorData` properties (including `page: pageInfo`) are re-assigned onto the error object via a for-of loop over `Object.entries(errorData)`. This means the page path *is* available as `error.page.path` on the main thread, but the default error formatter does not print it -- only `error.message` and `error.cause` are displayed.
+
+### GitHub issues (bcomnes/domstack, bcomnes/top-bun)
+
+Unable to search GitHub issues directly (tool access restricted). The top-bun repository is not indexed on DeepWiki, suggesting it may have been renamed or archived when the project became DomStack. No existing upstream issues about vars getter error handling were found through available channels.
+
+### Raindrop / Basic Memory
+
+No relevant bookmarks or notes found about DomStack error handling patterns. Basic Memory contains a package note for `npm:@domstack/static` but no error-handling-specific content.

@@ -37,8 +37,10 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <meta name="theme-color" content=${themeColor} />
     <link rel="manifest" href="/manifest.json" />
 
+    <script>(function(){var s=localStorage.getItem('theme')||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'})()</script>
+
     <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500,700|newsreader:400,400i,500,600,700|public-sans:400,500,600" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500,700|newsreader:400,400i,500,600,700|public-sans:400,500,600&display=swap" rel="stylesheet" />
 
     ${styles.map(href => html`<link rel="stylesheet" href=${href} />`)}
 
@@ -60,7 +62,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   `);
 
   const navHtml = navItems.map(item => renderToStringSync(html`
-    <a href=${item.href} class=${`nav-item${item.active ? ' active' : ''}`}>
+    <a href=${item.href} class=${`nav-item${item.active ? ' active' : ''}`} aria-current=${item.active ? 'page' : false}>
       <span>${item.label}</span>
       <span aria-hidden="true" style=${item.active ? '' : 'opacity: 0;'}>\u2192</span>
     </a>
@@ -101,8 +103,10 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   // Classes from page vars are sanitized to prevent attribute breakout
   const classes = String(vars.classes || '').replaceAll('"', '');
 
+  const lang = String(vars.lang || 'en');
+
   return `<!DOCTYPE html>
-<html lang="en" class="no-js${classes ? ` ${classes}` : ''}${vars.hfeed ? ' h-feed' : ''}">
+<html lang="${lang}" class="no-js${classes ? ` ${classes}` : ''}${vars.hfeed ? ' h-feed' : ''}">
 <head>${headContent}</head>
 <body>${bodyContent}</body>
 </html>`;

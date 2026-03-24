@@ -1,5 +1,5 @@
 /* eslint-disable n/no-unsupported-features/node-builtins -- Browser-only client bundle */
-/* global HTMLElement, localStorage, customElements */
+/* global HTMLElement, localStorage, customElements, matchMedia */
 document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, 'js');
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }
 
@@ -27,16 +27,21 @@ class ThemeToggle extends HTMLElement {
         this._apply();
       });
     }
+
+    // Cross-tab sync: update when another tab changes the theme
+    globalThis.addEventListener('storage', (e) => {
+      if (e.key === 'theme' && typeof e.newValue === 'string') {
+        this._theme = ThemeToggle.#THEMES.includes(e.newValue) ? e.newValue : 'system';
+        this._apply();
+      }
+    });
   }
 
   _apply () {
     const root = document.documentElement;
-
-    if (this._theme === 'system') {
-      delete root.dataset.theme;
-    } else {
-      root.dataset.theme = this._theme;
-    }
+    const isDark = this._theme === 'dark' ||
+      (this._theme === 'system' && matchMedia('(prefers-color-scheme:dark)').matches);
+    root.dataset.theme = isDark ? 'dark' : 'light';
 
     const btn = this.querySelector('button');
 

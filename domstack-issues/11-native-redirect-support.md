@@ -232,3 +232,30 @@ The template approach also means:
 
 - **#10 — Allow `--copy` to handle individual files**: For platforms that support `_redirects` files (Netlify, Cloudflare Pages), an alternative to generating redirect HTML is to place a `_redirects` file at the project root and copy it into the output. This requires `--copy` to support individual files.
 - **#09 — Templates should receive `global.data` output in vars**: If redirect data were part of `globalVars`, templates like the sitemap could access it to exclude redirect stubs from the URL list.
+
+---
+
+## External Research
+
+### DomStack / top-bun upstream
+
+**No existing issues or PRs** related to redirects were found in either `bcomnes/domstack` or `bcomnes/top-bun` repositories. This is a genuinely new feature request.
+
+**DeepWiki analysis** (bcomnes/domstack) confirms:
+- DomStack has **no built-in redirect mechanism**. Its only URL rewriting is the automatic conversion of `.md`/`.markdown` file extensions to pretty URLs (`index.html`).
+- For custom redirects, users must implement them at the web server level, CDN, or via hand-crafted HTML files with `<meta http-equiv="refresh">`.
+- The `--copy` flag can be used to include pre-existing static redirect HTML files or platform-specific `_redirects` files, but DomStack does not generate these.
+
+### How other SSGs handle redirects (Raindrop bookmarks)
+
+Several relevant bookmarks were found:
+
+- **"Redirects on GitHub Pages"** (help.github.com) — Jekyll supports redirects via the `jekyll-redirect-from` gem, which is whitelisted on GitHub Pages. This generates HTML meta-refresh pages automatically from frontmatter.
+- **"Redirection" WordPress plugin** (urbangiraffe.com) — manages 301 redirections, tracks 404 errors, supports import/export of Apache `.htaccess` rules. Demonstrates the value of centralized redirect management with validation.
+- **".htaccess Tools"** (htaccesstools.com) — documents the difference between 301 (permanent) and 302 (temporary) redirects and mod_rewrite patterns. Relevant for understanding what server-side redirect generation should produce.
+- **"redirect.pizza"** — a domain redirect service, showing that redirect management is common enough to warrant dedicated tooling.
+- **"Netlify"** (netlify.com) — platform that supports `_redirects` files natively, the primary target format proposed in Option A.
+
+### Key takeaway
+
+The absence of any upstream discussion about redirects confirms this is an unaddressed gap. The proposed Option A (configuration-based redirects in `global.vars.js`) aligns well with how DomStack already centralizes site configuration, and the `--copy` flag workaround for `_redirects` files (mentioned in related issue #10) provides an interim path for platform-specific server-side redirects.

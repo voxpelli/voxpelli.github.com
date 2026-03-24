@@ -199,3 +199,51 @@ Every DomStack user writing custom layouts, templates, `global.data.js`, or page
 - **#02** -- Documenting `global.data.js` also requires users to understand `PageData` properties; exported types would make the docs linkable to real type definitions.
 - **#05** -- Documenting template return types references `TemplateOutputOverride` and `TemplateFunctionParams`, both of which should be importable.
 - **#06** -- Layout composition patterns need `LayoutFunctionParams` to show how to properly forward `scripts`, `styles`, `page`, `pages`, and `workers`.
+
+---
+
+## External Research
+
+*Researched 2026-03-24 against `@domstack/static@11.0.3`.*
+
+### Verified: current exports vs. missing types
+
+**`index.d.ts` exports exactly 9 function/class types** (confirmed by reading the installed package):
+
+- `DomStack` (class)
+- `LayoutFunction`, `AsyncLayoutFunction`
+- `GlobalDataFunction`, `AsyncGlobalDataFunction`
+- `PageFunction`, `AsyncPageFunction`
+- `TemplateFunction`, `TemplateAsyncIterator`
+- `TemplateOutputOverride`
+- `BuildOptions` (re-exported from esbuild)
+
+**Not exported from entry point** (confirmed -- these exist in internal `.d.ts` files but are not re-exported):
+
+| Type | Defined in | Notes |
+|------|-----------|-------|
+| `PageData` (class) | `lib/build-pages/page-data.d.ts` | Generic class with `<T, U, V>` params; has `vars` getter, `pageInfo`, `renderInnerPage()`, `renderFullPage()` |
+| `PageInfo` | `lib/identify-pages.d.ts` | Object type with `pageFile`, `type` (`"js" \| "md" \| "html"`), `path`, `outputName`, `outputRelname`, `draft`, `pageStyle?`, `clientBundle?`, `pageVars?`, `workers?` |
+| `TemplateInfo` | `lib/identify-pages.d.ts` | Object type with `templateFile`, `path`, `outputName` |
+| `LayoutFunctionParams` | `lib/build-pages/page-data.d.ts` | `{ vars, scripts?, styles?, children, page, pages, workers? }` |
+| `GlobalDataFunctionParams` | `lib/build-pages/index.d.ts` | `{ pages: PageData<any, any, any>[] }` |
+| `PageFunctionParams` | `lib/build-pages/page-builders/page-writer.d.ts` | `{ vars, scripts?, styles?, page, pages, workers? }` |
+| `TemplateFunctionParams` | `lib/build-pages/page-builders/template-builder.d.ts` | Extracted from `Parameters<TemplateFunction<T>>` -- resolves to `{ vars, template, pages }` |
+
+### `index.js` imports but does not re-export
+
+The `index.js` entry point uses `@import` JSDoc to bring in `PageInfo`, `TemplateInfo`, and other internal types (line 12: `@import { PageInfo, TemplateInfo } from './lib/identify-pages.js'`), but these are only used internally for the `DomStack` class implementation -- they are not re-exported via `@typedef`.
+
+### DeepWiki findings
+
+DeepWiki confirms that `PageData`, `PageInfo`, and `TemplateInfo` are "not directly exported from the package entry point for external use." The README lists only the function types (`LayoutFunction`, `PageFunction`, etc.) as importable from `@domstack/static`. DeepWiki notes that `PageData` is "a class used internally" and `PageInfo`/`TemplateInfo` are "internal typedefs."
+
+### Upstream issues and PRs
+
+- **No existing issues found** on `bcomnes/domstack` related to type exports, `PageData`, or `PageInfo`. (DeepWiki cannot access the issue tracker; GitHub search was unavailable during research. The `top-bun` repository -- the predecessor -- is not indexed on DeepWiki.)
+- This appears to be a novel request with no prior upstream discussion.
+
+### Raindrop and Basic Memory
+
+- **Raindrop**: No bookmarks related to domstack types or DX found in the 13k+ library.
+- **Basic Memory**: An `npm:@domstack/static` note exists but does not cover type export gaps. No prior research on this topic.

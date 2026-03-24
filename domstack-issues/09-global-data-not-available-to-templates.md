@@ -267,3 +267,16 @@ Additionally, any future template that needs aggregated data (e.g., a JSON feed,
 
 - **#07 — Improve `PageData.vars` getter error messages**: The duplicated try/catch wrappers in `feeds.template.js` exist partly because templates must iterate `pages` themselves. If templates received pre-aggregated data, they would not need to access individual page `.vars` at all.
 - **#08 — Programmatic API for testing**: Template build errors go through the same worker-boundary serialization. Fixing the template vars issue reduces the surface area where errors can occur during template rendering.
+
+---
+
+## External Research
+
+### DeepWiki confirmation
+DeepWiki explicitly states: "Templates receive the `vars` object, which contains variables from `global.vars.ts`." It also confirms templates receive an array of `PageData` instances. There is **no mention** of `global.data.js` output being available in template `vars` — confirming this issue's core claim.
+
+### Workaround pattern used in this codebase
+`src/feeds.template.js` works around this by re-deriving all post data from the `pages` array — duplicating the filtering/sorting logic from `global.data.js`. This is the only viable pattern currently, but it leads to logic duplication and inconsistency risk.
+
+### GitHub issues
+No existing upstream issues specifically about template vars scope. This appears to be an undocumented architectural decision rather than a known bug.

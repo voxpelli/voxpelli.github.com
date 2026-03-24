@@ -60,3 +60,22 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 ### Testing
 
 Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from `public/` and validate: homepage structure, Atom feed content, webmention forms, redirects, sitemap, service worker, and absence of defunct services.
+
+## Design Context
+
+**Brand personality**: Thoughtful, Technical, Warm.
+
+**"Sovereign Warmth" theme** (current foundation, open to evolution):
+- Palette: warm parchment canvas (`#f4f1eb`), deep ink (`#2c2a28`), falu red accent (`#8c2121`), cloudberry orange (`#d97714`), stone borders
+- Typography: Newsreader (serif, headings/article body), Public Sans (sans, UI), JetBrains Mono (mono, metadata/nav/code). Fluid `clamp()` sizing
+- Layout: Two-column sidebar (340px sticky) + content area on desktop, stacked mobile
+- Dark mode: Full support via CSS custom properties + `<theme-toggle>` web component
+
+**Design principles**:
+1. **Content sovereignty** — design serves readability, never competes. Article text: serif, 65ch max-width
+2. **Warm technical** — engineering precision (mono metadata, grid background, structured borders) with warmth (parchment tones, serif type, organic colors)
+3. **IndieWeb native** — microformats (h-card, h-entry, h-feed) are structural. Webmentions, feeds, micropub are first-class
+4. **Progressive layers** — works without JS, without custom fonts, in dark mode. Each layer enhances without breaking lower layers
+5. **Restrained motion** — subtle transforms and opacity transitions only. Respect `prefers-reduced-motion`
+
+See `.impeccable.md` for full design context with references and detailed guidelines.

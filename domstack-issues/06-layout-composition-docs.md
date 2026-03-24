@@ -122,3 +122,18 @@ This pattern works correctly, but was discovered through experimentation rather 
 
 - **#01** -- Exporting `LayoutFunctionParams` would let users type their layout functions precisely, especially the `page`, `pages`, and `workers` params that are easy to forget.
 - **#02** -- The variable merge order documented in issue #02 explains why `vars` in a layout contains `global.data.js` output (which affects what data layouts can access).
+
+---
+
+## External Research
+
+### DeepWiki confirmed composition model
+Layouts CAN call other layouts by importing them — `blog.layout.ts` can import and call `root.layout.js`. Styles and scripts do **NOT** automatically cascade in nested layouts. To include parent layout styles/scripts, explicitly import them via `@import` in CSS or `import` in JS. The layout function receives `scripts` and `styles` arrays containing URLs of all relevant bundles.
+
+### GitHub issues
+- Issue [#24](https://github.com/bcomnes/domstack/issues/24) (closed): "Multiple layout files" — established that layouts can be composed.
+- Issue [#183](https://github.com/bcomnes/domstack/issues/183) (closed): "JSX support in global and layout clients" — relates to layout client-side scripting.
+- Issue [#60](https://github.com/bcomnes/domstack/issues/60) (closed): "CDN free default style" — relates to the default layout's style dependencies.
+
+### Key pitfall confirmed
+The non-cascading styles/scripts is the primary pitfall. Users expect CSS from a parent layout to "just work" in child layouts, but DomStack requires explicit `@import`. This is the main documentation gap this issue proposes to address.

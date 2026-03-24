@@ -159,3 +159,46 @@ The feeds template is the only consumer with access to rendered HTML because it 
 - **#01** -- Exporting `PageData` types would make `renderInnerPage()` discoverable via autocompletion.
 - **#02** -- The `global.data.js` caveats documentation should cross-reference this issue's explanation of why rendered content is unavailable there.
 - **#09** -- Template `vars` not including `global.data.js` output means templates must re-derive post data even when using `renderInnerPage()`, compounding the complexity.
+
+---
+
+## External Research
+
+### Build pipeline (confirmed via source code analysis)
+
+The DomStack build sequence is:
+1. `identifyPages()` — scans filesystem
+2. `pageData.init()` — for markdown: reads file, extracts frontmatter via `mdBuilder()`, stores in `builderVars`. Raw markdown captured in closure but **not rendered**
+3. `resolveGlobalData()` — calls `global.data.js` with initialized `PageData[]`. Only frontmatter vars available, no rendered content
+4. `buildPages()` — calls `pageWriter()` → `page.renderFullPage()` → `renderInnerPage()` → `mdBuilder.pageLayout()` → `renderMd()`. Markdown rendered to HTML **here**
+5. Templates run — can call `renderInnerPage()` on any page
+
+The `mdBuilder` function (lib/build-pages/page-builders/md/index.js) captures `mdUnparsed` in a closure and defers rendering to the `pageLayout` async function. At `init()` time, only frontmatter is extracted.
+
+### DeepWiki confirmation
+
+DeepWiki confirms: "`global.vars.js` is processed during the `identifyPages` phase, which occurs before any pages are rendered. The `PageData` instances, and thus the `renderInnerPage` method, are only created and initialized during the `buildPages` phase." (Note: DeepWiki conflates `global.data.js` with `global.vars.js` — they are distinct files in DomStack, but the ordering constraint applies to both.)
+
+### GitHub issues
+
+No existing issues on `bcomnes/domstack` specifically about `renderInnerPage` or content availability in `global.data.js`. The repo has 7 open issues, none related to this topic. Issue #81 (closed) about using esbuild for CSS imports is the closest to build pipeline discussion.
+
+### Implications for voxpelli.com
+
+The `/social/` and `/links/` pages currently render empty because they use `vars.content` from `global.data.js` which is always empty for markdown pages. Two viable fix paths:
+1. **Convert to templates** — like `feeds.template.js`, these pages could call `renderInnerPage()` to get rendered content
+2. **Read raw markdown at global.data.js time** — read the source file directly via `fs.readFile()` and do minimal processing (word count, excerpt extraction) without full markdown rendering
+
+### CORRECTION: renderInnerPage() IS available in global.data.js
+
+Source code analysis of DomStack's `lib/build-pages/index.js` (lines 227-231) confirms that `global.data.js` receives **fully initialized PageData[]** instances with `renderInnerPage()` available. DomStack's own test suite (`test-cases/general-features/`) demonstrates this working. The earlier assumption (from DeepWiki) that rendering was unavailable at this stage was **incorrect**.
+
+This means the fix is simpler than expected:
+```javascript
+// In global.data.js:
+const renderedHtml = await page.renderInnerPage({ pages });
+```
+
+Additionally, `page.pageInfo.pageFile.filepath` provides the raw source file path for direct `fs.readFile()` access if only raw markdown is needed (e.g., for word counting without full rendering).
+
+**The documentation issue (Part 1 of the proposal) is still valid** — this capability is not documented and DeepWiki gets it wrong, proving the discoverability gap is real.

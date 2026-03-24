@@ -25,10 +25,10 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
     const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
     const isoDate = dateObj.toISOString();
     const isoDateShort = isoDate.slice(0, 10).replaceAll('-', '.');
-    const wordCount = typeof content === 'string'
+    const wordCount = typeof content === 'string' && content
       ? content.replaceAll(/<[^>]*>/g, '').split(/\s+/).length
       : 0;
-    const readTime = Math.round(wordCount / 275);
+    const readTime = Math.max(1, Math.round(wordCount / 275));
 
     const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
@@ -36,7 +36,7 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
       <${tag} class="post-card h-entry">
           <div class="post-meta">
             <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
-            <span class="badge">${readTime} MIN READ</span>
+            ${wordCount > 0 ? html`<span class="badge">${readTime} MIN READ</span>` : ''}
           </div>
           <h3 class="post-title p-name"><a lang=${lang} class="u-url u-uid" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a></h3>
         </${tag}>

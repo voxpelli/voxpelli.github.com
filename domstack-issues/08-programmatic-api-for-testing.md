@@ -265,3 +265,60 @@ A test helper with proper path resolution would let this project (and every DomS
 - **#07 — Improve `PageData.vars` getter error messages**: The opaque error reporting described here is the same root cause. Better error wrapping in the vars getter would directly improve the programmatic API experience.
 - **#10 — Service worker management**: The `sw.js` file requires a manual `cp` command because `--copy` only handles directories. A test helper would need to account for this workaround too.
 - **#09 — Templates should receive `global.data` output**: Template build errors are also serialized through the worker boundary with the same fidelity loss.
+
+---
+
+## External Research
+
+### DeepWiki findings (bcomnes/domstack)
+
+The `DomStack` class constructor accepts `(src, dest, opts)` where `opts` includes `copy` (array of directory paths), `ignore` (array of ignore patterns), and other options. The constructor stores `src` and `dest` as-is and processes `copy` paths only to:
+1. Add their `basename()` to the ignore list (so copied dirs are not processed as pages)
+2. Validate that no copy dir is inside the `dest` directory (via `resolve()` + `relative()`)
+
+Crucially, `resolve(copyDir)` in the validation step resolves relative to `process.cwd()`, not relative to the project root or `src` directory. The CLI resolves paths before passing them to the constructor, but programmatic callers must do this themselves.
+
+The `build()` method delegates to `builder(src, dest, { static: true, ...opts })` and returns a `Promise<Results>` containing:
+- `siteData`: identified pages, layouts, templates
+- `esbuildResults`: bundling output
+- `staticResults`: static file copy results
+- `copyResults`: additional directory copy results
+- `pageBuildResults`: page rendering results (including `errors` and `warnings` arrays)
+
+Errors from page building are collected in a `DomStackAggregateError` (extends `AggregateError`) with a `.results` property containing partial build output. This allows watch mode to continue even when some pages fail.
+
+### Existing test infrastructure in domstack
+
+DomStack uses Node.js's built-in `node:test` runner. Test cases are organized in `test-cases/` subdirectories, each containing a `src/` directory and an `index.test.js` that programmatically instantiates `DomStack` and calls `build()`. Key test directories:
+
+- `test-cases/general-features/` -- page types, asset bundling, layouts, web workers, static files
+- `test-cases/build-errors/` -- asset build failures and error aggregation
+- `test-cases/page-build-errors/` -- page rendering failures and page-level error handling
+- `test-cases/conflict-pages/` -- conflicting page detection
+- `test-cases/drafts/` -- draft page handling
+
+Unit tests also exist alongside source files (e.g., `lib/build-pages/resolve-vars.test.js`, `lib/identify-pages.test.js`).
+
+The `page-build-errors` test demonstrates the exact pattern proposed in this issue: programmatic `DomStack` instantiation, `build()` call, and assertion on `DomStackAggregateError` contents. This confirms the programmatic API *works* for testing but requires boilerplate and has the error fidelity issues described.
+
+### Source code analysis (installed @domstack/static)
+
+**Constructor (`index.js` lines 155-186)**: The constructor does `this.#src = src; this.#dest = dest` with no path resolution. Copy dirs are validated with `resolve(copyDir)` (relative to cwd) but not stored in resolved form -- `this.opts` stores them as passed. The `basename(dir)` call in the ignore list means only the directory name is ignored, not the full path.
+
+**`build()` method (`index.js` line 192-194)**: Simply calls `builder(this.#src, this.#dest, { static: true, ...this.opts })`. No temp directory support, no dry-run mode.
+
+**Worker boundary (`build-pages/index.js` lines 100-135)**: The `buildPages()` function spawns a `Worker` thread and returns a Promise. On the main thread side, `workerReport.errors` are processed by copying `errorData` properties onto each error object via `for (const [key, val] of Object.entries(errorData)) { error[key] = val }`. The structured-clone serialization means `cause` arrives as a plain `{ message, stack }` object, not an `Error` instance.
+
+**`DomStackAggregateError` (`lib/helpers/domstack-aggregate-error.js`)**: Extends `AggregateError` with a `.results` property. The `bin.js` CLI uses `inspect()` to log these errors, but the page path (available as `error.page.path`) is not surfaced in the default output format.
+
+### top-bun predecessor
+
+The `bcomnes/top-bun` repository is not indexed on DeepWiki, suggesting it was likely renamed or archived when the project became DomStack. The `resolvePostVars()` function in the current codebase throws explicitly: `"postVars is no longer supported... Move data aggregation to a global.data.js file instead."` -- indicating a migration from the top-bun-era API.
+
+### GitHub issues
+
+Unable to search GitHub issues directly (tool access restricted). No existing upstream issues about programmatic API, testing support, or copy path resolution were found through available channels.
+
+### Raindrop / Basic Memory
+
+No relevant bookmarks found about DomStack testing patterns. Basic Memory contains a package note for `npm:@domstack/static` but no testing-specific content.

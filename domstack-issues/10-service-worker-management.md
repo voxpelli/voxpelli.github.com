@@ -226,3 +226,17 @@ The watch mode gap is particularly painful: during `domstack --watch`, changes t
 
 - **#08 — Programmatic API for testing**: The test helper would also need to handle individual file copying, compounding the workaround complexity.
 - **#11 — Native redirect support**: If `_redirects` could be copied via `--copy`, it would provide a lightweight alternative to the template-based redirect approach for platforms that support it natively.
+
+---
+
+## External Research
+
+### DeepWiki confirmation
+The `--copy` flag copies entire directories only. It preserves internal structure and copies everything (JS, CSS, HTML, MD) without DomStack processing. Copy directories must reside outside `dest` but can be within `src` (in which case they're gitignore-style excluded from DomStack's build).
+
+### Upstream issue
+- Issue [#34](https://github.com/bcomnes/domstack/issues/34) (open): "Service worker support" — directly relevant. This is an active upstream issue about how to handle service workers in DomStack sites.
+- Issue [#19](https://github.com/bcomnes/domstack/issues/19) (closed): "Harden static copying to not include any page assets" — about the boundary between static copying and page asset processing.
+
+### Current workaround in this codebase
+`package.json` uses `cp sw.js public/sw.js` appended to the build command. This works but is fragile — it runs after DomStack's build, so the file isn't watched during dev mode and isn't part of the build pipeline.

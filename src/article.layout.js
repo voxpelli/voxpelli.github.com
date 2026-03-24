@@ -33,9 +33,9 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
 
   const webmentionForm = renderToStringSync(html`
     <div>
-      Have you written a response to this? Let me know the URL:
       <form action=${`${wmEndpoint}/api/webmention`} method="post">
-        <input name="source" type="url" placeholder="http://example.com/my-cool-post" />
+        <label for="webmention-source">Have you written a response to this? Let me know the URL:</label>
+        <input id="webmention-source" name="source" type="url" placeholder="http://example.com/my-cool-post" />
         <input name="target" value=${`${vars.siteUrl}${vars.pageUrl || ''}`} type="hidden" />
         <input value="Send Webmention" type="submit" />
       </form>

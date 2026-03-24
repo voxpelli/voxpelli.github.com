@@ -87,3 +87,16 @@ Add a brief "When to use which" comparison table to the existing Templates docum
 - **#02** -- The distinction between `vars` in templates (global.vars only) vs `vars` in page functions (includes global.data) should be cross-referenced.
 - **#03** -- The async iterator pattern is the primary way to use `renderInnerPage()`, which is documented in issue #03.
 - **#09** -- Template `vars` not including `global.data.js` output is the reason templates must re-derive data from the `pages` array.
+
+---
+
+## External Research
+
+### DeepWiki confirmed return types
+DeepWiki documents four template return types: **string** (single file, filename from template name), **object** (`{ content, outputName }` for custom filename), **array of objects** (multiple files from one template), and **async generator** (yields objects, ideal for feeds). The `TemplateFunction` and `TemplateAsyncIterator` types define these. The `templateBuilder` in `lib/build-pages/page-builders/template-builder.js` processes all variants.
+
+### GitHub issues
+- Issue [#172](https://github.com/bcomnes/domstack/issues/172) (open): "Support multiple template types in eject" — relates to template discoverability and ejection support.
+
+### Template vars scope
+DeepWiki explicitly states: "Templates receive `global.vars.ts` output in `vars`." No mention of `global.data.js` — confirming issue #09 that templates get only `global.vars.js`, not the aggregated global data.
