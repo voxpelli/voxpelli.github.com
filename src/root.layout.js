@@ -48,7 +48,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/all.xml" title="All posts" />
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/english.xml" title="English posts" />
 
-    <link rel="canonical" href=${canonicalUrl} class=${vars.hfeed ? 'u-url' : false} />
+    <link rel="canonical" href=${canonicalUrl} />
     <meta name="twitter:site" content="@voxpelli" />
     ${vars.frontpage
 ? html`
@@ -94,7 +94,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
         <theme-toggle><button type="button" aria-label="Toggle theme">\u2600\uFE0F</button></theme-toggle>
       </aside>
 
-      <main id="main-content" class="content-area">
+      <main id="main-content" class=${`content-area${vars.hfeed ? ' h-feed' : ''}`}>
         ${rawHtml(children)}
       </main>
     </div>
@@ -107,7 +107,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   const lang = String(vars.lang || 'en');
 
   return `<!DOCTYPE html>
-<html lang="${lang}" class="no-js${classes ? ` ${classes}` : ''}${vars.hfeed ? ' h-feed' : ''}">
+<html lang="${lang}" class="no-js${classes ? ` ${classes}` : ''}">
 <head>${headContent}</head>
 <body>${bodyContent}</body>
 </html>`;
