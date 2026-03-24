@@ -49,7 +49,6 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/english.xml" title="English posts" />
 
     <link rel="canonical" href=${canonicalUrl} />
-    <meta name="twitter:site" content="@voxpelli" />
     ${vars.frontpage
 ? html`
   <link rel="self" href=${siteUrl} type="text/html" />
