@@ -75,7 +75,7 @@ ${entries.join('\n')}
 
   yield {
     outputName: 'all.xml',
-    content: await buildFeed({
+    content: buildFeed({
       selfUrl: '/all.xml',
       htmlUrl: '/',
       posts: recentPosts,
@@ -84,7 +84,7 @@ ${entries.join('\n')}
 
   yield {
     outputName: 'english.xml',
-    content: await buildFeed({
+    content: buildFeed({
       selfUrl: '/english.xml',
       htmlUrl: '/',
       subtitle: 'English posts',
@@ -94,7 +94,7 @@ ${entries.join('\n')}
 
   yield {
     outputName: 'links/all.xml',
-    content: await buildFeed({
+    content: buildFeed({
       selfUrl: '/links/all.xml',
       htmlUrl: '/links/',
       subtitle: 'Links',
