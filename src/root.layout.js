@@ -10,6 +10,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   const authorName = String(vars.authorName || '');
   const themeColor = String(vars.themeColor || '');
   const pushHub = String(vars.pushHub || '');
+  const micropubEndpoint = String(vars.micropubEndpoint || '');
   const webmentionEndpoint = String(vars.webmentionEndpoint || '');
 
   const title = vars.frontpage
@@ -62,7 +63,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     ${vars.frontpage
       ? html`
         ${pushHub ? html`<link rel="hub" href=${pushHub} />` : ''}
-        <link rel="micropub" href="https://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />
+        ${micropubEndpoint ? html`<link rel="micropub" href=${micropubEndpoint} />` : ''}
       `
       : ''}
     ${vars.author ? html`<link rel="author" type="text/html" href="/" title=${authorName} />` : ''}
@@ -99,7 +100,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
           ${rawHtml(navHtml)}
         </nav>
 
-        <button class="btn" type="button" onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()">Subscribe to RSS</button>
+        <button class="btn" type="button" data-subtome>Subscribe to RSS</button>
 
         <theme-toggle></theme-toggle>
       </aside>

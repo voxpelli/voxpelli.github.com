@@ -168,3 +168,13 @@ class RelativeTime extends HTMLElement {
 
 customElements.define('theme-toggle', ThemeToggle);
 customElements.define('relative-time', RelativeTime);
+
+// --- Subtome RSS Subscribe ---
+const subtomeBtn = document.querySelector('[data-subtome]');
+if (subtomeBtn) {
+  subtomeBtn.addEventListener('click', () => {
+    const script = document.createElement('script');
+    script.src = 'https://www.subtome.com/load.js';
+    document.body.append(script);
+  });
+}
