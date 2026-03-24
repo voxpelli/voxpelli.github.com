@@ -3,6 +3,9 @@
 document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, 'js');
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }
 
+// eslint-disable-next-line no-console -- intentional Easter egg for curious developers
+console.log('%cVoxPelli %c— Built with DomStack, async-htm-to-string, and a lot of opinions about the open web. Source: https://github.com/voxpelli/voxpelli.github.com', 'font-weight:bold;font-size:14px', 'font-size:12px;color:#8c2121');
+
 /**
  * <theme-toggle> — HTML web component
  * Wraps a <button> and cycles through light/dark/system themes.
