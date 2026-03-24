@@ -122,3 +122,41 @@ test('homepage has Superfeedr WebSub hub link', async () => {
   assert.match(html, /rel="hub"/);
   assert.match(html, /voxpelli\.superfeedr\.com/);
 });
+
+test('social page has posts with content', async () => {
+  const html = await readFile('public/social/index.html', 'utf8');
+  assert.match(html, /h-entry/, 'social page should contain h-entry elements');
+
+  const eContentMatch = html.match(/<div[^>]*class="e-content"[^>]*>([\s\S]*?)<\/div>/);
+  const likelistMatch = html.match(/likelist/);
+
+  assert.ok(
+    (eContentMatch && eContentMatch[1] && eContentMatch[1].trim().length > 0) || likelistMatch,
+    'social page should have at least one non-empty e-content div or a likelist'
+  );
+});
+
+test('links page has bookmark posts', async () => {
+  const html = await readFile('public/links/index.html', 'utf8');
+  assert.match(html, /u-bookmark-of/, 'links page should contain u-bookmark-of links');
+});
+
+test('archive page has year headings', async () => {
+  const html = await readFile('public/archive/index.html', 'utf8');
+  assert.match(html, /<h2>20\d{2}<\/h2>/, 'archive page should contain year headings');
+
+  const yearPattern = /<h2>(20\d{2})<\/h2>/g;
+  const years = [...html.matchAll(yearPattern)].map(m => m[1]);
+
+  assert.ok(years.length >= 2, 'archive page should have at least two year headings');
+});
+
+test('offline page renders without frontmatter', async () => {
+  const html = await readFile('public/offline/index.html', 'utf8');
+  assert.doesNotMatch(html, /^---$/m, 'offline page must not contain frontmatter delimiters');
+  assert.doesNotMatch(html, /layout:/, 'offline page must not contain layout: as visible text');
+});
+
+test('404 page exists', async () => {
+  await access('public/404.html');
+});
