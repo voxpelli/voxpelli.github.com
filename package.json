@@ -5,7 +5,7 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "build": "domstack --copy images --copy media && cp sw.js public/sw.js",
+    "build": "domstack --copy images --copy media && cp sw.js public/sw.js && cp public/404/index.html public/404.html",
     "dev": "domstack --watch --copy images --copy media",
     "build:drafts": "domstack --drafts --copy images --copy media",
     "check:lint": "eslint --report-unused-disable-directives .",
