@@ -3,6 +3,7 @@ import { html as h, rawHtml, renderToStringSync } from 'async-htm-to-string';
 /** @import { PageVars } from '../page.js' */
 
 import { renderPost } from '../lib/render-post.js';
+import { parseDateSafe } from '../lib/utils.js';
 
 export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
@@ -44,7 +45,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
       }
 
       const likes = /** @type {string[]} */ (post['mf-like-of']);
-      const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
+      const dateObj = parseDateSafe(post.date);
       const isoDate = dateObj.toISOString();
       const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       const pageUrl = String(post.pageUrl || '');

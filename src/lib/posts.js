@@ -1,3 +1,5 @@
+import { parseDateSafe } from './utils.js';
+
 /**
  * Shared post-filtering and sorting logic for indexes, feeds, and archives.
  *
@@ -39,5 +41,5 @@ export function filterAndSortPosts (pages) {
         ),
       };
     })
-    .sort((a, b) => new Date(/** @type {string} */ (b.date)).getTime() - new Date(/** @type {string} */ (a.date)).getTime());
+    .sort((a, b) => parseDateSafe(b.date).getTime() - parseDateSafe(a.date).getTime());
 }

@@ -1,5 +1,7 @@
 import { html } from 'async-htm-to-string';
 
+import { parseDateSafe } from './utils.js';
+
 /**
  * Render post footer with date, author, and permalink.
  * Returns an htm template for direct nesting (not a string).
@@ -11,7 +13,7 @@ import { html } from 'async-htm-to-string';
  * @returns {import('async-htm-to-string').HtmlTemplateValue}
  */
 export function PostFooter ({ authorName, nonenglish, post }) {
-  const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
+  const dateObj = parseDateSafe(post.date);
   const isoDate = dateObj.toISOString();
   const longDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const pageUrl = String(post.pageUrl || '');

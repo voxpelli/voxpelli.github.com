@@ -2,6 +2,7 @@ import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { renderPostContent } from './render-post-content.js';
 import { renderPostLike } from './render-post-like.js';
+import { parseDateSafe } from './utils.js';
 
 /**
  * Smart post dispatcher - renders as blog summary, like, or full content
@@ -22,7 +23,7 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
 
   // Blog article summary (no category, not standalone)
   if (!post.category && !standalone) {
-    const dateObj = post.date ? new Date(/** @type {string} */ (post.date)) : new Date();
+    const dateObj = parseDateSafe(post.date);
     const isoDate = dateObj.toISOString();
     const isoDateShort = isoDate.slice(0, 10).replaceAll('-', '.');
     const wordCount = typeof content === 'string' && content
