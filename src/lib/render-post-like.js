@@ -28,10 +28,7 @@ export function renderPostLike ({ authorName, compact, post }) {
 
     return renderToStringSync(html`
       <p class="h-entry">
-        <span class="p-name">
-          Liked
-          ${likeLinks}
-        </span>
+        <span class="p-name">Liked${' '}${likeLinks}</span>${' '}
         <time class="dt-published" datetime=${isoDate}>
           <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
         </time>
@@ -41,10 +38,7 @@ export function renderPostLike ({ authorName, compact, post }) {
 
   return renderToStringSync(html`
     <article class="h-entry">
-      <p class="p-name">
-        Liked
-        ${likeLinks}
-      </p>
+      <p class="p-name">Liked${' '}${likeLinks}</p>
       ${PostFooter({ authorName, nonenglish: false, post })}
     </article>
   `);

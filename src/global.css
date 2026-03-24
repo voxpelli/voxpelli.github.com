@@ -1122,14 +1122,19 @@ input:focus-visible {
   color: var(--color-ink);
 }
 
-/* Like grouping: shared border, tight spacing */
-.likelist {
-  padding: var(--space-sm) 0;
-  border-bottom: var(--border-structural);
+/* Like grouping: override content-area section padding for compact likes */
+.content-area > .likelist {
+  padding: var(--space-sm) var(--space-lg);
 }
 
 .likelist .h-entry + .h-entry {
   margin-top: var(--space-xs);
+}
+
+/* Likes inside likelist: remove per-entry inline padding (section handles it) */
+.likelist .h-entry:has(.u-like-of) {
+  padding-inline: 0;
+  padding-block: 0;
 }
 
 /* Domain badge for bookmark posts */
