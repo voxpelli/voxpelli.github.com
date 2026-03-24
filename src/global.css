@@ -707,7 +707,7 @@ relative-time .relative-label {
 
 /* === Skip-to-content link === */
 .skip-link {
-  position: absolute;
+  position: fixed;
   top: -100%;
   left: var(--space-lg);
   z-index: 100;
