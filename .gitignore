@@ -7,6 +7,12 @@
 npm-debug.log
 yarn-error.log
 
+# Retrospectives (local session notes)
+RETRO-*.md
+
+# Screenshots (Playwright artifacts)
+screenshots/
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
