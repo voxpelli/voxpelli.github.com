@@ -6,17 +6,20 @@ import { html } from 'async-htm-to-string';
  * @param {object} options
  * @param {string[]|undefined} [options.bookmarkOf]
  * @param {string[]|undefined} [options.repostOf]
+ * @param {boolean} [options.standalone] - When true (article pages), renders h1. When false (listing), renders h2.
  * @param {string} [options.title]
  * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
  */
-export function PostHeader ({ bookmarkOf, repostOf, title }) {
+export function PostHeader ({ bookmarkOf, repostOf, standalone, title }) {
   if (!title) return;
 
+  const Tag = standalone ? 'h1' : 'h2';
+
   if (bookmarkOf && bookmarkOf[0]) {
-    return html`<header><h1 class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></h1></header>`;
+    return html`<header><${Tag} class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></${Tag}></header>`;
   }
   if (repostOf && repostOf[0]) {
-    return html`<header><h1 class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></h1></header>`;
+    return html`<header><${Tag} class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></${Tag}></header>`;
   }
-  return html`<header><h1 class="p-name">${title}</h1></header>`;
+  return html`<header><${Tag} class="p-name">${title}</${Tag}></header>`;
 }

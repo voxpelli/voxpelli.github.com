@@ -42,7 +42,7 @@ export function renderPostContent ({ authorName, content, nonenglish, post, site
   return renderToStringSync(html`
     <article class="h-entry" lang=${lang}>
         ${PostMedia({ photos, videos })}
-        ${PostHeader({ bookmarkOf, repostOf, title })}
+        ${PostHeader({ bookmarkOf, repostOf, standalone: standalone || false, title })}
         ${PostReply({ headingLang, inReplyTo, swedish: swedish || false })}
         <div class="e-content">${rawHtml(content || '')}</div>
         ${PostSyndication({ headingLang, standalone: standalone || false, swedish: swedish || false, syndication })}
