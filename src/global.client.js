@@ -43,7 +43,7 @@ const TOGGLE_STYLES = `
     background: transparent;
     color: inherit;
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0.6;
     transition: opacity 0.15s, background 0.15s;
     padding: 0;
     font-size: 14px;
@@ -56,7 +56,7 @@ const TOGGLE_STYLES = `
 
   button[aria-pressed="true"] {
     opacity: 1;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.08);
   }
 `;
 
