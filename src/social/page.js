@@ -3,7 +3,7 @@ import { html as h, rawHtml, renderToStringSync } from 'async-htm-to-string';
 /** @import { PageVars } from '../page.js' */
 
 import { renderPost } from '../lib/render-post.js';
-import { parseDateSafe } from '../lib/utils.js';
+import { extractFullDomain, parseDateSafe } from '../lib/utils.js';
 
 export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
@@ -51,7 +51,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
       const pageUrl = String(post.pageUrl || '');
 
       const likeLinks = likes.map((like, i) => {
-        const truncated = like.length > 50 ? like.slice(0, 50) + '...' : like;
+        const truncated = extractFullDomain(like);
         const isSecondToLast = i === likes.length - 2;
         const isLast = i === likes.length - 1;
         const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');

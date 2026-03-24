@@ -1,6 +1,7 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 import { PostFooter } from './render-post-footer.js';
+import { extractFullDomain } from './utils.js';
 
 /**
  * @param {object} options
@@ -15,7 +16,7 @@ export function renderPostLike ({ authorName, post }) {
     const isSecondToLast = i === likes.length - 2;
     const isLast = i === likes.length - 1;
     const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
-    return html`<a class="u-like-of" href=${like}>${like}</a>${rawHtml(suffix)}`;
+    return html`<a class="u-like-of" href=${like}>${extractFullDomain(like)}</a>${rawHtml(suffix)}`;
   });
 
   return renderToStringSync(html`

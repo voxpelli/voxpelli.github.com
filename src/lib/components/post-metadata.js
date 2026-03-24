@@ -1,6 +1,6 @@
 import { html } from 'async-htm-to-string';
 
-import { capitalize, extractDomain, extractName } from '../utils.js';
+import { capitalize, extractDomain, extractFullDomain, extractName } from '../utils.js';
 
 /**
  * Render a bilingual heading with optional lang attribute.
@@ -30,7 +30,7 @@ export function PostReply ({ headingLang, inReplyTo, swedish }) {
   return html`
     ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
     <ul>
-      ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${r}</a></li>`)}
+      ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${extractFullDomain(r)}</a></li>`)}
     </ul>
   `;
 }

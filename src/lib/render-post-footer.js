@@ -10,13 +10,24 @@ import { parseDateSafe } from './utils.js';
  * @param {Record<string, unknown>} options.post - Post frontmatter/vars
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
+ * @param {boolean} [options.compact] - When true, omit author attribution (for social feeds)
  * @returns {import('async-htm-to-string').HtmlTemplateValue}
  */
-export function PostFooter ({ authorName, nonenglish, post }) {
+export function PostFooter ({ authorName, compact, nonenglish, post }) {
   const dateObj = parseDateSafe(post.date);
   const isoDate = dateObj.toISOString();
   const longDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const pageUrl = String(post.pageUrl || '');
+
+  if (compact) {
+    return html`
+      <footer lang=${nonenglish ? 'en' : false}>
+        <relative-time><time class="dt-published" datetime=${isoDate}>
+          <a class="u-url u-uid" href=${pageUrl}>${longDate}</a>
+        </time></relative-time>
+      </footer>
+    `;
+  }
 
   return html`
     <footer lang=${nonenglish ? 'en' : false}>
