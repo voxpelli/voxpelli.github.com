@@ -1,4 +1,4 @@
-import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
+import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { PostFooter } from './render-post-footer.js';
 import { extractFullDomain, parseDateSafe } from './utils.js';
@@ -17,7 +17,7 @@ export function renderPostLike ({ authorName, compact, post }) {
     const isSecondToLast = i === likes.length - 2;
     const isLast = i === likes.length - 1;
     const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
-    return html`<a class="u-like-of" href=${like}>${extractFullDomain(like)}</a>${rawHtml(suffix)}`;
+    return html`<a class="u-like-of" href=${like}>${extractFullDomain(like)}</a>${suffix}`;
   });
 
   if (compact) {

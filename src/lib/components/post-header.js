@@ -19,7 +19,7 @@ export function PostHeader ({ bookmarkOf, repostOf, standalone, title }) {
 
   if (bookmarkOf && bookmarkOf[0]) {
     const domain = extractFullDomain(bookmarkOf[0]);
-    return html`<header><${Tag} class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></${Tag}><span class="domain-badge">${domain}</span></header>`;
+    return html`<header><${Tag} class="p-name"><a class="u-bookmark-of" href=${bookmarkOf[0]}>${title}</a></${Tag}><span class="domain-badge" aria-hidden="true">${domain}</span></header>`;
   }
   if (repostOf && repostOf[0]) {
     return html`<header><${Tag} class="p-name"><a class="u-repost-of" href=${repostOf[0]}>${title}</a></${Tag}></header>`;
