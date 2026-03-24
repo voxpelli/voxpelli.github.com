@@ -539,8 +539,28 @@ time a,
 .posts-extras {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 var(--space-xs);
+  gap: var(--space-xs);
   list-style: none;
+  padding: var(--space-lg);
+  border-bottom: var(--border-structural);
+}
+
+.posts-extras a {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-stone);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.posts-extras a:hover {
+  background-color: var(--color-canvas-alt);
+  border-color: var(--color-falu-red);
+  transform: translateX(4px);
 }
 
 /* === Webmention responses link === */
