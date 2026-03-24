@@ -33,7 +33,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
   const headContent = renderToStringSync(html`
     <meta charset="utf-8" />
 
-    <title class=${vars.hfeed ? 'p-name' : false}>${title}</title>
+    <title>${title}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -57,16 +57,15 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
     <meta property="og:title" content=${title} />
     <meta property="og:url" content=${canonicalUrl} />
     <meta property="og:site_name" content=${blogName} />
-    <meta property="og:type" content=${vars.frontpage ? 'website' : 'article'} />
+    <meta property="og:type" content=${vars.layout === 'article' ? 'article' : 'website'} />
     <meta property="og:locale" content=${lang === 'sv' ? 'sv_SE' : 'en_US'} />
 
     ${vars.frontpage
-? html`
-  <link rel="self" href=${siteUrl} type="text/html" />
-    ${pushHub ? html`<link rel="hub" href=${pushHub} />` : ''}
-    <link rel="micropub" href="https://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />
-`
-: ''}
+      ? html`
+        ${pushHub ? html`<link rel="hub" href=${pushHub} />` : ''}
+        <link rel="micropub" href="https://micropub-to-github.herokuapp.com/micropub/voxpelli.com" />
+      `
+      : ''}
     ${vars.author ? html`<link rel="author" type="text/html" href="/" title=${authorName} />` : ''}
     ${vars.webmentionable ? html`<link rel="webmention" href=${`${webmentionEndpoint}/api/webmention`} />` : ''}
   `);
@@ -107,6 +106,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
       </aside>
 
       <main id="main-content" class=${`content-area${vars.hfeed ? ' h-feed' : ''}`}>
+        ${vars.hfeed ? html`<span class="sr-only p-name">${blogName}</span>` : ''}
         ${rawHtml(children)}
       </main>
     </div>
