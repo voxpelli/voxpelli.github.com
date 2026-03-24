@@ -462,6 +462,7 @@ ol {
   vertical-align: middle;
   position: relative;
   top: -2px;
+  margin-left: 0.25em;
 }
 
 .h-card.full-card .u-photo {
