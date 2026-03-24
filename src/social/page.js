@@ -1,9 +1,7 @@
-import { html as h, rawHtml, renderToStringSync } from 'async-htm-to-string';
-
 /** @import { PageVars } from '../page.js' */
 
+import { renderPostLike } from '../lib/render-post-like.js';
 import { renderPost } from '../lib/render-post.js';
-import { extractFullDomain, parseDateSafe } from '../lib/utils.js';
 
 export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
@@ -34,6 +32,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
     renderCache.set(/** @type {string} */ (post.path), html);
   }));
 
+  const authorName = String(pageVars.authorName || '');
   let result = '<div class="content-header">\n  <h2>Social // Interactions</h2>\n</div>\n\n';
   let isLikeList = false;
 
@@ -44,38 +43,14 @@ export default async function socialPage ({ pages, vars: pageVars }) {
         result += '<section class="likelist">\n';
       }
 
-      const likes = /** @type {string[]} */ (post['mf-like-of']);
-      const dateObj = parseDateSafe(post.date);
-      const isoDate = dateObj.toISOString();
-      const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const pageUrl = String(post.pageUrl || '');
-
-      const likeLinks = likes.map((like, i) => {
-        const truncated = extractFullDomain(like);
-        const isSecondToLast = i === likes.length - 2;
-        const isLast = i === likes.length - 1;
-        const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
-        return h`<a class="u-like-of" href=${like}>${truncated}</a>${rawHtml(suffix)}`;
-      });
-
-      result += renderToStringSync(h`
-        <p class="h-entry">
-          <span class="p-name">
-            Liked
-            ${likeLinks}
-          </span>
-          <time class="dt-published" datetime=${isoDate}>
-            <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
-          </time>
-        </p>
-      `) + '\n';
+      result += renderPostLike({ authorName, compact: true, post }) + '\n';
     } else {
       if (isLikeList) {
         isLikeList = false;
         result += '</section>\n';
       }
       result += renderPost({
-        authorName: String(pageVars.authorName || ''),
+        authorName,
         content: renderCache.get(/** @type {string} */ (post.path)) || String(post.content || ''),
         post,
         siteUrl: String(pageVars.siteUrl || ''),

@@ -1131,3 +1131,12 @@ input:focus-visible {
 .likelist .h-entry + .h-entry {
   margin-top: var(--space-xs);
 }
+
+/* Domain badge for bookmark posts */
+.domain-badge {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-ink-light);
+  margin-top: 0.25rem;
+}

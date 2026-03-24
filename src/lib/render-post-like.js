@@ -1,15 +1,16 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 import { PostFooter } from './render-post-footer.js';
-import { extractFullDomain } from './utils.js';
+import { extractFullDomain, parseDateSafe } from './utils.js';
 
 /**
  * @param {object} options
  * @param {Record<string, unknown>} options.post
  * @param {string} options.authorName
+ * @param {boolean} [options.compact] - When true, renders compact <p> for social stream; false renders full <article>
  * @returns {string}
  */
-export function renderPostLike ({ authorName, post }) {
+export function renderPostLike ({ authorName, compact, post }) {
   const likes = /** @type {string[]} */ (post['mf-like-of']) || [];
 
   const likeLinks = likes.map((like, i) => {
@@ -18,6 +19,25 @@ export function renderPostLike ({ authorName, post }) {
     const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
     return html`<a class="u-like-of" href=${like}>${extractFullDomain(like)}</a>${rawHtml(suffix)}`;
   });
+
+  if (compact) {
+    const dateObj = parseDateSafe(post.date);
+    const isoDate = dateObj.toISOString();
+    const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const pageUrl = String(post.pageUrl || '');
+
+    return renderToStringSync(html`
+      <p class="h-entry">
+        <span class="p-name">
+          Liked
+          ${likeLinks}
+        </span>
+        <time class="dt-published" datetime=${isoDate}>
+          <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
+        </time>
+      </p>
+    `);
+  }
 
   return renderToStringSync(html`
     <article class="h-entry">
