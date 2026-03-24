@@ -27,6 +27,14 @@ export function LocalizedHeading ({ enText, headingLang, svText, swedish }) {
  */
 export function PostReply ({ headingLang, inReplyTo, swedish }) {
   if (!inReplyTo || inReplyTo.length === 0) return;
+
+  if (inReplyTo.length === 1) {
+    return html`
+      ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
+      <p><a class="u-in-reply-to" rel="in-reply-to" href=${inReplyTo[0]}>${extractFullDomain(/** @type {string} */ (inReplyTo[0]))}</a></p>
+    `;
+  }
+
   return html`
     ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
     <ul>

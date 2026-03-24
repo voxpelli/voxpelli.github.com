@@ -28,7 +28,7 @@ export function renderPostLike ({ authorName, compact, post }) {
 
     return renderToStringSync(html`
       <p class="h-entry">
-        <span class="p-name">Liked${' '}${likeLinks}</span>${' '}
+        <span class="p-name">Liked${' '}${likeLinks}</span>${' \u2014 '}
         <time class="dt-published" datetime=${isoDate}>
           <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
         </time>

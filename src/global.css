@@ -1084,11 +1084,10 @@ input:focus-visible {
   text-decoration-color: var(--color-stone);
 }
 
-/* Replies: conversational — subtle background tint instead of left border (avoids clash with sidebar border) */
+/* Replies: conversational — inset shadow accent (avoids clash with sidebar border) */
 .h-entry:has(.u-in-reply-to) {
-  background-color: var(--color-canvas-alt);
-  border-radius: 4px;
-  margin-inline: var(--space-xs);
+  box-shadow: inset 3px 0 0 var(--color-stone);
+  padding-inline-start: calc(var(--space-lg) + 3px);
 }
 
 /* Reply verb heading: mono uppercase */
@@ -1100,11 +1099,10 @@ input:focus-visible {
   color: var(--color-ink-light);
 }
 
-/* Bookmarks: curated link — subtle background tint */
+/* Bookmarks: curated link — inset shadow accent */
 .h-entry:has(.u-bookmark-of) {
-  background-color: var(--color-canvas-alt);
-  border-radius: 4px;
-  margin-inline: var(--space-xs);
+  box-shadow: inset 3px 0 0 var(--color-stone-light);
+  padding-inline-start: calc(var(--space-lg) + 3px);
 }
 
 /* Bookmark title: serif, slightly smaller than articles */
