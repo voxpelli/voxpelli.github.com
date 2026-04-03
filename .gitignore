@@ -6,6 +6,7 @@
 /.env
 npm-debug.log
 yarn-error.log
+/.playwright-mcp
 
 # Retrospectives (local session notes)
 RETRO-*.md
