@@ -426,7 +426,8 @@ img {
 }
 
 .content-header h2,
-.content-header h3 {
+.content-header h3,
+.content-header .content-title {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -690,7 +691,7 @@ blockquote {
   overflow-wrap: break-word;
 }
 
-.linklist h3 {
+.linklist strong {
   display: inline;
   font-size: inherit;
   font-weight: 400;
@@ -995,8 +996,8 @@ input:focus-visible {
   color: var(--color-falu-red);
 }
 
-/* Metadata section headings: mono uppercase */
-.linklist h3 {
+/* Metadata section labels: mono uppercase */
+.linklist strong {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -1176,8 +1177,8 @@ input:focus-visible {
   padding-inline-start: calc(var(--space-lg) + 3px);
 }
 
-/* Reply verb heading: mono uppercase */
-.h-entry:has(.u-in-reply-to) h3 {
+/* Reply verb label: mono uppercase */
+.h-entry:has(.u-in-reply-to) strong {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -1228,4 +1229,74 @@ input:focus-visible {
   font-size: 0.8rem;
   color: var(--color-ink-light);
   margin-top: 0.25rem;
+}
+
+/* === Print === */
+@media print {
+  /* Reset colors and background for clean printing */
+  :root {
+    --color-canvas: #fff;
+    --color-canvas-alt: #fff;
+    --color-ink: #000;
+    --color-ink-light: #333;
+    --color-stone: #ccc;
+    --color-stone-light: #eee;
+    --color-falu-red: #000;
+    --color-cloudberry: #000;
+  }
+
+  body {
+    background-image: none;
+  }
+
+  /* Hide non-content elements */
+  .sidebar,
+  .skip-link,
+  .webmention-form,
+  theme-toggle {
+    display: none !important;
+  }
+
+  /* Full-width content — override grid layout */
+  .layout-wrapper {
+    display: block;
+    max-width: none;
+    border: none;
+  }
+
+  .content-area {
+    width: 100%;
+  }
+
+  /* Remove decorative borders and shadows */
+  .layout-wrapper,
+  .post-card,
+  .btn {
+    border: none;
+    box-shadow: none;
+  }
+
+  .post-card::before {
+    display: none;
+  }
+
+  /* Remove sticky/fixed positioning */
+  .sidebar,
+  .content-header {
+    position: static;
+  }
+
+  /* Show URLs for external links in article content */
+  .e-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+
+  /* Avoid breaking inside post cards and articles */
+  .post-card,
+  .h-entry {
+    break-inside: avoid;
+  }
 }

@@ -88,6 +88,7 @@ function applyTheme (mode) {
  */
 class ThemeToggle extends HTMLElement {
   connectedCallback () {
+    if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
     const current = localStorage.getItem(STORAGE_KEY) || 'system';
 

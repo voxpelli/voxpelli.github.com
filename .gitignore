@@ -8,8 +8,9 @@ npm-debug.log
 yarn-error.log
 /.playwright-mcp
 
-# Retrospectives (local session notes)
+# Retrospectives and sprint plans (local session notes)
 RETRO-*.md
+SWARM-*.md
 
 # Screenshots (Playwright artifacts)
 screenshots/

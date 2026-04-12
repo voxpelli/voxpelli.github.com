@@ -50,6 +50,5 @@ ${linkPosts.length > 5
   <a href="/archive/full/">Full Archive</a>
 </p>`
 : ''}
-
-<script defer src="https://webmention.herokuapp.com/js/cutting-edge.js"></script>`;
+`;
 }

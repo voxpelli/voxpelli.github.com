@@ -13,7 +13,7 @@ import { capitalize, extractDomain, extractFullDomain, extractName } from '../ut
  * @returns {import('async-htm-to-string').HtmlTemplateValue}
  */
 export function LocalizedHeading ({ enText, headingLang, svText, swedish }) {
-  return html`<h3 lang=${headingLang}>${swedish ? svText : enText}</h3>`;
+  return html`<strong lang=${headingLang}>${swedish ? svText : enText}</strong>`;
 }
 
 /**
@@ -30,16 +30,20 @@ export function PostReply ({ headingLang, inReplyTo, swedish }) {
 
   if (inReplyTo.length === 1) {
     return html`
-      ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
-      <p><a class="u-in-reply-to" rel="in-reply-to" href=${inReplyTo[0]}>${extractFullDomain(/** @type {string} */ (inReplyTo[0]))}</a></p>
+      <div class="replies linklist">
+        ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
+        <p><a class="u-in-reply-to" rel="in-reply-to" href=${inReplyTo[0]}>${extractFullDomain(/** @type {string} */ (inReplyTo[0]))}</a></p>
+      </div>
     `;
   }
 
   return html`
-    ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
-    <ul>
-      ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${extractFullDomain(r)}</a></li>`)}
-    </ul>
+    <div class="replies linklist">
+      ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
+      <ul>
+        ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${extractFullDomain(r)}</a></li>`)}
+      </ul>
+    </div>
   `;
 }
 

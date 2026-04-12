@@ -4,7 +4,5 @@
  */
 export default function robotsTemplate (_options) {
   return `User-agent: *
-Disallow: /webpage-kodfabrik-se/
-Disallow: /webpage-svpt-nu/
 `;
 }
