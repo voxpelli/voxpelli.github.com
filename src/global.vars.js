@@ -1,4 +1,17 @@
-export default {
+/**
+ * @typedef {object} SiteVars
+ * @property {string} blogName
+ * @property {string} siteUrl
+ * @property {string} authorName
+ * @property {string} authorEmail
+ * @property {string} pushHub
+ * @property {string} themeColor
+ * @property {string} micropubEndpoint
+ * @property {string} webmentionEndpoint
+ */
+
+/** @satisfies {SiteVars} */
+const vars = {
   blogName: 'VoxPelli',
   siteUrl: 'https://voxpelli.com',
   authorName: 'Pelle Wessman',
@@ -8,3 +21,5 @@ export default {
   micropubEndpoint: 'https://micropub-to-github.herokuapp.com/micropub/voxpelli.com',
   webmentionEndpoint: 'https://webmention.herokuapp.com',
 };
+
+export default vars;
