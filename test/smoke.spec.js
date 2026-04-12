@@ -112,6 +112,14 @@ test('service worker exists', async () => {
   await access('public/sw.js');
 });
 
+test('homepage post cards have reading time badges', async () => {
+  const html = await readFile('public/index.html', 'utf8');
+  const badgePattern = /<span class="badge">\d+ MIN READ<\/span>/g;
+  const badges = [...html.matchAll(badgePattern)];
+
+  assert.ok(badges.length > 0, 'homepage should have at least one reading time badge');
+});
+
 test('no defunct service references in homepage', async () => {
   const html = await readFile('public/index.html', 'utf8');
   assert.doesNotMatch(html, /flattr/i);
