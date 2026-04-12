@@ -12,7 +12,10 @@ yarn-error.log
 RETRO-*.md
 SWARM-*.md
 
-# Screenshots (Playwright artifacts)
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
 screenshots/
 
 # Beads / Dolt files (added by bd init)

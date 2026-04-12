@@ -13,6 +13,7 @@
     "check:tsc-browser": "tsc -p tsconfig.browser.json",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
     "check": "run-p check:* --continue-on-error",
+    "e2e": "playwright test",
     "test:build": "node --test 'test/**/*.spec.js'",
     "test": "run-s check build test:build",
     "husky-enable": "husky",
@@ -20,13 +21,16 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
     "@domstack/static": "^11",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^20.19.0",
     "@voxpelli/eslint-config": "^23",
     "@voxpelli/tsconfig": "^16",
     "eslint": "^9",
     "husky": "^9",
     "npm-run-all2": "^8",
+    "serve": "^14.2.6",
     "type-coverage": "^2.29.7",
     "typescript": "~5.9.3"
   },
