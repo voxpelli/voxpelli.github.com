@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:lint` — ESLint only
 - `npm run check:tsc` — TypeScript type checking only
 - `npm run test:build` — smoke tests only (requires prior build): `node --test 'test/**/*.spec.js'`
+- `npm run e2e` — Playwright e2e tests (requires prior build): chromium + mobile viewports
 - `npm run build:drafts` — include `.draft.*` pages
 
 ## Code Style
@@ -20,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Type coverage enforced at 95%+ with `--strict`
 - Node.js `^20.19.0 || ^22.13.0 || >=24`
 - `n/no-sync` rule disabled (sync file reads acceptable in this SSG context)
-- `src/global.client.js` excluded from tsc (browser-only code)
+- `src/global.client.js` checked by separate `tsconfig.browser.json` (DOM lib, no Node types)
 
 ## Architecture
 
@@ -28,7 +29,7 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 
 ### DomStack File Conventions
 
-- **Layouts**: `src/*.layout.js` — receive `{ children, vars, scripts, styles }`, return HTML string
+- **Layouts**: `src/*.layout.js` — receive `{ children, page, vars, scripts, styles }`, return HTML string. `page.path` provides the page's URL path.
 - **Pages**: `src/**/page.{js,md,html}` — JS pages export default function returning HTML via `async-htm-to-string`
 - **Templates**: `src/*.template.js` — non-HTML output (feeds, sitemap, robots.txt). Return string or `[{ content, outputName }]` array
 - **Variables**: `global.vars.js` (site-wide) < `page.vars.js` (per-page) < frontmatter (highest priority)
@@ -42,7 +43,7 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 ### Shared Components
 
 `src/lib/` contains render helpers used by pages and templates:
-- `render-post.js` — smart dispatcher for blog summaries vs full content vs likes
+- `render-post.js` — smart dispatcher for blog summaries vs full content vs likes. Defines `PostVars` typedef (`PostVarsBase & Record<string, unknown>`) used by all render functions
 - `render-post-content.js`, `render-post-footer.js`, `render-post-like.js` — post rendering
 - `components/post-header.js`, `components/post-metadata.js`, `components/post-media.js` — post components
 - `render-rss-entry.js` — Atom feed entry XML
@@ -60,6 +61,8 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 ### Testing
 
 Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from `public/` and validate: homepage structure, Atom feed content, webmention forms, redirects, sitemap, service worker, and absence of defunct services.
+
+E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` via `npm run e2e`.
 
 ## Design Context
 
