@@ -1,3 +1,5 @@
+/** @import { PostVars } from './render-post.js' */
+
 import { html } from 'async-htm-to-string';
 
 import { parseDateSafe } from './utils.js';
@@ -7,7 +9,7 @@ import { parseDateSafe } from './utils.js';
  * Returns an htm template for direct nesting (not a string).
  *
  * @param {object} options
- * @param {Record<string, unknown>} options.post - Post frontmatter/vars
+ * @param {PostVars} options.post - Post frontmatter/vars
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
  * @param {boolean} [options.compact] - When true, omit author attribution (for social feeds)
@@ -17,7 +19,7 @@ export function PostFooter ({ authorName, compact, nonenglish, post }) {
   const dateObj = parseDateSafe(post.date);
   const isoDate = dateObj.toISOString();
   const longDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const pageUrl = String(post.pageUrl || '');
+  const pageUrl = post.pageUrl || '';
 
   if (compact) {
     return html`

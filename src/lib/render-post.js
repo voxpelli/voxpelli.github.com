@@ -5,10 +5,25 @@ import { renderPostLike } from './render-post-like.js';
 import { parseDateSafe } from './utils.js';
 
 /**
+ * @typedef {object} PostVarsBase
+ * @property {string} [title]
+ * @property {string} [date]
+ * @property {string} [lang]
+ * @property {string} [category]
+ * @property {string} [pageUrl]
+ * @property {string[]} [tags]
+ * @property {string[]} [persontags]
+ * @property {string[]} [submitto]
+ * @property {string} [content]
+ */
+
+/** @typedef {PostVarsBase & Record<string, unknown>} PostVars */
+
+/**
  * Smart post dispatcher - renders as blog summary, like, or full content
  *
  * @param {object} options
- * @param {Record<string, unknown>} options.post - Post frontmatter/vars
+ * @param {PostVars} options.post - Post frontmatter/vars
  * @param {string} [options.content] - Rendered content
  * @param {boolean} [options.standalone]
  * @param {string} [options.container] - Container element tag (default: 'article')
@@ -39,7 +54,7 @@ export function renderPost ({ authorName, container, content, post, siteUrl, sta
             <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
             ${wordCount > 0 ? html`<span class="badge">${readTime} MIN READ</span>` : ''}
           </div>
-          <h3 class="post-title p-name"><a lang=${lang} class="u-url u-uid" href=${/** @type {string} */ (post.pageUrl) || ''}>${String(post.title || '')}</a></h3>
+          <h3 class="post-title p-name"><a lang=${lang} class="u-url u-uid" href=${post.pageUrl || ''}>${post.title || ''}</a></h3>
         </${tag}>
     `);
   }

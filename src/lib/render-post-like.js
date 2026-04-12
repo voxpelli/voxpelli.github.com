@@ -1,3 +1,5 @@
+/** @import { PostVars } from './render-post.js' */
+
 import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { PostFooter } from './render-post-footer.js';
@@ -5,7 +7,7 @@ import { extractFullDomain, parseDateSafe } from './utils.js';
 
 /**
  * @param {object} options
- * @param {Record<string, unknown>} options.post
+ * @param {PostVars} options.post
  * @param {string} options.authorName
  * @param {boolean} [options.compact] - When true, renders compact <p> for social stream; false renders full <article>
  * @returns {string}
@@ -24,7 +26,7 @@ export function renderPostLike ({ authorName, compact, post }) {
     const dateObj = parseDateSafe(post.date);
     const isoDate = dateObj.toISOString();
     const shortDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    const pageUrl = String(post.pageUrl || '');
+    const pageUrl = post.pageUrl || '';
 
     return renderToStringSync(html`
       <p class="h-entry">

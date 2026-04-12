@@ -1,3 +1,5 @@
+/** @import { PostVars } from './render-post.js' */
+
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 import { PostHeader } from './components/post-header.js';
@@ -9,7 +11,7 @@ import { PostFooter } from './render-post-footer.js';
  * Render full post content with all microformats.
  *
  * @param {object} options
- * @param {Record<string, unknown>} options.post
+ * @param {PostVars} options.post
  * @param {string} [options.content] - Rendered markdown content
  * @param {boolean} [options.standalone]
  * @param {boolean} [options.compact] - When true, suppress author attribution and webmention link
@@ -27,12 +29,11 @@ export function renderPostContent ({ authorName, compact, content, nonenglish, p
   const repostOf = /** @type {string[]|undefined} */ (post['mf-repost-of']);
   const inReplyTo = /** @type {string[]|undefined} */ (post['mf-in-reply-to']);
   const syndication = /** @type {string[]|undefined} */ (post['mf-syndication']);
-  const persontags = /** @type {string[]|undefined} */ (post.persontags);
-  const submitto = /** @type {string[]|undefined} */ (post.submitto);
-  const rawTags = post.tags;
-  const tags = Array.isArray(rawTags) ? /** @type {string[]} */ (rawTags) : undefined;
-  const title = /** @type {string} */ (post.title);
-  const pageUrl = String(post.pageUrl || '');
+  const persontags = Array.isArray(post.persontags) ? post.persontags : undefined;
+  const submitto = Array.isArray(post.submitto) ? post.submitto : undefined;
+  const tags = Array.isArray(post.tags) ? post.tags : undefined;
+  const title = post.title;
+  const pageUrl = post.pageUrl || '';
 
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
   const headingLang = !swedish && nonenglish ? 'en' : false;

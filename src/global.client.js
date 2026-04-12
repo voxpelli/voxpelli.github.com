@@ -132,7 +132,7 @@ class RelativeTime extends HTMLElement {
     const time = this.querySelector('time[datetime]');
     if (!time) return;
 
-    const date = new Date(time.getAttribute('datetime'));
+    const date = new Date(/** @type {string} */ (time.getAttribute('datetime')));
     if (Number.isNaN(date.getTime())) return;
 
     const label = RelativeTime.#format(date);

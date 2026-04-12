@@ -10,6 +10,7 @@
     "build:drafts": "domstack --drafts --copy images --copy media",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
+    "check:tsc-browser": "tsc -p tsconfig.browser.json",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
     "check": "run-p check:* --continue-on-error",
     "test:build": "node --test 'test/**/*.spec.js'",
