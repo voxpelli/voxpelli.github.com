@@ -1272,6 +1272,44 @@ input:focus-visible {
   color: var(--color-falu-red);
 }
 
+/* === Year-jump nav (archive) === */
+.year-nav {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  overflow-x: auto;
+  border-bottom: var(--border-structural);
+  background: var(--color-canvas);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* === Sticky year headers (archive) === */
+.post-list > .content-header {
+  position: sticky;
+  top: 2.5rem;
+  z-index: 5;
+  background: var(--color-canvas);
+}
+
+/* === Subgrid alignment (archive) === */
+@supports (grid-template-columns: subgrid) {
+  .post-list {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .post-list > .content-header,
+  .post-list > .post-card {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+}
+
 /* === Print === */
 @media print {
   /* Reset colors and background for clean printing */
@@ -1324,7 +1362,8 @@ input:focus-visible {
 
   /* Remove sticky/fixed positioning */
   .sidebar,
-  .content-header {
+  .content-header,
+  .year-nav {
     position: static;
   }
 

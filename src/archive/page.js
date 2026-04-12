@@ -16,11 +16,17 @@ export default function archivePage ({ vars: pageVars }) {
   const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.postsByYear) || {};
   const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 
-  let result = '<div class="content-header">\n  <p class="content-title">Archive // All Writings</p>\n</div>\n\n<div class="post-list">\n';
+  let result = '<div class="content-header">\n  <p class="content-title">Archive // All Writings</p>\n</div>\n\n';
+
+  result += '<nav class="year-nav" aria-label="Jump to year">\n';
+  for (const year of years) {
+    result += `  <a href="#year-${year}">${year}</a>\n`;
+  }
+  result += '</nav>\n\n<div class="post-list">\n';
 
   for (const year of years) {
     const posts = postsByYear[year] || [];
-    result += `  <div class="content-header"><h2>${year}</h2></div>\n`;
+    result += `  <div class="content-header" id="year-${year}"><h2>${year}</h2></div>\n`;
 
     for (const post of posts) {
       result += '    ' + renderPost({
