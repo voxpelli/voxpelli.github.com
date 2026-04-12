@@ -1,16 +1,25 @@
 import { filterAndSortPosts } from './lib/posts.js';
 
 /**
+ * @typedef {object} PageData
+ * @property {{ path: string, outputRelname: string }} pageInfo
+ * @property {Record<string, unknown>} vars
+ * @property {(opts: { pages: PageData[] }) => Promise<string>} [renderInnerPage]
+ */
+
+/**
  * Aggregate page data for indexes, feeds, and archives.
  * Pages are DomStack PageData objects with .pageInfo and .vars properties.
  *
- * @param {{ pages: Array<{ pageInfo: { path: string, outputRelname: string }, vars: Record<string, unknown> }> }} options
- * @returns {Record<string, unknown>}
+ * @param {{ pages: PageData[] }} options
+ * @returns {Promise<Record<string, unknown>>}
  */
-export default function globalData ({ pages }) {
+export default async function globalData ({ pages }) {
   // Build page index for enriching base posts with extra fields
   /** @type {Map<string, Record<string, unknown>>} */
   const varsByPath = new Map(pages.map(p => [p.pageInfo.path, p.vars]));
+  /** @type {Map<string, PageData>} */
+  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Filter and sort posts using shared helper, then enrich with extra fields
   const allPosts = filterAndSortPosts(pages).map(post => {
@@ -33,6 +42,21 @@ export default function globalData ({ pages }) {
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = linkPosts.slice(0, 10);
+
+  // Render recent blog posts to get content for reading time calculation.
+  // Only the 10 most recent are rendered (shown on homepage) for performance.
+  await Promise.all(recentPosts.map(async (post) => {
+    const page = pagesByPath.get(post.path);
+    if (!page || typeof page.renderInnerPage !== 'function') return;
+    try {
+      const renderedHtml = await page.renderInnerPage({ pages });
+      if (typeof renderedHtml === 'string' && renderedHtml) {
+        post.content = renderedHtml;
+      }
+    } catch {
+      // Silently skip failed renders — reading time is non-critical
+    }
+  }));
 
   // Posts by year for archive
   /** @type {Record<string, typeof blogPosts>} */

@@ -45,6 +45,45 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
     <script defer src=${`${wmEndpoint}/js/cutting-edge.js`}></script>
   `);
 
+  // Find adjacent posts for prev/next navigation (scoped to same content category)
+  const category = vars.category;
+  /** @type {Array<Record<string, unknown>>} */
+  let postList;
+
+  if (category === 'social') {
+    postList = /** @type {Array<Record<string, unknown>>} */ (vars.socialPosts) || [];
+  } else if (category === 'links') {
+    postList = /** @type {Array<Record<string, unknown>>} */ (vars.linkPosts) || [];
+  } else {
+    postList = /** @type {Array<Record<string, unknown>>} */ (vars.blogPosts) || [];
+  }
+  const currentIndex = postList.findIndex(p => String(p.pageUrl) === pageUrl);
+  const prevPost = currentIndex !== -1 ? postList[currentIndex + 1] : undefined; // older
+  const nextPost = currentIndex > 0 ? postList[currentIndex - 1] : undefined; // newer
+
+  const postNav = (prevPost || nextPost)
+    ? renderToStringSync(html`
+      <nav class="post-nav" aria-label="Post navigation">
+        ${prevPost
+          ? html`
+            <a class="post-nav-link post-nav-prev" href=${String(prevPost.pageUrl || '')} rel="prev">
+              <span class="post-nav-label">Older</span>
+              <span class="post-nav-title">${String(prevPost.title || '')}</span>
+            </a>
+          `
+          : ''}
+        ${nextPost
+          ? html`
+            <a class="post-nav-link post-nav-next" href=${String(nextPost.pageUrl || '')} rel="next">
+              <span class="post-nav-label">Newer</span>
+              <span class="post-nav-title">${String(nextPost.title || '')}</span>
+            </a>
+          `
+          : ''}
+      </nav>
+    `)
+    : '';
+
   const layoutVars = {
     ...vars,
     author: true,
@@ -53,7 +92,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
   };
 
   return rootLayout({
-    children: articleHtml + '\n' + webmentionForm,
+    children: articleHtml + '\n' + webmentionForm + '\n' + postNav,
     page,
     scripts,
     styles,
