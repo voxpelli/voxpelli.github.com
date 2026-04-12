@@ -1,10 +1,10 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 /**
- * @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
-export default function rootLayout ({ children, scripts = [], styles = [], vars }) {
+export default function rootLayout ({ children, page, scripts = [], styles = [], vars }) {
   const blogName = String(vars.blogName || '');
   const siteUrl = String(vars.siteUrl || '');
   const authorName = String(vars.authorName || '');
@@ -19,7 +19,7 @@ export default function rootLayout ({ children, scripts = [], styles = [], vars 
 
   const lang = String(vars.lang || 'en');
 
-  const pageUrl = String(vars.pageUrl || '') || '/';
+  const pageUrl = (page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '')) || '/';
   const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 
   // Determine active nav item

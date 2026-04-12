@@ -6,16 +6,17 @@ import rootLayout from './root.layout.js';
 /**
  * Article/post layout - extends root layout with webmention form and post rendering
  *
- * @param {{ children: string, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, page?: { path: string }, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
-export default function articleLayout ({ children, scripts = [], styles = [], vars }) {
+export default function articleLayout ({ children, page, scripts = [], styles = [], vars }) {
   const swedish = !vars.lang || vars.lang === 'sv';
   const nonenglish = vars.lang !== 'en';
+  const pageUrl = page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '');
 
   const postVars = {
     ...vars,
-    pageUrl: vars.pageUrl || '',
+    pageUrl,
   };
 
   const articleHtml = renderPostContent({
@@ -36,7 +37,7 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
       <form action=${`${wmEndpoint}/api/webmention`} method="post">
         <label for="webmention-source">Have you written a response to this? Let me know the URL:</label>
         <input id="webmention-source" name="source" type="url" placeholder="http://example.com/my-cool-post" />
-        <input name="target" value=${`${vars.siteUrl}${vars.pageUrl || ''}`} type="hidden" />
+        <input name="target" value=${`${vars.siteUrl}${pageUrl}`} type="hidden" />
         <input value="Send Webmention" type="submit" />
       </form>
     </section>
@@ -53,6 +54,7 @@ export default function articleLayout ({ children, scripts = [], styles = [], va
 
   return rootLayout({
     children: articleHtml + '\n' + webmentionForm,
+    page,
     scripts,
     styles,
     vars: layoutVars,
