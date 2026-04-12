@@ -3,6 +3,9 @@ layout: article
 title: I'm joining Bloglovin
 date: '2014-08-18T07:45:00.000Z'
 lang: en
+tags:
+  - career
+  - startup
 ---
 
 <span class="p-summary">Last week I said goodbye to [Valtech](https://valtech.se/), where I've been this last year, and this week I'm happy to say hello to [Bloglovin](http://www.bloglovin.com/blog/4308583/?claim=42679w3fmct) where I'm rejoining parts of my [good old](http://goodold.se/) team.</span>

@@ -3,6 +3,9 @@ layout: article
 title: Better colors with SassScript
 date: '2014-05-28T09:45:00.000Z'
 lang: en
+tags:
+  - css
+  - sass
 ---
 
 <span class="p-summary">Preprocessors – it's the new hot thing in the frontend world. Sass is what makes you cool – Sass is what makes a site great. At least that's how the talk goes.</span>

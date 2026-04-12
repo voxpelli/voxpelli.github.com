@@ -3,6 +3,9 @@ layout: article
 title: My 2015 in Freelance
 date: '2016-01-03T10:00:00.000Z'
 lang: en
+tags:
+  - year-in-review
+  - freelance
 ---
 
 2016 is in full swing and it's long overdue to take a look back at the past year and what happened then. This is part two of four in a series of posts about 2015.

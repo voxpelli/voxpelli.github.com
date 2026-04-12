@@ -2,6 +2,9 @@
 layout: article
 title: Tent.io och Identi.ca - en liten historielektion
 date: '2012-10-02T00:00:00.000Z'
+tags:
+  - federation
+  - open-web
 ---
 
 Det har varit en del snack kring [Tent.io](http://tent.io/) på sistone – den där tjänsten som näst efter App.net ska ta död på de stora jättarna Facebook och Twitter. Jag har själv inte djupdykt i Tent.io's tekniska implementation, men anar en viss historielöshet i de standarder de föreslår och inte minst i rapporteringen om tjänsten i sig.

@@ -3,6 +3,10 @@ layout: article
 title: Why federate just the social web?
 date: '2012-10-15T00:00:00.000Z'
 lang: en
+tags:
+  - federation
+  - open-web
+  - indieweb
 ---
 
 Twitter's stricter API-terms resulted in reactions like App.net and Tent.io to be launched and in the question of a federated social web yet again being a topic that gathered interest from around the web.

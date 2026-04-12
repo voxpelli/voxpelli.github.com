@@ -3,6 +3,10 @@ layout: article
 title: Moving to Jekyll and English
 date: '2011-08-08T00:00:00.000Z'
 lang: en
+tags:
+  - jekyll
+  - static-sites
+  - blogging
 ---
 I've long had my blog in a Drupal 6 based system, which I set it up during the Christmas of 2008. Drupal however is not a very good blogging tool which has resulted in me only writing a handful of posts since then. [Drupal](http://drupal.org/) is built to be a really powerful and extensible framework that can fit every purpose one can imagine - for a simple little blog that only me myself am going to use that flexibility becomes more of a burden than a help.
 

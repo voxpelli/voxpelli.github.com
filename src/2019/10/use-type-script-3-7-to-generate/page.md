@@ -3,6 +3,10 @@ layout: article
 title: How to use TypeScript 3.7 to generate declarations from JSDoc
 date: '2019-10-07T15:42:27.043Z'
 lang: en
+tags:
+  - typescript
+  - jsdoc
+  - javascript
 ---
 
 ## Background

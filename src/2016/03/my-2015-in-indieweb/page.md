@@ -3,6 +3,9 @@ layout: article
 title: My 2015 in IndieWeb
 date: '2016-03-12T15:55:00.000Z'
 lang: en
+tags:
+  - indieweb
+  - year-in-review
 ---
 
 2016 is in full swing and it's long overdue to take a look back at the past year and what happened then. This is **part two of four** in a series of posts about 2015.

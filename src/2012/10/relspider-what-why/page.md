@@ -3,6 +3,10 @@ layout: article
 title: RelSpider - what and why?
 date: '2012-10-10T00:00:00.000Z'
 lang: en
+tags:
+  - indieweb
+  - web-standards
+  - open-web
 ---
 
 The ones following me at GitHub, Twitter and so has perhaps noticed that I've been doing some work on something I call "[RelSpider](https://github.com/voxpelli/relspider)" and perhaps the ones who have seen that has wondered a bit why I've done so and even more why they should care about it.

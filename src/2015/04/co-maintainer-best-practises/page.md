@@ -3,6 +3,9 @@ layout: article
 title: We should have co-maintainer best practises
 date: '2015-04-05T14:20:00.000Z'
 lang: en
+tags:
+  - open-source
+  - collaboration
 ---
 
 Collaboration is one of the key aspects of open source. The collaboration though is often dependent on the maintainer being able to accept or deny a contribution and to give feedback on the next step.

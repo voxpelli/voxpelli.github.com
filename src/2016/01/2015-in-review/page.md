@@ -3,6 +3,8 @@ layout: article
 title: 2015 in review
 date: '2016-01-03T10:00:00.000Z'
 lang: en
+tags:
+  - year-in-review
 ---
 
 A new year has come and it’s time to say good bye to an eventful year by taking a look back at it.

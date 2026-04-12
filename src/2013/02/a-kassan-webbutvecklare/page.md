@@ -2,6 +2,9 @@
 layout: article
 title: A-kassan ur en webbutvecklares perspektiv
 date: '2013-02-06T00:00:00.000Z'
+tags:
+  - samhälle
+  - freelance
 ---
 
 A-kassans värld är relativt ny för mig - det dröjde länge innan jag blev medlem i en, men i takt med att regeringen gjort att också sjukdom kan leda till arbetslöshet och i takt med att jag själv började fundera på om det kanske var dags att utforska alternativa yrken så kändes a-kassa som en allt bättre idé.

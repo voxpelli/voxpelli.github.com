@@ -3,6 +3,9 @@ layout: article
 title: Server-controlled AJAX at Flattr
 date: '2012-04-27T00:00:00.000Z'
 lang: en
+tags:
+  - javascript
+  - api
 ---
 ### The short story, distilled to its essence
 

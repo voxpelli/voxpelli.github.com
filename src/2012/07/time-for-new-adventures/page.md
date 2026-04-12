@@ -3,6 +3,8 @@ layout: article
 title: Time for new adventures
 date: '2012-07-13T00:00:00.000Z'
 lang: en
+tags:
+  - career
 ---
 
 13:th July was my last day at [Flattr](https://flattr.com/). Almost two years after I started working there once a week it has become time to move on. This autumn I will take a break from web development and will instead be investigating the life of a student by taking some philosophy courses at [Lund University](http://www.lu.se/).

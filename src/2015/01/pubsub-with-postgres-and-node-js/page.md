@@ -3,6 +3,10 @@ layout: article
 title: Publish/subscribe with Postgres and Node.js
 date: '2015-01-05T20:00:00.000Z'
 lang: en
+tags:
+  - nodejs
+  - postgresql
+  - realtime
 ---
 
 A few years ago *realtime* was the buzzword of the day. The killer feature of something could be that it did something old – but in *realtime*.

@@ -2,6 +2,8 @@
 layout: article
 title: Sista dagen på Good Old
 date: '2011-03-29T16:16:21.000Z'
+tags:
+  - career
 ---
 Idag var min sista dag som anställd på [Good Old](http://goodold.se). Från och med nästa månad kommer jag att fördela min tid mellan anställning på [Flattr](http://flattr.com) och [frilansande](http://kodfabrik.se). På Flattr kommer jag mestadels pyssla med front-end-biten medans jag som frilans nog huvudsakligen kommer att fokusera på opensource-moduler och då i synnerhet kring Drupal.
 

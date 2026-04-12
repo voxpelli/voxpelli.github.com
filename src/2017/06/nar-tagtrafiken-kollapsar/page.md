@@ -2,6 +2,9 @@
 layout: article
 title: När tågtrafiken kollapsar – vem fyller upp?
 date: '2017-06-28T15:41:00.000Z'
+tags:
+  - samhälle
+  - infrastruktur
 ---
 
 Tågtrafiken är i haveri. Vi kan swipea hem oss några häftiga burritos genom ett cykelbud, boka taxis genom några enkla små gester – men tågen? De står alltjämt still.

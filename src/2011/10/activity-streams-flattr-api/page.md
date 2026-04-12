@@ -3,6 +3,10 @@ layout: article
 title: Activity Streams in Flattr API v2
 date: '2011-10-31T00:00:00.000Z'
 lang: en
+tags:
+  - activity-streams
+  - api
+  - open-web
 ---
 Last week we [announced](http://blog.flattr.net/2011/10/api-v2-beta-out-whats-changed/) a public beta of the [next generation Flattr API](https://developers.flattr.net/v2/). Our last API became a dead end so we decided to rebuild it from scratch with extendability and maintainability in mind and while doing that we decided to throw in some candy as well - the new API eg. uses the now standard combo of [OAuth 2](http://tools.ietf.org/html/draft-ietf-oauth-v2) and [Bearer Tokens](http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer) for authentication and also supports the even more standard JSON as a response format in addition to a [few other formats](https://developers.flattr.net/v2/#formats).
 

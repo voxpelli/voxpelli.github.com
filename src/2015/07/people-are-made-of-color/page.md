@@ -3,6 +3,9 @@ layout: article
 title: People are made of color
 date: '2015-07-04T10:15:00.000Z'
 lang: en
+tags:
+  - diversity
+  - perspective
 ---
 
 There are plenty of perspectives on things in life. At first they all seem pretty shallow and simple – black and white to speak in terms of color – things are one way or another and that's that.

@@ -3,6 +3,9 @@ layout: article
 title: Reclaiming the reply with Indie-Config – Overview
 date: '2014-10-20T19:32:00.000Z'
 lang: en
+tags:
+  - indieweb
+  - web-standards
 ---
 
 ## tl;dr

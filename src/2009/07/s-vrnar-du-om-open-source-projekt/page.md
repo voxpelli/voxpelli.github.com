@@ -2,6 +2,8 @@
 layout: article
 title: Så värnar du om open source projekt
 date: '2009-07-20T17:59:08.000Z'
+tags:
+  - open-source
 ---
 Vi använder alla open source idag och vi påverkas alla av vilken riktning utvecklingen av ett open source projekt tar.
 
@@ -25,7 +27,7 @@ Om du inte får gehör, vilket kanske kan vara svårt om det råkar vara en slut
 
 Forkning är en av de mer spännande aspekter av open source - oavsett hur åt skogen ett projekt och dess ledning går så kan produkten alltid överleva om någon plockar upp stafettpinnen och springer vidare. Det är inte lätt och det är traditionellt sett något som kan ses med ganska onda ögon från det existerande communityt så i de flesta fall är det enbart en sista utväg - men som alltid är vetskapen att den finns där om den behövs det viktigaste - det finns alltid en lösning med open source - alltid.
 
-Exempel: [activeCollab](http://www.activecollab.com/) levde som ett open source projekt när upphovsmannen bestämde sig för att nästa version skulle lanseras kommersiellt - det gillade inte delar av communityt som valde att bygga vidare på open source varianten under namnet [ProjectPier](http://www.projectpier.org/)
+Exempel: [activeCollab](http://www.activecollab.com/) levde som ett open source projekt när upphovsmannen bestämde sig för att nästa version skulle lanseras kommersiellt - det gillade inte delar av communityt som valde att bygga vidare på open source varianten under namnet [ProjectPier](http://www.projectpier.org/)
 ### Långsam större händelse
 
 Det kan hända att ett projekt så sakteliga viker av från kursen. Kanske börjar community-medlemmarna tappa gnistan, gå vidare i livet eller helt enkelt gå i samma fotspår och göra saker av slentrian istället för av upptäckarlusta. Orsakerna kan vara många, men gemensamt är att du troligast först märker det när det är för sent. När projektet under några år så sakteliga svängt in på fel kurs och mer eller mindre självdött kan det krävas mycket för att rädda det när man väl märker det.

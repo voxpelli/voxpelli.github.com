@@ -2,6 +2,9 @@
 layout: article
 title: 'Pingback, Multiping och Global Redirect'
 date: '2009-01-02T22:35:16.000Z'
+tags:
+  - web-standards
+  - drupal
 ---
 Jobbade idag med att integrera olika former av pingning för denna bloggen.
 

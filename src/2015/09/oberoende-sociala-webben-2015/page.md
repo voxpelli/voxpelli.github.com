@@ -4,6 +4,10 @@ title: Den oberoende sociala webben 2015
 date: '2015-09-18T19:00:00.000Z'
 submitto:
   - 'http://news.indiewebcamp.com/sv'
+tags:
+  - indieweb
+  - federation
+  - open-web
 ---
 
 Sociala medier. Synonymt med Facebook, Twitter, Instagram. Vad händer [när en av dem försvinner](http://digital.di.se/artikel/vad-hander-nar-twitter-forsvinner)? Är det game over då? [Jaiku](http://jardenberg.se/mindpark-16-natten-da-mikrobloggen-blev-av-med-oskulden/) i repris, fast denna gång utan livlina?

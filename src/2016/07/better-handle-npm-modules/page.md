@@ -3,6 +3,10 @@ layout: article
 title: 3 tricks to better handle npm modules
 date: '2016-07-05T17:10:00.000Z'
 lang: en
+tags:
+  - npm
+  - nodejs
+  - javascript
 ---
 
 Developing with npm modules isn't just installing modules and then updating them. In a team environment you might not even know when a new module should be installed or when its version requirement has changed. This can cause lots of weird unexpected behaviors when the installed modules doesn't match the expectations of the app – and that annoys and is a waste of time.

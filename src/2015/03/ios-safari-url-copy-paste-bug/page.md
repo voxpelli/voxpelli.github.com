@@ -3,6 +3,10 @@ layout: article
 title: iOS Safari URL copy & paste bug
 date: '2015-03-15T17:15:00.000Z'
 lang: en
+tags:
+  - ios
+  - safari
+  - bugs
 ---
 
 Every now and then one stumbles upon a bug that turns out weirder than it initially looked. What I thought to be some JavaScript that blocked some pasting from working out appeared to be a Safari iOS bug.

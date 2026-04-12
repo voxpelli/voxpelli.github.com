@@ -3,6 +3,9 @@ layout: article
 title: 'Experts don’t change the world, society does'
 date: '2016-03-13T13:50:00.000Z'
 lang: en
+tags:
+  - society
+  - perspective
 ---
 
 The expert. The pinnacle of knowledge within a field. The Einstein. The one who pushes the boundaries of humanities to new heights. The true revolutionary. The one everyone wants to be. The one everyone strives to become.

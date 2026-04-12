@@ -2,6 +2,8 @@
 layout: article
 title: Du röstar inte bara på valdagen
 date: '2010-09-19T16:55:48.000Z'
+tags:
+  - samhälle
 ---
 Idag läggs röstsedlar i kuvert som förseglar vårt styre de nästkommande fyra åren. Idag har vi makten - det är idag som är demokrati. Eller?
 

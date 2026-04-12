@@ -3,6 +3,10 @@ layout: article
 title: 'New service: WebMentions for static pages'
 date: '2013-12-18T22:45:00.000Z'
 lang: en
+tags:
+  - indieweb
+  - webmentions
+  - static-sites
 ---
 
 <span class="p-summary">I'm now launching a service that can receive and embeds WebMentions for sites. Useful for eg. static blogs on GitHub Pages.</span>
