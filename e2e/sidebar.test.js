@@ -12,7 +12,7 @@ test.describe('Sidebar sticky behavior — desktop', () => {
 
     const position = await page.evaluate(() => {
       const el = document.querySelector('.sidebar');
-      // eslint-disable-next-line no-undef, unicorn/no-null -- browser context
+      // eslint-disable-next-line unicorn/no-null -- browser context
       return el ? getComputedStyle(el).position : null;
     });
 
@@ -58,7 +58,7 @@ test.describe('Sidebar sticky behavior — mobile', () => {
 
     const position = await page.evaluate(() => {
       const el = document.querySelector('.sidebar');
-      // eslint-disable-next-line no-undef, unicorn/no-null -- browser context
+      // eslint-disable-next-line unicorn/no-null -- browser context
       return el ? getComputedStyle(el).position : null;
     });
 

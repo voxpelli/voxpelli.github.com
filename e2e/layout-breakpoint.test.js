@@ -68,7 +68,7 @@ test.describe('layout breakpoint at 1024px', () => {
       const el = document.querySelector('.sidebar');
       // eslint-disable-next-line unicorn/no-null -- browser context
       if (!el) return null;
-      // eslint-disable-next-line no-undef -- browser context
+
       const styles = getComputedStyle(el);
       return {
         borderBottom: styles.borderBottomWidth,
@@ -90,7 +90,7 @@ test.describe('layout breakpoint at 1024px', () => {
       const el = document.querySelector('.sidebar');
       // eslint-disable-next-line unicorn/no-null -- browser context
       if (!el) return null;
-      // eslint-disable-next-line no-undef -- browser context
+
       const styles = getComputedStyle(el);
       return {
         borderBottom: styles.borderBottomWidth,

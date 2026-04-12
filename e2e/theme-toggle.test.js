@@ -67,7 +67,6 @@ test.describe('theme toggle', () => {
     // The inline <script> in <head> reads localStorage and sets data-theme
     // synchronously, so there should be no flash of the wrong theme.
     await page.addInitScript(() => {
-      // eslint-disable-next-line no-undef -- browser context
       localStorage.setItem('theme', 'dark');
     });
 
@@ -84,7 +83,6 @@ test.describe('theme toggle', () => {
 
   test('FOWT prevention: light theme from localStorage', async ({ page }) => {
     await page.addInitScript(() => {
-      // eslint-disable-next-line no-undef -- browser context
       localStorage.setItem('theme', 'light');
     });
 
@@ -112,11 +110,10 @@ test.describe('theme toggle', () => {
     // same origin, but the storage event only fires in OTHER tabs,
     // so we dispatch it manually.
     await page2.evaluate(() => {
-      // eslint-disable-next-line no-undef -- browser context
       globalThis.dispatchEvent(new StorageEvent('storage', {
         key: 'theme',
         newValue: 'dark',
-        // eslint-disable-next-line no-undef -- browser context
+
         storageArea: localStorage,
       }));
     });
