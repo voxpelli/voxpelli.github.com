@@ -67,6 +67,23 @@ export default async function globalData ({ pages }) {
     postsByYear[year].push(post);
   }
 
+  // Tags index — built from blogPosts only (social/link posts have different tag semantics)
+  /** @type {Record<string, typeof blogPosts>} */
+  const allTags = {};
+  for (const post of blogPosts) {
+    const postTags = /** @type {string[]|undefined} */ (post.tags);
+    if (!postTags) continue;
+    for (const tag of postTags) {
+      const normalizedTag = String(tag).toLowerCase();
+      if (!allTags[normalizedTag]) allTags[normalizedTag] = [];
+      allTags[normalizedTag].push(post);
+    }
+  }
+
+  const tagCounts = Object.entries(allTags)
+    .map(([tag, posts]) => ({ tag, count: posts.length }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+
   return {
     allPosts,
     blogPosts,
@@ -76,5 +93,7 @@ export default async function globalData ({ pages }) {
     recentEnglishPosts,
     recentLinks,
     postsByYear,
+    allTags,
+    tagCounts,
   };
 }

@@ -1310,6 +1310,29 @@ input:focus-visible {
   }
 }
 
+/* === Tag cloud (tags index) === */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+}
+
+.tag-cloud a {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-stone);
+  border-radius: 3px;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: background-color 0.15s var(--ease-out);
+}
+
+.tag-cloud a:hover {
+  background: var(--color-canvas-alt);
+}
+
 /* === Print === */
 @media print {
   /* Reset colors and background for clean printing */

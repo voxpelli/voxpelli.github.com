@@ -126,7 +126,7 @@ export function PostTags ({ headingLang, swedish, tags }) {
     <div class="tags linklist">
         ${LocalizedHeading({ enText: 'Tags:', headingLang, svText: 'Taggar:', swedish })}
         <ul>
-          ${tags.map(tag => html`<li class="p-category">${String(tag)}</li>`)}
+          ${tags.map(tag => html`<li class="p-category"><a href=${`/tags/${encodeURIComponent(String(tag).toLowerCase())}/`}>${String(tag)}</a></li>`)}
         </ul>
       </div>
   `;
