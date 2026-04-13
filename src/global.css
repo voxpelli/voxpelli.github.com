@@ -129,11 +129,16 @@ body {
   max-width: 1440px;
   margin: 0 auto;
   background-color: var(--color-canvas);
-  border-left: var(--border-structural);
-  border-right: var(--border-structural);
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .layout-wrapper {
+    border-left: var(--border-structural);
+    border-right: var(--border-structural);
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -387,9 +392,6 @@ img {
     gap: var(--space-md);
   }
 
-  .content-area {
-    min-width: 0;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -585,6 +587,7 @@ img {
 .content-area {
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Prevent grid child from expanding viewport with wide content */
 }
 
 .content-header {
@@ -1168,6 +1171,19 @@ input:focus-visible {
   overflow-wrap: break-word;
 }
 
+/* Code blocks: horizontal scroll for wide content */
+.e-content pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Video iframes (YouTube etc.): constrain width, preserve aspect ratio */
+.e-content iframe {
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
 .content-area > .h-entry .e-content h2 {
   font-family: var(--font-sans);
   font-size: 1.35rem;
@@ -1527,23 +1543,25 @@ input:focus-visible {
   background: var(--color-canvas);
 }
 
-/* === Subgrid alignment (archive) === */
+/* === Subgrid alignment (archive, tablet+ only) === */
 @supports (grid-template-columns: subgrid) {
-  .post-list {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-  }
+  @media (min-width: 768px) {
+    .post-list {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+    }
 
-  .post-list > .content-header,
-  .post-list > .post-card {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-  }
+    .post-list > .content-header,
+    .post-list > .post-card {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+    }
 
-  /* Excerpt cards need vertical stacking, not 3-column subgrid */
-  .post-list > .post-card:has(.post-excerpt) {
-    grid-template-columns: 1fr;
+    /* Excerpt cards need vertical stacking, not 3-column subgrid */
+    .post-list > .post-card:has(.post-excerpt) {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
