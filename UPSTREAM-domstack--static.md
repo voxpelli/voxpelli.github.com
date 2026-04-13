@@ -17,8 +17,8 @@
 
 ## Bugs
 
-- **markdown-it-highlightjs renders bare `<pre><code>` without `.highlight` wrapper** (2026-04-13) [degraded] — DomStack's default markdown-it config uses highlight.js which renders code blocks as `<pre><code class="hljs">` without a wrapping `<div class="highlight">`. The default ejected CSS targets `.highlight { overflow: auto }` which never matches the actual built output, causing code blocks to overflow on mobile.
-  Severity: degraded · Ownership: upstream · Workaround: full — add `.e-content pre { overflow-x: auto; max-width: 100% }` in consumer CSS
+- **markdown-it-highlightjs renders bare `<pre><code>` without `.highlight` wrapper** (2026-04-13) [degraded] — DomStack's default markdown-it config uses `markdown-it-highlightjs@4.1.0` which renders code blocks as `<pre><code class="hljs">` without a wrapping `<div class="highlight">`. The default ejected CSS targets `.highlight { overflow: auto }` and 28+ token color rules (`.highlight .c`, `.highlight .k`, etc.) — ALL are dead CSS that never matches the actual built output. The token classes are Jekyll/Rouge conventions (`c`, `k`, `err`), not highlight.js conventions (`hljs-attr`, `hljs-string`, `hljs-keyword`). Both the overflow handling and the entire syntax theme are broken by default.
+  Severity: degraded · Ownership: upstream · Workaround: full — add `.e-content pre { overflow-x: auto }` for overflow; retarget theme rules to `.hljs` classes for token colors
 
 - **HTML builder doesn't strip YAML frontmatter** (2026-03-24) [degraded] — Only the markdown builder strips frontmatter. HTML pages (`page.html`) with frontmatter render it as visible text.
   Severity: degraded · Ownership: upstream · Workaround: full — use `page.vars.js` alongside `page.html`
