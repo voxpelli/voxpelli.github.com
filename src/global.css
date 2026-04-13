@@ -772,7 +772,7 @@ p,
 ul,
 ol,
 .e-content,
-.highlight,
+pre:has(> code.hljs),
 .webmention-mention,
 .webmention-facepile,
 .linklist,
@@ -791,7 +791,7 @@ ol {
 }
 
 /* === Code highlighting === */
-.highlight {
+pre:has(> code.hljs) {
   font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
   overflow: auto;
 }
@@ -1371,35 +1371,25 @@ input:focus-visible {
   font-size: 0.85rem;
 }
 
-/* === Syntax highlighting (theme-aware) === */
-.highlight { background: var(--hl-bg); border-radius: 4px; padding: var(--space-xs); }
-.highlight .c, .highlight .cm, .highlight .c1, .highlight .cs { color: var(--hl-comment); font-style: italic }
-.highlight .cp { color: var(--hl-comment); font-weight: bold }
-.highlight .err { color: var(--color-falu-red); background-color: var(--hl-error-bg) }
-.highlight .k, .highlight .kc, .highlight .kd, .highlight .kp, .highlight .kr, .highlight .o, .highlight .ow, .highlight .gs { font-weight: bold }
-.highlight .kt { color: var(--hl-name); font-weight: bold }
-.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il { color: var(--hl-number) }
-.highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .s1 { color: var(--hl-string) }
-.highlight .sr { color: var(--hl-number) }
-.highlight .ss { color: var(--color-cloudberry) }
-.highlight .na, .highlight .no, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi { color: var(--hl-name) }
-.highlight .nb { color: var(--hl-name) }
-.highlight .nc { color: var(--hl-name); font-weight: bold }
-.highlight .ne, .highlight .nf { color: var(--color-falu-red); font-weight: bold }
-.highlight .ni { color: var(--color-cloudberry) }
-.highlight .nn { color: var(--color-ink-light) }
-.highlight .nt { color: var(--color-falu-red) }
-.highlight .ge { font-style: italic }
-.highlight .gd { background-color: var(--hl-del-bg) }
-.highlight .gd .x { background-color: var(--hl-del-bg) }
-.highlight .gi { background-color: var(--hl-add-bg) }
-.highlight .gi .x { background-color: var(--hl-add-bg) }
-.highlight .go { color: var(--color-ink-light) }
-.highlight .gp { color: var(--color-ink-light) }
-.highlight .gh, .highlight .gu { color: var(--color-ink-light) }
-.highlight .gt, .highlight .gr { color: var(--color-falu-red) }
-.highlight .bp { color: var(--hl-comment) }
-.highlight .w { color: var(--color-stone) }
+/* === Syntax highlighting (highlight.js theme-aware) === */
+pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--space-xs); display: block; }
+.hljs-comment { color: var(--hl-comment); font-style: italic }
+.hljs-keyword { font-weight: bold }
+.hljs-string { color: var(--hl-string) }
+.hljs-attr,
+.hljs-property { color: var(--hl-name) }
+.hljs-built_in { color: var(--hl-name) }
+.hljs-title { color: var(--color-falu-red); font-weight: bold }
+.hljs-params { color: var(--color-ink) }
+.hljs-punctuation { color: var(--color-ink-light) }
+.hljs-number { color: var(--hl-number) }
+.hljs-literal { color: var(--hl-number) }
+.hljs-regexp { color: var(--hl-number) }
+.hljs-symbol { color: var(--color-cloudberry) }
+.hljs-type { color: var(--hl-name); font-weight: bold }
+.hljs-meta { color: var(--hl-comment); font-weight: bold }
+.hljs-addition { background-color: var(--hl-add-bg) }
+.hljs-deletion { background-color: var(--hl-del-bg) }
 
 /* === Social Stream Type Detection via :has() === */
 
