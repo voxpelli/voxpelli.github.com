@@ -6,13 +6,19 @@
 - **Export PageData, PageInfo types from package entry** (2026-03-24) — DomStack exports function types but not the data types those functions receive. Users wanting full type safety must manually define PageData/PageInfo. See `domstack-issues/01-export-pagedata-types.md`.
   Ownership: upstream · Workaround: partial — manual JSDoc typedefs
 
-- **Templates should receive global.data.js output in vars** (2026-03-24) — Templates get only `global.vars.js` in `vars`, not the aggregated `global.data.js` output. Forces templates to re-derive post data from raw pages array. See `domstack-issues/09-global-data-not-available-to-templates.md`.
-  Ownership: upstream · Workaround: full — duplicate filter logic in templates
+- **Templates should receive global.data.js output in vars** (2026-03-24) — Templates get only `global.vars.js` in `vars`, not the aggregated `global.data.js` output. See `domstack-issues/09-global-data-not-available-to-templates.md`.
+  Ownership: upstream · Workaround: full — access via `pages[0].vars` (PageData getter includes globalDataVars)
 
 - **--copy for individual files** (2026-03-24) — The `--copy` flag only handles directories. Service workers and other root-level files require a manual `cp` in the build script. See `domstack-issues/10-service-worker-management.md`.
   Ownership: upstream · Workaround: full — `cp sw.js public/sw.js` in build script
 
+- **PageData.vars getter creates fresh objects on each access** (2026-04-13) — `PageData.vars` is a getter that merges globalVars + globalDataVars + pageVars + builderVars into a new object each call. Setting `page.vars.x = y` writes to a temporary object that is immediately garbage-collected. Breaks write-through patterns where global.data.js tries to enrich page vars.
+  Ownership: upstream · Workaround: full — mutate array items from global.data.js return value, not the getter result
+
 ## Bugs
+
+- **markdown-it-highlightjs renders bare `<pre><code>` without `.highlight` wrapper** (2026-04-13) [degraded] — DomStack's default markdown-it config uses highlight.js which renders code blocks as `<pre><code class="hljs">` without a wrapping `<div class="highlight">`. The default ejected CSS targets `.highlight { overflow: auto }` which never matches the actual built output, causing code blocks to overflow on mobile.
+  Severity: degraded · Ownership: upstream · Workaround: full — add `.e-content pre { overflow-x: auto; max-width: 100% }` in consumer CSS
 
 - **HTML builder doesn't strip YAML frontmatter** (2026-03-24) [degraded] — Only the markdown builder strips frontmatter. HTML pages (`page.html`) with frontmatter render it as visible text.
   Severity: degraded · Ownership: upstream · Workaround: full — use `page.vars.js` alongside `page.html`
