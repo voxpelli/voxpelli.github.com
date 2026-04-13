@@ -179,3 +179,45 @@ if (subtomeBtn) {
     document.body.append(script);
   });
 }
+
+// --- Mobile Nav: button/drawer toggle ---
+const hamburgerBtn = /** @type {HTMLButtonElement | null} */ (document.querySelector('.hamburger-btn'));
+const navDrawer = document.querySelector('#nav-drawer');
+
+if (hamburgerBtn && navDrawer) {
+  const isMobile = () => globalThis.matchMedia('(max-width: 767px)').matches;
+
+  /** @param {boolean} open */
+  const setNavOpen = (open) => {
+    navDrawer.classList.toggle('is-open', open);
+    hamburgerBtn.setAttribute('aria-expanded', String(open));
+    if (isMobile()) {
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+  };
+
+  hamburgerBtn.addEventListener('click', () => {
+    setNavOpen(hamburgerBtn.getAttribute('aria-expanded') !== 'true');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && hamburgerBtn.getAttribute('aria-expanded') === 'true') {
+      setNavOpen(false);
+      hamburgerBtn.focus();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (
+      hamburgerBtn.getAttribute('aria-expanded') === 'true' &&
+      !navDrawer.contains(/** @type {Node} */ (e.target)) &&
+      !hamburgerBtn.contains(/** @type {Node} */ (e.target))
+    ) {
+      setNavOpen(false);
+    }
+  });
+
+  globalThis.matchMedia('(max-width: 767px)').addEventListener('change', (e) => {
+    if (!e.matches) setNavOpen(false);
+  });
+}

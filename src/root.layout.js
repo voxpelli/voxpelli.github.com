@@ -89,20 +89,25 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
         </header>
 
         <div class="profile-widget">
-          <img src="/avatar.jpg" alt=${authorName} class="u-photo" width="56" height="56" loading="lazy" />
+          <img src="/avatar.jpg" alt=${authorName} class="u-photo" width="72" height="72" loading="lazy" />
           <div class="profile-info p-note">
             <strong>voxpelli</strong>
             <span>Developer. IndieWeb advocate.</span>
           </div>
         </div>
 
-        <nav class="nav-menu">
-          ${rawHtml(navHtml)}
-        </nav>
-
-        <button class="btn" type="button" data-subtome>Subscribe to RSS</button>
-
-        <theme-toggle></theme-toggle>
+        <div class="nav-disclosure">
+          <button class="hamburger-btn" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open navigation menu">
+            <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          <div class="nav-drawer" id="nav-drawer">
+            <nav class="nav-menu">
+              ${rawHtml(navHtml)}
+            </nav>
+            <button class="btn" type="button" data-subtome>Subscribe to RSS</button>
+            <theme-toggle></theme-toggle>
+          </div>
+        </div>
       </aside>
 
       <main id="main-content" class=${`content-area${vars.hfeed ? ' h-feed' : ''}`}>

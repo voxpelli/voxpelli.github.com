@@ -228,7 +228,7 @@ img {
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.04em;
-  margin-bottom: var(--space-xs);
+  margin-bottom: 0.25em;
   padding: 0;
   text-align: left;
 }
@@ -254,6 +254,17 @@ img {
   margin-bottom: 0;
 }
 
+/* Brand + profile should read as one identity block */
+.brand-header + .profile-widget {
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+@media (min-width: 1024px) {
+  .brand-header + .profile-widget {
+    margin-top: calc(-1 * var(--space-md));
+  }
+}
+
 /* === Profile Widget === */
 .profile-widget {
   display: flex;
@@ -262,15 +273,40 @@ img {
 }
 
 .profile-widget img {
-  width: 56px;
-  height: 56px;
-  border-radius: 4px;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
   border: var(--border-structural);
   filter: grayscale(20%);
 }
 
+/* Tablet: stack profile vertically in narrow sidebar */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .profile-widget {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .profile-widget img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 .profile-info {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  color: var(--color-ink-light);
+}
+
+.profile-info strong {
+  font-weight: 500;
+  display: block;
+  color: var(--color-ink);
+}
+
+.profile-info span {
+  display: block;
 }
 
 .profile-info strong {
@@ -326,22 +362,106 @@ img {
   color: var(--color-canvas);
 }
 
-/* === Mobile: compact sidebar layout === */
+/* === Nav Disclosure (button/drawer hamburger) === */
+
+/* No-JS: hamburger never shown, drawer always visible */
+.no-js .hamburger-btn {
+  display: none;
+}
+
+/* Desktop + Tablet: hide hamburger, show drawer */
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none;
+  }
+
+  .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-drawer {
+    gap: var(--space-md);
+  }
+
+  .content-area {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-drawer {
+    gap: var(--space-xl);
+  }
+}
+
+/* === Hamburger button === */
+.hamburger-btn {
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  line-height: 1;
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 22px;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-ink);
+  border-radius: 1px;
+  transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* === Mobile: compact sidebar + hamburger drawer === */
 @media (max-width: 767px) {
   .sidebar {
-    padding: var(--space-xs) var(--space-sm);
+    padding: var(--space-sm) var(--space-sm);
     gap: 0;
+    position: relative;
+  }
+
+  /* When drawer is open, elevate sidebar above main content */
+  .js:has(#nav-drawer.is-open) .sidebar {
+    z-index: 100;
   }
 
   .brand-header {
     display: flex;
-    align-items: baseline;
-    gap: var(--space-xs);
-    flex-wrap: nowrap;
+    align-items: center;
+    min-height: 44px;
+    padding-right: calc(44px + var(--space-xs));
+    position: relative;
+    z-index: 2;
   }
 
   .brand-header .title {
-    font-size: clamp(2rem, 1.5rem + 2.5vw, 2.75rem);
+    font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.5rem);
     margin-bottom: 0;
     line-height: 1;
   }
@@ -354,42 +474,79 @@ img {
     display: none;
   }
 
-  .nav-menu {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 0;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    margin-inline: calc(-1 * var(--space-sm));
-    padding-inline: var(--space-sm);
-    scrollbar-width: none;
-  }
-
-  .nav-menu::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-item {
-    font-size: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-  }
-
-  .nav-arrow {
-    display: none;
-  }
-
-  .sidebar > .btn {
-    display: none;
-  }
-
-  .sidebar > theme-toggle {
-    position: fixed;
-    bottom: var(--space-sm);
+  .js .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    position: absolute;
+    top: var(--space-sm);
     right: var(--space-sm);
-    z-index: 10;
+    z-index: 2;
+    transition: background-color 0.15s var(--ease-out);
+  }
+
+  .js .hamburger-btn:hover {
+    background-color: var(--color-canvas-alt);
+  }
+
+  .nav-disclosure {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide drawer by default on mobile — prevents FOUC before JS adds .js class */
+  .nav-drawer {
+    display: none;
+  }
+
+  .js .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-color: var(--color-canvas);
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-lg);
+    padding-top: calc(var(--space-sm) + 44px + var(--space-lg));
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      opacity 0.15s var(--ease-out),
+      visibility 0s linear 0.15s;
+  }
+
+  .js .nav-drawer.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition:
+      opacity 0.15s var(--ease-out),
+      visibility 0s linear 0s;
+  }
+
+  .no-js .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .nav-drawer .nav-menu {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .nav-drawer .nav-item {
+    font-size: 1rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .nav-drawer .nav-arrow {
+    display: block;
   }
 }
 
