@@ -54,13 +54,14 @@
     color-scheme: dark;
     --color-canvas: #1e1d1b;
     --color-canvas-alt: #2a2826;
-    --color-ink: #e0ddd8;
-    --color-ink-light: #c4bfb8;
+    --color-ink: #cecbc7;
+    --color-ink-light: #a09b95;
     --color-falu-red: #c84040;
     --color-cloudberry: #e8941f;
-    --color-stone: #605b55;
-    --color-stone-light: #3d3a36;
+    --color-stone: #857f78;
+    --color-stone-light: #5a5550;
     --color-grid: #2a2826;
+    --border-heavy: 2px solid var(--color-stone);
     --hl-bg: #2a2826;
     --hl-comment: #8a8580;
     --hl-string: #e8941f;
@@ -76,13 +77,14 @@
   color-scheme: dark;
   --color-canvas: #1e1d1b;
   --color-canvas-alt: #2a2826;
-  --color-ink: #e0ddd8;
-  --color-ink-light: #c4bfb8;
+  --color-ink: #cecbc7;
+  --color-ink-light: #a09b95;
   --color-falu-red: #c84040;
   --color-cloudberry: #e8941f;
-  --color-stone: #605b55;
-  --color-stone-light: #3d3a36;
+  --color-stone: #857f78;
+  --color-stone-light: #5a5550;
   --color-grid: #2a2826;
+  --border-heavy: 2px solid var(--color-stone);
   --hl-bg: #2a2826;
   --hl-comment: #8a8580;
   --hl-string: #e8941f;
@@ -91,6 +93,17 @@
   --hl-error-bg: #3d2020;
   --hl-add-bg: #203d20;
   --hl-del-bg: #3d2020;
+}
+
+/* Dark mode: sidebar divider gets warm falu-red accent */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .sidebar {
+    border-color: rgba(200, 64, 64, 0.55);
+  }
+}
+
+[data-theme="dark"] .sidebar {
+  border-color: rgba(200, 64, 64, 0.55);
 }
 
 /* === Base === */
@@ -510,6 +523,68 @@ img {
 }
 
 .post-card:hover .post-title a {
+  color: var(--color-falu-red);
+}
+
+/* === Post excerpt === */
+
+/* Excerpt cards need more vertical space than title-only cards */
+.post-card:has(.post-excerpt) {
+  gap: var(--space-sm);
+}
+
+.post-excerpt {
+  font-family: var(--font-serif);
+  font-size: 0.95em;
+  line-height: 1.55;
+  color: var(--color-ink-light);
+  position: relative;
+  overflow: hidden;
+  max-height: 8em;
+}
+
+.post-excerpt p {
+  margin: 0 0 0.5em;
+}
+
+.post-excerpt p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Strip headings that leak into excerpts — they're section intros, not excerpt structure */
+.post-excerpt h2,
+.post-excerpt h3 {
+  font-size: 1em;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  margin: 0 0 0.25em;
+}
+
+.post-excerpt-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3em;
+  background: linear-gradient(to bottom, transparent, var(--color-canvas));
+  pointer-events: none;
+}
+
+.post-card:hover .post-excerpt-fade {
+  background: linear-gradient(to bottom, transparent, var(--color-canvas-alt));
+}
+
+.post-read-more {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-light);
+  position: relative;
+  z-index: 1;
+}
+
+.post-card:hover .post-read-more {
   color: var(--color-falu-red);
 }
 
@@ -1308,6 +1383,11 @@ input:focus-visible {
     display: grid;
     grid-template-columns: subgrid;
   }
+
+  /* Excerpt cards need vertical stacking, not 3-column subgrid */
+  .post-list > .post-card:has(.post-excerpt) {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* === Tag cloud (tags index) === */
@@ -1331,6 +1411,129 @@ input:focus-visible {
 
 .tag-cloud a:hover {
   background: var(--color-canvas-alt);
+}
+
+/* === Motion === */
+
+/* --- 1. View Transitions (cross-document MPA, Chrome/Edge 126+, Safari 18+) --- */
+@view-transition {
+  navigation: auto;
+}
+
+.sidebar {
+  view-transition-name: sidebar;
+}
+
+#main-content {
+  view-transition-name: main-content;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(main-content) {
+    animation: vt-fade-out 0.2s var(--ease-out) forwards;
+  }
+
+  ::view-transition-new(main-content) {
+    animation: vt-fade-in 0.2s var(--ease-out) forwards;
+  }
+
+  /* Sidebar stays static — no animation */
+  ::view-transition-old(sidebar),
+  ::view-transition-new(sidebar) {
+    animation: none;
+  }
+
+  /* Root: suppress default cross-fade (named elements handle everything) */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* --- 2. Scroll-driven post card fade-up (Chrome/Edge 115+, Firefox 110+, Safari 18+) --- */
+@keyframes card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .post-card {
+      animation: card-fade-up 0.3s var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
+
+/* --- 3. Expanding underline on article body links --- */
+.e-content a {
+  position: relative;
+}
+
+.e-content a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-falu-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.e-content a:hover::after {
+  transform: scaleX(1);
+}
+
+/* Let the expanding underline carry the hover signal, not text color */
+.e-content a:hover {
+  text-decoration-color: var(--color-stone);
+  color: inherit;
+}
+
+/* --- 4. Reading progress bar (article pages only) --- */
+@keyframes reading-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .content-area > .h-entry::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--color-falu-red);
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: reading-progress linear both;
+      animation-timeline: scroll(root);
+      z-index: 100;
+    }
+  }
 }
 
 /* === Print === */
@@ -1390,8 +1593,14 @@ input:focus-visible {
     position: static;
   }
 
+  /* Reset motion pseudo-element for print */
+  .e-content a::after {
+    display: none;
+  }
+
   /* Show URLs for external links in article content */
   .e-content a[href^="http"]::after {
+    display: inline;
     content: " (" attr(href) ")";
     font-family: var(--font-mono);
     font-size: 0.75em;

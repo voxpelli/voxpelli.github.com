@@ -30,6 +30,7 @@ export default function homePage ({ vars: pageVars }) {
     renderPost({
       post,
       content: /** @type {string} */ (post.content) || '',
+      excerpt: true,
       container: 'article',
       authorName: /** @type {string} */ (pageVars.authorName),
       siteUrl: /** @type {string} */ (pageVars.siteUrl),

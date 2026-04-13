@@ -43,9 +43,8 @@ export default async function globalData ({ pages }) {
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = linkPosts.slice(0, 10);
 
-  // Render recent blog posts to get content for reading time calculation.
-  // Only the 10 most recent are rendered (shown on homepage) for performance.
-  await Promise.all(recentPosts.map(async (post) => {
+  // Render all blog posts to get content for excerpts and reading time.
+  await Promise.all(blogPosts.map(async (post) => {
     const page = pagesByPath.get(post.path);
     if (!page || typeof page.renderInnerPage !== 'function') return;
     try {
@@ -54,7 +53,7 @@ export default async function globalData ({ pages }) {
         post.content = renderedHtml;
       }
     } catch {
-      // Silently skip failed renders — reading time is non-critical
+      // Silently skip failed renders — excerpts are non-critical
     }
   }));
 

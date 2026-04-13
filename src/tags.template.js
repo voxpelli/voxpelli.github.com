@@ -1,45 +1,27 @@
-import { filterAndSortPosts } from './lib/posts.js';
 import { renderPost } from './lib/render-post.js';
-import { escapeXml } from './lib/escape.js';
+import rootLayout from './root.layout.js';
 
 /**
  * Generate tag index page and individual tag pages.
  *
  * Templates receive { vars, pages } where vars is global.vars only (not global.data).
- * We compute tag data from pages directly, same as feeds.template.js.
+ * However, pages[].vars (the PageData getter) includes global.data output, so we
+ * access pre-computed allTags/tagCounts from there — posts already have rendered content.
  *
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown> }> }} options
+ * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, styles: string[], scripts: string[] }> }} options
  * @returns {Array<{outputName: string, content: string}>}
  */
 export default function tagsTemplate ({ pages, vars }) {
-  const siteUrl = /** @type {string} */ (vars.siteUrl);
-  const blogName = /** @type {string} */ (vars.blogName);
   const authorName = /** @type {string} */ (vars.authorName);
 
-  // Filter and sort posts, then build tag index
-  const allPosts = filterAndSortPosts(pages);
-  const blogPosts = allPosts.filter(p => !p.category);
+  // Extract global styles/scripts from any initialized page
+  const styles = pages[0]?.styles ?? [];
+  const scripts = pages[0]?.scripts ?? [];
 
-  // Build page vars lookup for accessing tags from original page data
-  /** @type {Map<string, Record<string, unknown>>} */
-  const varsByPath = new Map(pages.map(p => [p.pageInfo.path, p.vars]));
-
-  /** @type {Record<string, typeof blogPosts>} */
-  const allTags = {};
-  for (const post of blogPosts) {
-    const pageVars = varsByPath.get(post.path);
-    const postTags = /** @type {string[]|undefined} */ (pageVars?.tags);
-    if (!postTags) continue;
-    for (const tag of postTags) {
-      const normalizedTag = String(tag).toLowerCase();
-      if (!allTags[normalizedTag]) allTags[normalizedTag] = [];
-      allTags[normalizedTag].push(post);
-    }
-  }
-
-  const tagCounts = Object.entries(allTags)
-    .map(([tag, posts]) => ({ tag, count: posts.length }))
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  // Access pre-computed tag data from global.data.js (via PageData.vars getter which includes globalDataVars)
+  const pageVars = pages[0]?.vars ?? {};
+  const allTags = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.allTags) || {};
+  const tagCounts = /** @type {Array<{tag: string, count: number}>} */ (pageVars.tagCounts) || [];
 
   /** @type {Array<{outputName: string, content: string}>} */
   const output = [];
@@ -47,81 +29,53 @@ export default function tagsTemplate ({ pages, vars }) {
   // Tag index page
   const tagLinks = tagCounts
     .map(({ count, tag }) =>
-      `<a href="/tags/${encodeURIComponent(tag)}/">${escapeXml(tag)} <span>(${count})</span></a>`
+      `<a href="/tags/${encodeURIComponent(tag)}/">${tag} <span>(${count})</span></a>`
     )
     .join('\n          ');
 
   output.push({
     outputName: 'tags/index.html',
-    content: buildPage({
-      title: 'Tags',
-      heading: 'Tags',
-      body: `<div class="tag-cloud">
+    content: rootLayout({
+      children: `<div class="content-header">
+      <p class="content-title">Tags</p>
+    </div>
+    <div class="tag-cloud">
           ${tagLinks}
         </div>`,
-      siteUrl,
-      blogName,
-      pageUrl: '/tags/',
+      vars: { ...vars, title: 'Tags', pageUrl: '/tags/' },
+      styles,
+      scripts,
     }),
   });
 
   // Individual tag pages
   for (const { tag } of tagCounts) {
-    const posts = /** @type {typeof blogPosts} */ (allTags[tag]);
+    const posts = allTags[tag] || [];
     const postHtml = posts
       .map(post => renderPost({
-        post: /** @type {import('./lib/render-post.js').PostVars} */ ({ ...post }),
+        post: /** @type {import('./lib/render-post.js').PostVars} */ (post),
+        content: /** @type {string} */ (post.content) || '',
+        excerpt: true,
         authorName,
-        siteUrl,
+        siteUrl: /** @type {string} */ (vars.siteUrl),
       }))
       .join('\n');
 
     output.push({
       outputName: `tags/${encodeURIComponent(tag)}/index.html`,
-      content: buildPage({
-        title: `Tag: ${tag}`,
-        heading: `Tag: ${tag}`,
-        body: `<div class="post-list">
+      content: rootLayout({
+        children: `<div class="content-header">
+      <p class="content-title">Tag: ${tag}</p>
+    </div>
+    <div class="post-list">
           ${postHtml}
         </div>`,
-        siteUrl,
-        blogName,
-        pageUrl: `/tags/${encodeURIComponent(tag)}/`,
+        vars: { ...vars, title: `Tag: ${tag}`, pageUrl: `/tags/${encodeURIComponent(tag)}/` },
+        styles,
+        scripts,
       }),
     });
   }
 
   return output;
-}
-
-/**
- * Build a minimal HTML page for tag output.
- *
- * @param {object} options
- * @param {string} options.title
- * @param {string} options.heading
- * @param {string} options.body
- * @param {string} options.siteUrl
- * @param {string} options.blogName
- * @param {string} options.pageUrl
- * @returns {string}
- */
-function buildPage ({ blogName, body, heading, pageUrl, siteUrl, title }) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeXml(title)} – ${escapeXml(blogName)}</title>
-  <link rel="canonical" href="${escapeXml(siteUrl + pageUrl)}" />
-</head>
-<body>
-  <main>
-    <div class="content-header">
-      <p class="content-title">${escapeXml(heading)}</p>
-    </div>
-    ${body}
-  </main>
-</body>
-</html>`;
 }
