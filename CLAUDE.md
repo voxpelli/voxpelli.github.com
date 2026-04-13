@@ -36,6 +36,12 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 - **Global data**: `src/global.data.js` — receives all pages, returns aggregated collections (`allPosts`, `blogPosts`, `recentPosts`, `postsByYear`, etc.)
 - **Settings overrides**: `src/esbuild.settings.js` or `src/markdown-it.settings.js` for build tool config
 
+### DomStack Gotchas
+
+- **Template data access**: Templates receive `{ vars, pages }` where `vars` is `global.vars.js` only. Access `global.data.js` output via `pages[0].vars` (the `PageData.vars` getter includes `globalDataVars`)
+- **`PageData.vars` is a getter**: Creates a fresh merged object each call — setting `page.vars.x = y` writes to a temporary object. Mutate `post.content` on array items from `global.data.js` instead
+- **Code blocks render as bare `<pre><code class="hljs">`**: `markdown-it-highlightjs` does NOT wrap in `.highlight` — CSS targeting `.highlight` won't match built output
+
 ### Rendering Pipeline
 
 `root.layout.js` wraps all pages. `article.layout.js` extends root for blog posts (adds webmention forms, microformat markup). Both use `async-htm-to-string` for HTML generation — `html` tagged templates for safe rendering, `rawHtml()` only for pre-escaped content (XSS risk).
@@ -64,6 +70,8 @@ Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from
 
 E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` via `npm run e2e`.
 
+**Mobile overflow testing**: Never trust visual inspection alone. Use `document.body.scrollWidth > document.documentElement.clientWidth` to detect horizontal overflow programmatically. Test at 375px viewport width against articles with code blocks, YouTube iframes, and the archive page.
+
 ## Design Context
 
 **Brand personality**: Thoughtful, Technical, Warm.
@@ -72,7 +80,8 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 - Palette: warm parchment canvas (`#f4f1eb`), deep ink (`#2c2a28`), falu red accent (`#8c2121`), cloudberry orange (`#d97714`), stone borders
 - Typography: Newsreader (serif, headings/article body), Public Sans (sans, UI), JetBrains Mono (mono, metadata/nav/code). Fluid `clamp()` sizing
 - Layout: Two-column sidebar (340px sticky) + content area on desktop, stacked mobile
-- Dark mode: Full support via CSS custom properties + `<theme-toggle>` web component
+- Mobile: hamburger menu via `<button aria-expanded>` + `.js/.no-js` class toggle (NOT `<details>/<summary>` — accessibility issues). Nav drawer is a fixed overlay with z-index stacking managed via `:has()` on `.sidebar`
+- Dark mode: Full support via CSS custom properties + `<theme-toggle>` web component. Text targets ~10:1 contrast (not symmetric 12:1) — bright-on-dark reads louder. Sidebar uses warm falu-red accent border in dark mode
 
 **Design principles**:
 1. **Content sovereignty** — design serves readability, never competes. Article text: serif, 65ch max-width
