@@ -191,9 +191,7 @@ if (hamburgerBtn && navDrawer) {
   const setNavOpen = (open) => {
     navDrawer.classList.toggle('is-open', open);
     hamburgerBtn.setAttribute('aria-expanded', String(open));
-    if (isMobile()) {
-      document.body.style.overflow = open ? 'hidden' : '';
-    }
+    document.body.style.overflow = (open && isMobile()) ? 'hidden' : '';
   };
 
   hamburgerBtn.addEventListener('click', () => {
