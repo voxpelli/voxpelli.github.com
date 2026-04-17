@@ -68,6 +68,8 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 
 Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from `public/` and validate: homepage structure, Atom feed content, webmention forms, redirects, sitemap, service worker, and absence of defunct services.
 
+Smoke tests require a clean production build, NOT a dev build. The regex `/global-[A-Z0-9]+\.css/i` expects hashed asset names which `npm run dev` does not produce. If smoke tests fail with "did not match regex", run `rm -f public/global-*.css public/global.client-*.js && npm run build` first. `public/` accumulates dozens of stale hashed files over a dev session — periodic cleanup is fine.
+
 E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` via `npm run e2e`.
 
 **Mobile overflow testing**: Never trust visual inspection alone. Use `document.body.scrollWidth > document.documentElement.clientWidth` to detect horizontal overflow programmatically. Test at 375px viewport width against articles with code blocks, YouTube iframes, and the archive page.
@@ -82,12 +84,13 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 - Layout: Two-column sidebar (340px sticky) + content area on desktop, stacked mobile
 - Mobile: hamburger menu via `<button aria-expanded>` + `.js/.no-js` class toggle (NOT `<details>/<summary>` — accessibility issues). Nav drawer is a fixed overlay with z-index stacking managed via `:has()` on `.sidebar`
 - Dark mode: Full support via CSS custom properties + `<theme-toggle>` web component. Text targets ~10:1 contrast (not symmetric 12:1) — bright-on-dark reads louder. Sidebar uses warm falu-red accent border in dark mode
+- Theme semantics: JS writes `[data-theme="dark"]` or `[data-theme="light"]` for explicit choices, but OMITS the attribute when mode is `'system'` — CSS `@media (prefers-color-scheme: dark) :root:not([data-theme])` handles OS flips natively. Don't regress to always-writing `data-theme` or you'll break live OS auto-switch.
 
 **Design principles**:
 1. **Content sovereignty** — design serves readability, never competes. Article text: serif, 65ch max-width
 2. **Warm technical** — engineering precision (mono metadata, grid background, structured borders) with warmth (parchment tones, serif type, organic colors)
 3. **IndieWeb native** — microformats (h-card, h-entry, h-feed) are structural. Webmentions, feeds, micropub are first-class
 4. **Progressive layers** — works without JS, without custom fonts, in dark mode. Each layer enhances without breaking lower layers
-5. **Restrained motion** — subtle transforms and opacity transitions only. Respect `prefers-reduced-motion`
+5. **Restrained motion** — subtle transforms and opacity transitions only. Respect `prefers-reduced-motion`. The universal `* { transition-duration: 0.01ms !important; scroll-behavior: auto !important }` block in `global.css` is load-bearing for ~10 motion sources BUT cannot reach `@view-transition { navigation: auto }` (navigation rule, not CSS property — gate with `@media (prefers-reduced-motion: no-preference)`) or Shadow DOM `<style>` blocks (isolated from outer `@media` — `<theme-toggle>` has its own inner `@media (prefers-reduced-motion: reduce)` rule in `TOGGLE_STYLES`). Any new motion in those contexts needs local gating.
 
 See `.impeccable.md` for full design context with references and detailed guidelines.
