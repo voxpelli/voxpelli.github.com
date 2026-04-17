@@ -1,5 +1,5 @@
 /* eslint-disable n/no-unsupported-features/node-builtins -- Browser-only client bundle */
-/* global HTMLElement, localStorage, customElements, matchMedia */
+/* global HTMLElement, localStorage, customElements */
 document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, 'js');
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }
 
@@ -66,8 +66,11 @@ const TOGGLE_STYLES = `
  * @param {string} mode - 'system', 'light', or 'dark'
  */
 function applyTheme (mode) {
-  const isDark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme:dark)').matches);
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  if (mode === 'system') {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = mode;
+  }
 
   for (const toggle of document.querySelectorAll('theme-toggle')) {
     const root = toggle.shadowRoot;
