@@ -1581,8 +1581,13 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 /* === Motion === */
 
 /* --- 1. View Transitions (cross-document MPA, Chrome/Edge 126+, Safari 18+) --- */
-@view-transition {
-  navigation: auto;
+/* Opt-in is itself a navigation rule, outside CSS property cascade — gate here,
+   not via ::view-transition-* pseudo duration overrides (which don't prevent
+   the transition from initiating). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 .sidebar {

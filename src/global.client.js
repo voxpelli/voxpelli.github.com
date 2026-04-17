@@ -58,6 +58,11 @@ const TOGGLE_STYLES = `
     opacity: 1;
     background: rgba(0, 0, 0, 0.08);
   }
+
+  /* Shadow DOM is isolated from outer @media blocks — inner rule is the only path */
+  @media (prefers-reduced-motion: reduce) {
+    button { transition: none; }
+  }
 `;
 
 /**
