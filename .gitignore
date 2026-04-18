@@ -11,6 +11,7 @@ yarn-error.log
 # Retrospectives and sprint plans (local session notes)
 RETRO-*.md
 SWARM-*.md
+SYNERGY-*.md
 
 # Playwright
 /test-results/
