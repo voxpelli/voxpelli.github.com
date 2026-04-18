@@ -10,9 +10,12 @@ console.log('%cVoxPelli %c— Built with DomStack, async-htm-to-string, and a lo
 
 const STORAGE_KEY = 'theme';
 
-const ICON_SYSTEM = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>';
-const ICON_SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-const ICON_MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+// Each swatch previews its mode's canvas — hardcoded so they render identically regardless of current theme.
+const SWATCH_LIGHT = '#f4f1eb';
+const SWATCH_DARK = '#1e1d1b';
+const ICON_SYSTEM = `<span class="swatch" style="background:linear-gradient(135deg, ${SWATCH_LIGHT} 50%, ${SWATCH_DARK} 50%)"></span>`;
+const ICON_SUN = `<span class="swatch" style="background:${SWATCH_LIGHT}"></span>`;
+const ICON_MOON = `<span class="swatch" style="background:${SWATCH_DARK}"></span>`;
 
 /** @type {Array<{ mode: string, icon: string, label: string }>} */
 const MODES = [
@@ -25,10 +28,9 @@ const TOGGLE_STYLES = `
   :host {
     display: none;
     flex-direction: row;
-    gap: 2px;
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    padding: 2px;
+    gap: 6px;
+    background: transparent;
+    padding: 0;
     align-self: flex-start;
   }
 
@@ -36,32 +38,44 @@ const TOGGLE_STYLES = `
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
     min-width: 44px;
     min-height: 44px;
-    border: none;
+    border: 1px solid var(--color-stone, #d1ccc5);
     border-radius: 4px;
-    background: transparent;
+    background: var(--color-canvas-alt, #e9e5de);
     color: inherit;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.15s, background 0.15s;
     padding: 0;
-    font-size: 14px;
-    line-height: 1;
+    transition: transform 0.12s, box-shadow 0.12s;
   }
 
   button:hover {
-    opacity: 0.8;
+    transform: translate(-1px, -1px);
+    box-shadow: 1px 1px 0 var(--color-ink, #2c2a28);
   }
 
   button[aria-pressed="true"] {
-    opacity: 1;
-    background: rgba(0, 0, 0, 0.08);
+    border-width: 2px;
+    border-color: var(--color-ink, #2c2a28);
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--color-ink, #2c2a28);
+  }
+
+  .swatch {
+    display: block;
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--color-ink, #2c2a28);
   }
 
   /* Shadow DOM is isolated from outer @media blocks — inner rule is the only path */
   @media (prefers-reduced-motion: reduce) {
     button { transition: none; }
+    button:hover,
+    button[aria-pressed="true"] { transform: none; }
   }
 `;
 
