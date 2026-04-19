@@ -13,6 +13,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run test:build` — smoke tests only (requires prior build): `node --test 'test/**/*.spec.js'`
 - `npm run e2e` — Playwright e2e tests (requires prior build): chromium + mobile viewports
 - `npm run build:drafts` — include `.draft.*` pages
+- `npm run check:knip` — dead-code + unused-dep detection (runs in `check`)
+
+**Tooling dep rule:** if a config file names a tool (e.g. `knip.json` references `knip`), that tool IS a `devDependencies` entry. Don't rely on `npx`-auto-install — it masks the dependency and `npm ci` won't reproduce the toolchain. Add config → add dep.
 
 ## Code Style
 
@@ -35,6 +38,7 @@ This site carries the [notbyai.fyi](https://notbyai.fyi/) "Written by Human, Not
   3. Add `ai-placeholder` to the `tags` frontmatter array.
   4. Human author rewrites before the file ships, at which point the disclaimer, tag, and `.draft.` filename are all removed together.
 - **PESOS re-imports** (lifting human-authored content from elsewhere into this site) are ambiguous: the body is human, but titles, framing, tags, and citation footers are often AI-assembled. Treat them as placeholders under the same rules above until a human review pass lands.
+- **`AI-INELIGIBLE` beads flag.** Issues that require human authorship (prose microcopy, design-intent decisions, content strategy) must carry the flag as the leading line of the description: `AI-INELIGIBLE: <one-line reason>`. Wave planners filter on this flag to keep human-decision items out of autonomous execution. Reasons like `AI-INELIGIBLE: human microcopy` or `AI-INELIGIBLE-UNTIL-HUMAN-DRAFTS: implementation trivial after human copy lands` are both valid — the prefix is what the planner matches on.
 
 ## Architecture
 
