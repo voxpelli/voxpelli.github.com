@@ -12,6 +12,7 @@ yarn-error.log
 RETRO-*.md
 SWARM-*.md
 SYNERGY-*.md
+PR_COMMENTS*.md
 
 # Playwright
 /test-results/
