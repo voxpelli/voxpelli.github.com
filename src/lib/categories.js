@@ -36,7 +36,8 @@ export const CATEGORIES = new Map([
  * @returns {Array<Record<string, unknown>>}
  */
 export function getCategoryCollection (category, vars) {
-  const descriptor = CATEGORIES.get(category) ?? CATEGORIES.get();
+  // eslint-disable-next-line unicorn/no-useless-undefined -- Map.get requires 1 arg per tsc (TS2554)
+  const descriptor = CATEGORIES.get(category) ?? CATEGORIES.get(undefined);
   const key = descriptor?.collectionKey ?? 'blogPosts';
   const collection = vars[key];
   return Array.isArray(collection)

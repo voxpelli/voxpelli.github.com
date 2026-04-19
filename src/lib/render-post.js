@@ -29,15 +29,16 @@ export { safePostUrl } from './safe-url.js';
  * @property {string} [via]
  */
 
-/** @typedef {PostVarsBase & TilPostVarsExtra} TilPostVars */
-/** @typedef {PostVarsBase & { category?: undefined | 'social' | 'links' }} BasePostVars */
+/** @typedef {PostVarsBase & TilPostVarsExtra & Record<string, unknown>} TilPostVars */
+/** @typedef {PostVarsBase & { category?: undefined | 'social' | 'links' } & Record<string, unknown>} BasePostVars */
 
 /**
- * Discriminated union over post category. Narrowing via
- * `if (post.category === 'til')` exposes topic/via as typed fields without
- * bracket-access escape hatches. Consumers expecting the old
- * `PostVarsBase & Record<string, unknown>` shape are unaffected because
- * every branch of the union exposes every PostVarsBase field.
+ * Discriminated union over post category. Narrowing (e.g. the cast inside
+ * renderTil where the dispatcher guarantees category==='til') exposes
+ * topic/via as typed fields. The Record<string, unknown> intersection on
+ * both branches preserves the existing `post['mf-*']` bracket-access
+ * pattern used by render-post-content.js et al. — a full typedef of every
+ * microformat field is out of scope for this refactor.
  *
  * @typedef {TilPostVars | BasePostVars} PostVars
  */
