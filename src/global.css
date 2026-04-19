@@ -523,8 +523,11 @@ img {
     z-index: 1;
     background-color: var(--color-canvas);
     gap: var(--space-lg);
-    padding: var(--space-lg) var(--space-lg);
-    padding-top: calc(var(--space-sm) + 44px + var(--space-lg));
+    /* iOS safe-area: respect notch (left/right in landscape) + home-indicator (bottom) */
+    padding-top: calc(var(--space-sm) + 44px + var(--space-lg) + env(safe-area-inset-top));
+    padding-right: max(var(--space-lg), env(safe-area-inset-right));
+    padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+    padding-left: max(var(--space-lg), env(safe-area-inset-left));
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
@@ -1710,7 +1713,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
     .content-area > .h-entry::before {
       content: '';
       position: fixed;
-      top: 0;
+      top: env(safe-area-inset-top, 0);
       left: 0;
       width: 100%;
       height: 2px;

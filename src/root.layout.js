@@ -35,7 +35,7 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
     <title>${title}</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
     <meta name="theme-color" content=${themeColor} />
     <link rel="manifest" href="/manifest.json" />
@@ -44,6 +44,7 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
     ${rawHtml("<script>(function(){var s=localStorage.getItem('theme')||'system';if(s!=='system')document.documentElement.dataset.theme=s})()</script>")}
 
     <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link rel="preload" as="font" href="https://fonts.bunny.net/newsreader/files/newsreader-latin-400-normal.woff2" type="font/woff2" crossorigin="anonymous" />
     <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500,700|newsreader:400,400i,500,600,700|public-sans:400,500,600&display=swap" rel="stylesheet" />
 
     ${styles.map(href => html`<link rel="stylesheet" href=${href} />`)}
