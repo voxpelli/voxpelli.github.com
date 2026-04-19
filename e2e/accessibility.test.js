@@ -9,6 +9,8 @@ const pages = [
   { name: 'links', path: '/links/' },
   { name: 'archive', path: '/archive/' },
   { name: 'about', path: '/about/' },
+  { name: 'til-index', path: '/til/' },
+  { name: 'til-topic', path: '/til/topics/css/' },
 ];
 
 /**

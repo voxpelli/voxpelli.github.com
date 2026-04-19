@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const PORT = 3456;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -14,7 +16,7 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: 'http://localhost:3456',
+    baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
   },
   projects: [
@@ -28,8 +30,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node_modules/.bin/serve public -l 3456',
-    url: 'http://localhost:3456',
+    command: `npx serve public -l ${PORT}`,
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
 });

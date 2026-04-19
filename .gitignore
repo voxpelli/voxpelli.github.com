@@ -1,9 +1,9 @@
-/coverage
-/coverage-ts
 /node_modules
 /public
-/_site
 /.env
+
+# Top-level PNG screenshot leak guard (site assets under images/** still tracked)
+/*.png
 npm-debug.log
 yarn-error.log
 /.playwright-mcp

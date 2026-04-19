@@ -133,16 +133,25 @@ test.describe('Mobile hamburger drawer — focus & keyboard', () => {
     }
   });
 
-  test('Drawer link navigation lands on destination with drawer closed', async ({ page }) => {
+  test('Drawer link navigation closes drawer on destination page', async ({ page }) => {
     await page.goto('/');
 
-    await page.locator('.hamburger-btn').click();
+    // Open the drawer first so we're actually testing the open -> navigate -> closed
+    // transition, not the trivially-closed initial state on page load.
+    const hamburger = page.locator('.hamburger-btn');
+    await hamburger.click();
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('#nav-drawer')).toHaveClass(/is-open/);
 
-    await page.locator('#nav-drawer .nav-menu a[href="/about/"]').first().click();
+    // Click a drawer link and wait for the destination to fully load.
+    await Promise.all([
+      page.waitForURL('**/about/'),
+      page.locator('#nav-drawer .nav-menu a[href="/about/"]').first().click(),
+    ]);
     await page.waitForLoadState('domcontentloaded');
 
-    // Fresh page load — drawer state resets naturally via global.client.js
+    // On the fresh destination page the drawer should be closed (default state
+    // after nav, since drawer is DOM-local and not persisted across loads).
     await expect(page.locator('.hamburger-btn')).toHaveAttribute('aria-expanded', 'false');
     await expect(page.locator('#nav-drawer')).not.toHaveClass(/is-open/);
   });

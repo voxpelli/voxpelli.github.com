@@ -207,6 +207,17 @@ a:hover {
   hyphenate-limit-chars: 6 3 3;
 }
 
+/* Auto-linked URLs and other unbreakable strings overflow on narrow viewports
+   without this. Scoped to prose contexts only (article bodies, main content,
+   about page) — avoids breaking UI labels, sidebar nav, or breadcrumbs. */
+.e-content a,
+article :where(a),
+main.content-area p a,
+.about-page a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 a[lang="sv"]::before {
   content: "";
   width: 21px;
@@ -240,16 +251,11 @@ img {
   }
 }
 
-/* Desktop: restore generous spacing */
+/* Desktop: restore generous spacing + sticky sidebar layout */
 @media (min-width: 1024px) {
   .sidebar {
     padding: var(--space-xl) var(--space-lg);
     gap: var(--space-xl);
-  }
-}
-
-@media (min-width: 1024px) {
-  .sidebar {
     position: sticky;
     top: 0;
     height: 100vh;
@@ -1352,14 +1358,16 @@ figcaption {
   color: var(--color-falu-red);
 }
 
-/* Content links: underlines for readability */
-.e-content a {
+/* Content links: underlines for readability (article body + about page) */
+.e-content a,
+.about-page a {
   text-decoration: underline;
   text-decoration-color: var(--color-stone);
   text-underline-offset: 2px;
 }
 
-.e-content a:hover {
+.e-content a:hover,
+.about-page a:hover {
   text-decoration-color: var(--color-falu-red);
   color: var(--color-falu-red);
 }
@@ -1415,17 +1423,6 @@ figcaption {
   font-family: var(--font-mono);
   font-size: 0.9em;
   letter-spacing: 0.02em;
-}
-
-.about-page a {
-  text-decoration: underline;
-  text-decoration-color: var(--color-stone);
-  text-underline-offset: 2px;
-}
-
-.about-page a:hover {
-  text-decoration-color: var(--color-falu-red);
-  color: var(--color-falu-red);
 }
 
 /* About page sections inherit the article's reading width */
