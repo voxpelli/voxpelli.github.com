@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';
@@ -313,6 +313,126 @@ test('TIL standalone page renders post-nav (prev/next)', async () => {
   const hasNeighbours = tilIndexHtml.match(/href="\/til\/\d{4}\//g);
   if (hasNeighbours && hasNeighbours.length >= 2) {
     assert.ok(hasNav, 'TIL standalone page with ≥2 siblings must render post-nav');
+  }
+});
+
+test('all 5 metadata linklist components render somewhere in the build', async () => {
+  // SWARM-11 H7: post-metadata.js exposes 5 linklist variants (replies,
+  // elsewhere, persons, submitted-to, tags). The stress audit flagged that
+  // current content only exercises 2/5. If any component has zero rendered
+  // instances across the entire build, the component has rotted to unused.
+  //
+  // The archive/full page aggregates everything so it's the easiest place to
+  // hit all 5 — but we scan the whole build in case archive/full is ever
+  // trimmed or paginated.
+  const components = [
+    { className: 'replies linklist', label: 'PostReply' },
+    { className: 'elsewhere linklist', label: 'PostSyndication' },
+    { className: 'persons linklist', label: 'PostPersonTags' },
+    { className: 'submitted-to linklist', label: 'PostSubmitTo' },
+    { className: 'tags linklist', label: 'PostTags' },
+  ];
+
+  /** @type {Record<string, number>} */
+  const counts = Object.fromEntries(components.map(c => [c.className, 0]));
+
+  // Recursively collect every *.html file under public/ — readdir's
+  // recursive option lands in Node 20.1+ which the engines field allows.
+  const entries = await readdir('public', { recursive: true, withFileTypes: true });
+  const htmlFiles = entries
+    .filter(e => e.isFile() && e.name.endsWith('.html'))
+    .map(e => `${e.parentPath}/${e.name}`);
+
+  for (const file of htmlFiles) {
+    const html = await readFile(file, 'utf8');
+    for (const { className } of components) {
+      if (html.includes(`class="${className}"`)) {
+        counts[className] = (counts[className] || 0) + 1;
+      }
+    }
+  }
+
+  for (const { className, label } of components) {
+    assert.ok(
+      (counts[className] || 0) > 0,
+      `${label} (".${className.replace(' ', '.')}") has ZERO rendered instances across the build — component may have rotted`
+    );
+  }
+});
+
+test('metadata linklist renders correct microformat children', async () => {
+  // SWARM-11 H7 cont'd: beyond "does it render anywhere", assert the expected
+  // microformat class appears inside each linklist variant. archive/full
+  // aggregates enough content to exercise several components in one file.
+  const html = await readFile('public/archive/full/index.html', 'utf8');
+
+  // PostReply → u-in-reply-to
+  if (html.includes('class="replies linklist"')) {
+    assert.match(html, /class="replies linklist"[\s\S]*?class="u-in-reply-to"/, 'replies linklist must contain u-in-reply-to link');
+  }
+  // PostSyndication → u-syndication
+  if (html.includes('class="elsewhere linklist"')) {
+    assert.match(html, /class="elsewhere linklist"[\s\S]*?class="u-syndication"/, 'elsewhere linklist must contain u-syndication link');
+  }
+  // PostPersonTags → u-category h-card
+  if (html.includes('class="persons linklist"')) {
+    assert.match(html, /class="persons linklist"[\s\S]*?class="u-category h-card"/, 'persons linklist must contain u-category h-card link');
+  }
+});
+
+test('bilingual localized heading pattern is alive in output', async () => {
+  // SWARM-11 H7: post-metadata.js uses LocalizedHeading to render both English
+  // ("In reply to:") and Swedish ("Svar på:") strong labels depending on post
+  // language. Verify BOTH strings appear somewhere in the build — confirms the
+  // bilingual micropattern is exercised by real content, not just shadowed by
+  // one language only.
+  //
+  // NOTE: The `<strong lang="en">` attribute only renders when a post has
+  // `lang: 'de'` / `lang: 'fr'` / etc. (non-English AND non-Swedish). No
+  // current content exercises that path, so we assert the English/Swedish
+  // label strings directly rather than the `lang=` attribute.
+  const archive = await readFile('public/archive/full/index.html', 'utf8');
+  assert.match(archive, /<strong[^>]*>In reply to:<\/strong>/, 'English "In reply to:" localized heading must appear');
+  assert.match(archive, /<strong[^>]*>Svar på:<\/strong>/, 'Swedish "Svar på:" localized heading must appear');
+});
+
+test('TIL card subcomponents (til-topic link + relative-time)', async () => {
+  // SWARM-11 H9: TIL cards carry three subcomponents — the topic-badge link,
+  // optional "via" citation, and a <relative-time> wrapping the datetime.
+  // All TIL posts are currently draft-only, so prod build may skip this
+  // entirely. When cards exist, assert the structural subcomponents.
+  const tilIndexHtml = await readFile('public/til/index.html', 'utf8').catch(() => '');
+  if (!tilIndexHtml) return; // TIL index missing — nothing to check
+
+  const hasCard = tilIndexHtml.includes('til-card');
+  if (!hasCard) return; // Prod build with drafts excluded — no cards to check
+
+  // til-topic link pattern — <a class="til-topic" href="/til/topics/<slug>/">
+  assert.match(
+    tilIndexHtml,
+    /<a class="til-topic" href="\/til\/topics\/[^"/]+\/"/,
+    'TIL card must have .til-topic link pointing to /til/topics/<slug>/'
+  );
+
+  // <relative-time> wraps the <time class="dt-published">
+  assert.match(
+    tilIndexHtml,
+    /<relative-time><time class="dt-published"/,
+    'TIL card must wrap dt-published inside <relative-time>'
+  );
+
+  // til-via (source citation) — only on standalone TIL pages, not cards
+  const firstTilHref = tilIndexHtml.match(/href="(\/til\/\d{4}\/[^"]+\/)"/);
+  if (firstTilHref && firstTilHref[1]) {
+    const standalonePath = `public${firstTilHref[1]}index.html`;
+    const standalone = await readFile(standalonePath, 'utf8').catch(() => '');
+    if (standalone && standalone.includes('til-via')) {
+      assert.match(
+        standalone,
+        /<p class="til-via">via <a class="u-bookmark-of"/,
+        'til-via citation must wrap a u-bookmark-of link'
+      );
+    }
   }
 });
 

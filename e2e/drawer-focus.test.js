@@ -133,6 +133,45 @@ test.describe('Mobile hamburger drawer — focus & keyboard', () => {
     }
   });
 
+  test('Drawer survives within-mobile viewport resize (375 → 400 → 375)', async ({ page }) => {
+    // SWARM-11 H13: existing resize tests cover mobile → desktop (drawer
+    // auto-closes). NOT covered: within-mobile resize while drawer is open.
+    // matchMedia('change') listener should only fire when the media query
+    // boundary (768px) is crossed — resizing 375 → 400 → 375 must leave
+    // drawer state (aria-expanded + body overflow lock) untouched.
+    //
+    // Regression fence: if the drawer close-handler ever listens to a
+    // resize/orientationchange event instead of matchMedia, intermediate
+    // viewport changes would leak the body scroll lock.
+    await page.goto('/');
+
+    const hamburger = page.locator('.hamburger-btn');
+    const drawer = page.locator('#nav-drawer');
+
+    await hamburger.click();
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+    await expect(drawer).toHaveClass(/is-open/);
+    const overflowOpen = await page.evaluate(() => document.body.style.overflow);
+    expect(overflowOpen).toBe('hidden');
+
+    // Resize to a slightly wider mobile viewport — still under 768px.
+    await page.setViewportSize({ width: 400, height: 812 });
+
+    // Drawer state must be preserved.
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+    await expect(drawer).toHaveClass(/is-open/);
+    const overflowMid = await page.evaluate(() => document.body.style.overflow);
+    expect(overflowMid, 'body overflow lock must survive within-mobile resize').toBe('hidden');
+
+    // Resize back.
+    await page.setViewportSize({ width: 375, height: 812 });
+
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+    await expect(drawer).toHaveClass(/is-open/);
+    const overflowAfter = await page.evaluate(() => document.body.style.overflow);
+    expect(overflowAfter, 'body overflow lock must survive round-trip resize').toBe('hidden');
+  });
+
   test('Drawer link navigation closes drawer on destination page', async ({ page }) => {
     await page.goto('/');
 

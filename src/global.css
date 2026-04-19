@@ -67,6 +67,10 @@
 
 /* === Dark Mode === */
 /* No-JS fallback: follows OS preference when FOWT script hasn't run */
+/* Dark-mode blocks are INTENTIONALLY duplicated — the media-query branch
+   handles OS auto-follow when JS omits data-theme; the attribute branch
+   handles explicit user override. See test/dark-mode-sync.spec.js — tests
+   catch silent drift between the two blocks during palette revisions. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
