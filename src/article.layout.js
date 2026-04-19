@@ -1,6 +1,6 @@
 import { html, renderToStringSync } from 'async-htm-to-string';
 
-import { renderPostContent } from './lib/render-post-content.js';
+import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
 /**
@@ -10,8 +10,6 @@ import rootLayout from './root.layout.js';
  * @returns {string}
  */
 export default function articleLayout ({ children, page, scripts = [], styles = [], vars }) {
-  const swedish = !vars.lang || vars.lang === 'sv';
-  const nonenglish = vars.lang !== 'en';
   const pageUrl = page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '');
 
   const postVars = {
@@ -19,14 +17,16 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
     pageUrl,
   };
 
-  const articleHtml = renderPostContent({
+  // Route through the renderPost dispatcher so category-specific renderers
+  // (e.g. renderTil for TIL posts, renderPostLike for likes) can add their
+  // own affordances on standalone article pages. Generic posts fall through
+  // to renderPostContent, matching the prior direct-call behaviour.
+  const articleHtml = renderPost({
     authorName: /** @type {string} */ (vars.authorName),
     content: children,
-    nonenglish,
     post: postVars,
     siteUrl: /** @type {string} */ (vars.siteUrl),
     standalone: true,
-    swedish,
     webmentionEndpoint: /** @type {string} */ (vars.webmentionEndpoint),
   });
 

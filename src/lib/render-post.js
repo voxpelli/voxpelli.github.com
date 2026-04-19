@@ -32,9 +32,10 @@ import { parseDateSafe } from './utils.js';
  * @param {string} [options.container] - Container element tag (default: 'article')
  * @param {string} options.authorName
  * @param {string} options.siteUrl
+ * @param {string} [options.webmentionEndpoint] - Webmention endpoint (forwarded to renderPostContent for standalone pages)
  * @returns {string}
  */
-export function renderPost ({ authorName, container, content, excerpt, post, siteUrl, standalone }) {
+export function renderPost ({ authorName, container, content, excerpt, post, siteUrl, standalone, webmentionEndpoint }) {
   const swedish = !post.lang || post.lang === 'sv';
   const nonenglish = post.lang !== 'en';
   const tag = container || 'article';
@@ -81,6 +82,7 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
       siteUrl,
       standalone,
       swedish,
+      webmentionEndpoint,
     });
   }
 
@@ -99,6 +101,7 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
     siteUrl,
     standalone,
     swedish,
+    webmentionEndpoint,
   });
 }
 

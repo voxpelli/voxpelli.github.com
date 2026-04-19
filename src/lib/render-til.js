@@ -6,6 +6,7 @@ import { PostTags } from './components/post-metadata.js';
 import { extractExcerpt } from './excerpt.js';
 import { renderPostContent } from './render-post-content.js';
 import { safePostUrl } from './render-post.js';
+import { slugifyTopic } from './slugify-topic.js';
 import { extractFullDomain, parseDateSafe } from './utils.js';
 
 /**
@@ -46,11 +47,21 @@ import { extractFullDomain, parseDateSafe } from './utils.js';
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
  * @param {string} options.siteUrl
+ * @param {string} [options.webmentionEndpoint]
  * @returns {string}
  */
-export function renderTil ({ authorName, compact, content, nonenglish, post, siteUrl, standalone, swedish }) {
+export function renderTil ({ authorName, compact, content, nonenglish, post, siteUrl, standalone, swedish, webmentionEndpoint }) {
+  const via = typeof post['via'] === 'string' ? /** @type {string} */ (post['via']) : undefined;
+  const viaSafe = via ? safePostUrl(via) : '';
+  const topic = typeof post['topic'] === 'string' ? /** @type {string} */ (post['topic']) : undefined;
+
   if (standalone) {
-    return renderPostContent({
+    // Standalone article page: delegate to the generic renderPostContent (for
+    // header, microformats, footer, webmention link), then prepend TIL-specific
+    // affordances (topic badge, via citation) that aren't surfaced by the
+    // generic renderer. article.layout.js routes TIL pages through renderPost,
+    // which dispatches here.
+    const body = renderPostContent({
       authorName,
       compact,
       content,
@@ -59,7 +70,26 @@ export function renderTil ({ authorName, compact, content, nonenglish, post, sit
       siteUrl,
       standalone,
       swedish,
+      webmentionEndpoint,
     });
+
+    const tilMetaParts = [];
+    if (topic) {
+      tilMetaParts.push(renderToStringSync(html`
+        <a class="til-topic" href=${`/til/topics/${slugifyTopic(topic)}/`}>${topic}</a>
+      `));
+    }
+    if (via && viaSafe) {
+      tilMetaParts.push(renderToStringSync(html`
+        <p class="til-via">via <a class="u-bookmark-of" href=${viaSafe}>${extractFullDomain(via)}</a></p>
+      `));
+    }
+    if (tilMetaParts.length === 0) return body;
+
+    const tilMeta = `<div class="til-standalone-meta">${tilMetaParts.join('\n')}</div>`;
+    // Inject TIL meta right after the opening <article ...> tag so it sits
+    // above the content but inside the h-entry root.
+    return body.replace(/(<article[^>]*>)/, `$1\n${tilMeta}`);
   }
 
   const dateObj = parseDateSafe(post.date);
@@ -69,9 +99,6 @@ export function renderTil ({ authorName, compact, content, nonenglish, post, sit
   const postUrl = post.pageUrl || '';
   const safeUrl = safePostUrl(postUrl);
 
-  const via = typeof post['via'] === 'string' ? /** @type {string} */ (post['via']) : undefined;
-  const viaSafe = via ? safePostUrl(via) : '';
-  const topic = typeof post['topic'] === 'string' ? /** @type {string} */ (post['topic']) : undefined;
   const tags = Array.isArray(post.tags) ? post.tags : undefined;
 
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
@@ -86,7 +113,7 @@ export function renderTil ({ authorName, compact, content, nonenglish, post, sit
         <div class="post-meta">
           <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
           <span class="p-category" hidden>til</span>
-          ${topic ? html`<a class="til-topic" href=${`/til/topics/${encodeURIComponent(topic.toLowerCase())}/`}>${topic}</a>` : ''}
+          ${topic ? html`<a class="til-topic" href=${`/til/topics/${slugifyTopic(topic)}/`}>${topic}</a>` : ''}
         </div>
         <h3 class="post-title p-name"><a class="u-url u-uid" href=${safeUrl}>${post.title || ''}</a></h3>
         ${rawHtml(excerptHtml)}

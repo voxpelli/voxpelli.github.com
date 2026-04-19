@@ -59,6 +59,21 @@ export default async function globalData ({ pages }) {
     }
   }));
 
+  // Also pre-render TIL posts so topic-index pages (src/til/topics.template.js)
+  // can surface excerpts on compact cards. Same pattern as blogPosts above.
+  await Promise.all(tilPosts.map(async (post) => {
+    const page = pagesByPath.get(post.path);
+    if (!page || typeof page.renderInnerPage !== 'function') return;
+    try {
+      const renderedHtml = await page.renderInnerPage({ pages });
+      if (typeof renderedHtml === 'string' && renderedHtml) {
+        post.content = renderedHtml;
+      }
+    } catch {
+      // Silently skip failed renders — excerpts are non-critical
+    }
+  }));
+
   // Posts by year for archive
   /** @type {Record<string, typeof blogPosts>} */
   const postsByYear = {};

@@ -10,6 +10,7 @@ import { parseDateSafe } from './utils.js';
  * @property {unknown} category
  * @property {string} path
  * @property {string} pageUrl
+ * @property {unknown} [topic]
  */
 
 /**
@@ -35,6 +36,7 @@ export function filterAndSortPosts (pages) {
         category: vars.category,
         path: pagePath,
         pageUrl,
+        topic: vars.topic,
         // Preserve all mf-* fields
         ...Object.fromEntries(
           Object.entries(vars).filter(([k]) => k.startsWith('mf-'))

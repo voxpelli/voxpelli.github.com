@@ -266,7 +266,7 @@ img {
   font-size: 0.85rem;
   color: var(--color-ink-light);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-align: left;
   padding: 0;
   margin-bottom: 0;
@@ -628,7 +628,7 @@ img {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--color-ink-light);
   font-weight: 500;
   margin-bottom: 0;
@@ -677,6 +677,7 @@ img {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--color-ink-light);
+  font-variant-numeric: tabular-nums;
 }
 
 .badge {
@@ -762,7 +763,7 @@ img {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--color-ink-light);
   position: relative;
   z-index: 1;
@@ -873,6 +874,15 @@ article footer,
   font-size: 0.8em;
 }
 
+/* Numeric runs (dates, reading-time, counts) align as columns */
+time,
+.relative-time,
+relative-time,
+ul.posts span.time-to-read,
+.domain-badge {
+  font-variant-numeric: tabular-nums;
+}
+
 time a,
 .webmention-footer a {
   color: var(--color-ink-light);
@@ -892,7 +902,7 @@ time a,
   font-family: var(--font-mono);
   font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--color-stone);
   border-radius: 4px;
@@ -1845,18 +1855,20 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
     position: static;
   }
 
-  /* Reset motion pseudo-element for print */
-  .e-content a::after {
-    display: none;
-  }
-
-  /* Show URLs for external links in article content */
+  /* Show URLs for external links in article content; in-page and
+     relative anchors stay suppressed. Self-documenting via :not() —
+     don't split this into "hide all ::after, then re-show http"
+     (see voxpelli.github.com-gc4: cascade ordering trap). */
   .e-content a[href^="http"]::after {
     display: inline;
     content: " (" attr(href) ")";
     font-family: var(--font-mono);
     font-size: 0.75em;
     word-break: break-all;
+  }
+
+  .e-content a:not([href^="http"])::after {
+    display: none;
   }
 
   /* Avoid breaking inside post cards and articles */

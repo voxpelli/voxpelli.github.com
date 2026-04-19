@@ -1,26 +1,7 @@
 import { escapeXml } from '../lib/escape.js';
 import { renderPost } from '../lib/render-post.js';
+import { slugifyTopic } from '../lib/slugify-topic.js';
 import rootLayout from '../root.layout.js';
-
-/**
- * Normalise a topic string to a URL-safe slug.
- *
- * Topics come from TIL frontmatter as author-typed strings (e.g. `css`,
- * `File Formats`). Lowercase + kebab-case keeps URLs stable and predictable:
- * `/til/topics/file-formats/` rather than `/til/topics/File%20Formats/`.
- *
- * @param {string} topic
- * @returns {string}
- */
-function slugifyTopic (topic) {
-  return String(topic)
-    .toLowerCase()
-    .trim()
-    .replaceAll(/[\s_]+/g, '-')
-    .replaceAll(/[^a-z0-9-]/g, '')
-    .replaceAll(/-+/g, '-')
-    .replaceAll(/^-|-$/g, '');
-}
 
 /**
  * Generate per-topic TIL index pages at /til/topics/<slug>/.
@@ -48,38 +29,23 @@ export default function topicsTemplate ({ pages, vars }) {
   const pageVars = pages[0]?.vars ?? {};
   const tilPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.tilPosts) || [];
 
-  // `tilPosts` from global.data.js carries core post fields but not `topic`
-  // (the shared filterAndSortPosts helper in src/lib/posts.js only preserves
-  // content/tags/persontags/submitto/mf-*). Look up `topic` from each page's
-  // raw frontmatter via pagesByPath.
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
   // Group TILs by normalised topic slug. Preserve the first-seen display form
   // (author's original casing/spacing) so the page heading reads naturally.
+  // `topic` flows through filterAndSortPosts' allowlist (src/lib/posts.js),
+  // and `content` is populated by global.data.js, so no raw-frontmatter re-fetch needed.
   /** @type {Map<string, { display: string, posts: Array<Record<string, unknown>> }>} */
   const topicsBySlug = new Map();
   for (const post of tilPosts) {
-    const postPath = typeof post['path'] === 'string' ? post['path'] : '';
-    const rawVars = pagesByPath.get(postPath)?.vars ?? {};
-    const rawTopic = rawVars['topic'];
+    const rawTopic = post['topic'];
     const topic = typeof rawTopic === 'string' ? rawTopic.trim() : '';
     if (!topic) continue;
     const slug = slugifyTopic(topic);
     if (!slug) continue;
-    // Enrich the post with topic + content so renderPost/renderTil can surface
-    // the topic badge and an excerpt without re-reading frontmatter.
-    const enriched = {
-      ...post,
-      topic,
-      content: typeof post['content'] === 'string' && post['content']
-        ? post['content']
-        : (typeof rawVars['content'] === 'string' ? rawVars['content'] : ''),
-    };
     const existing = topicsBySlug.get(slug);
     if (existing) {
-      existing.posts.push(enriched);
+      existing.posts.push(post);
     } else {
-      topicsBySlug.set(slug, { display: topic, posts: [enriched] });
+      topicsBySlug.set(slug, { display: topic, posts: [post] });
     }
   }
 
