@@ -56,16 +56,16 @@
     --color-canvas: #1e1d1b;
     --color-canvas-alt: #2a2826;
     --color-ink: #cecbc7;
-    --color-ink-light: #a09b95;
-    --color-falu-red: #c84040;
+    --color-ink-light: #bab5ae;
+    --color-falu-red: #e56b6b;
     --color-cloudberry: #e8941f;
     --color-stone: #857f78;
-    --color-stone-light: #5a5550;
+    --color-stone-light: #6e6862;
     --color-grid: #2a2826;
     --color-btn-shadow: var(--color-ink-light);
     --border-heavy: 2px solid var(--color-stone);
     --hl-bg: #2a2826;
-    --hl-comment: #8a8580;
+    --hl-comment: #9e9892;
     --hl-string: #e8941f;
     --hl-number: #6dada0;
     --hl-name: #b0aba4;
@@ -80,16 +80,16 @@
   --color-canvas: #1e1d1b;
   --color-canvas-alt: #2a2826;
   --color-ink: #cecbc7;
-  --color-ink-light: #a09b95;
-  --color-falu-red: #c84040;
+  --color-ink-light: #bab5ae;
+  --color-falu-red: #e56b6b;
   --color-cloudberry: #e8941f;
   --color-stone: #857f78;
-  --color-stone-light: #5a5550;
+  --color-stone-light: #6e6862;
   --color-grid: #2a2826;
   --color-btn-shadow: var(--color-ink-light);
   --border-heavy: 2px solid var(--color-stone);
   --hl-bg: #2a2826;
-  --hl-comment: #8a8580;
+  --hl-comment: #9e9892;
   --hl-string: #e8941f;
   --hl-number: #6dada0;
   --hl-name: #b0aba4;
@@ -177,6 +177,16 @@ a {
 
 a:hover {
   color: var(--color-falu-red);
+}
+
+/* Swedish prose hyphenation — long compound words (e.g. "delningsekonomi")
+   break badly on narrow viewports without this. Scoped to article/post bodies
+   only; avoids hyphenating UI, nav, or code. */
+.e-content[lang="sv"],
+.e-content [lang="sv"],
+[lang="sv"] .e-content {
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
 }
 
 a[lang="sv"]::before {
@@ -1857,14 +1867,36 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 /* notbyai.fyi badge — preserve per vendor's usage terms (link back, no modification).
-   Lives at the bottom of the sidebar flex-column (margin-top: auto pushes it there
-   without forcing sidebar scroll). */
+   Two placements, exactly one visible per viewport:
+   - .notbyai-badge--sidebar lives at the bottom of the sidebar flex-column (desktop).
+   - .notbyai-badge--drawer lives inside the mobile hamburger drawer so the badge
+     remains visible in both closed and open states on mobile (the fixed-overlay
+     drawer otherwise hides a sidebar-level badge). */
 .notbyai-badge {
-  margin-top: auto;
   align-self: center;
   display: inline-block;
   line-height: 0;
   padding-top: var(--space-sm);
+}
+
+.notbyai-badge--sidebar {
+  margin-top: auto;
+}
+
+.notbyai-badge--drawer {
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .notbyai-badge--drawer {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .notbyai-badge--sidebar {
+    display: none;
+  }
 }
 
 .notbyai-badge img {
