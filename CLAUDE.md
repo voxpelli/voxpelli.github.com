@@ -23,6 +23,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `n/no-sync` rule disabled (sync file reads acceptable in this SSG context)
 - `src/global.client.js` checked by separate `tsconfig.browser.json` (DOM lib, no Node types)
 
+## Content Policy (notbyai.fyi)
+
+This site carries the [notbyai.fyi](https://notbyai.fyi/) "Written by Human, Not by AI" badge in the sidebar footer. That is a commitment, not just a graphic.
+
+- **AI does not draft prose for publication.** No blog posts, TIL entries, about-page copy, microcopy, or feed metadata strings written by an agent should ship to production.
+- **AI may write**: code, tests, JSDoc, CSS, build scripts, template logic, regex patterns, commit messages, PR descriptions, and explicitly-marked placeholder content.
+- **Placeholder content must be marked and excluded from prod.** If an agent must produce prose-shaped output during development (e.g. to prove a page-shape or build pipeline works):
+  1. Name the file `page.draft.md` (DomStack's filename-based draft convention excludes it from `npm run build`).
+  2. Add a prominent in-body disclaimer block at the top naming it as an AI-generated placeholder.
+  3. Add `ai-placeholder` to the `tags` frontmatter array.
+  4. Human author rewrites before the file ships, at which point the disclaimer, tag, and `.draft.` filename are all removed together.
+- **PESOS re-imports** (lifting human-authored content from elsewhere into this site) are ambiguous: the body is human, but titles, framing, tags, and citation footers are often AI-assembled. Treat them as placeholders under the same rules above until a human review pass lands.
+
 ## Architecture
 
 DomStack (`@domstack/static` v11) static site generator with convention-based file routing.
@@ -41,6 +54,8 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 - **Template data access**: Templates receive `{ vars, pages }` where `vars` is `global.vars.js` only. Access `global.data.js` output via `pages[0].vars` (the `PageData.vars` getter includes `globalDataVars`)
 - **`PageData.vars` is a getter**: Creates a fresh merged object each call — setting `page.vars.x = y` writes to a temporary object. Mutate `post.content` on array items from `global.data.js` instead
 - **Code blocks render as bare `<pre><code class="hljs">`**: `markdown-it-highlightjs` does NOT wrap in `.highlight` — CSS targeting `.highlight` won't match built output
+- **Drafts are filename-based, not frontmatter**: `page.draft.md` / `page.draft.html` / `page.draft.js` excludes from default build; `npm run build:drafts` includes them. Frontmatter `draft: true` has zero effect. Source: `@domstack/static/lib/identify-pages.js:29-30`
+- **`--copy images` flattens the top-level directory**: `images/foo.png` → `public/foo.png` (not `public/images/foo.png`). Anything you want at `public/<subdir>/` should be named `<subdir>/` at the top of your copied tree, e.g. `images/badges/x.svg` → `public/badges/x.svg`
 
 ### Rendering Pipeline
 

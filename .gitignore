@@ -20,7 +20,10 @@ PR_COMMENTS*.md
 /blob-report/
 screenshots/
 
-# Beads / Dolt files (added by bd init)
+# Beads / Dolt files — entire .beads/ dir excluded (repo is public;
+# issue tracker data stays local). History still contains prior commits
+# of .beads/issues.jsonl; a scrub would require history rewrite.
+.beads/
 .dolt/
 *.db
 .beads-credential-key
