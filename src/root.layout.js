@@ -116,6 +116,11 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
         ${rawHtml(children)}
       </main>
     </div>
+    <footer class="site-footer">
+      <p>
+        <a href="https://notbyai.fyi/" rel="noopener">Written by Human, Not by AI</a>
+      </p>
+    </footer>
     ${scripts.map(src => html`<script type="module" src=${src}></script>`)}
   `);
 

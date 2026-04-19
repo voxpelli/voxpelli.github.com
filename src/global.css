@@ -1855,3 +1855,25 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
     break-inside: avoid;
   }
 }
+
+/* Site footer (notbyai.fyi disclosure + future links) */
+.site-footer {
+  max-width: 65ch;
+  margin: var(--space-xl) auto var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--color-stone);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-ink-light);
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
