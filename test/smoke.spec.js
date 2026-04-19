@@ -7,6 +7,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 
+import { escapeXml } from '../src/lib/escape.js';
+import { safePostUrl } from '../src/lib/render-post.js';
+
 test('homepage has h-feed and DomStack assets', async () => {
   const html = await readFile('public/index.html', 'utf8');
   assert.match(html, /h-feed/);
@@ -167,4 +170,69 @@ test('offline page renders without frontmatter', async () => {
 
 test('404 page exists', async () => {
   await access('public/404.html');
+});
+
+test('XSS: escapeXml neutralizes <script>-bearing tag names', () => {
+  // Regression: tags.template.js interpolates tag names into the page body and
+  // into vars.title — a tag containing <script>alert(1)</script> must be escaped.
+  const malicious = '<script>alert(1)</script>';
+  const escaped = escapeXml(malicious);
+  assert.ok(!escaped.includes('<script'), 'escaped tag must not contain raw <script');
+  assert.ok(!escaped.includes('</script'), 'escaped tag must not contain raw </script');
+  assert.match(escaped, /&lt;script&gt;/);
+  assert.match(escaped, /&lt;\/script&gt;/);
+
+  // Also guard the common attribute-breaker chars.
+  assert.equal(escapeXml('"\'&<>'), '&quot;&apos;&amp;&lt;&gt;');
+});
+
+test('XSS: tags page source escapes tag names before interpolation', async () => {
+  // Source-level regression: ensure tags.template.js routes tag names through
+  // escapeXml before writing into HTML bodies and <title>.
+  const src = await readFile('src/tags.template.js', 'utf8');
+  assert.match(src, /escapeXml/, 'tags.template.js must import/use escapeXml');
+  // The raw `${tag}` interpolation inside HTML content must be gone.
+  assert.doesNotMatch(src, /content-title">Tag: \$\{tag\}</);
+  assert.doesNotMatch(src, /title: `Tag: \$\{tag\}`/);
+});
+
+test('XSS: safePostUrl allowlists safe schemes for href interpolation', async () => {
+  // Regression: encodeURI alone does NOT encode `:` or `<`/`>`, so a
+  // `javascript:alert(1)` payload would survive. safePostUrl restricts
+  // postUrl to same-origin paths and http(s) URLs; anything else -> ''.
+
+  // Source-level: the old encodeURI(postUrl) guard is gone and safePostUrl is used.
+  const src = await readFile('src/lib/render-post.js', 'utf8');
+  assert.match(src, /safePostUrl/, 'renderExcerpt must use safePostUrl');
+  assert.doesNotMatch(src, /href="\$\{postUrl\}"/);
+
+  // Same-origin absolute path — returned (with URI encoding of special chars).
+  assert.equal(safePostUrl('/2024/01/post/'), '/2024/01/post/');
+  assert.equal(safePostUrl('/path with space/'), '/path%20with%20space/');
+
+  // https: URL — returned encoded.
+  assert.equal(safePostUrl('https://example.com/foo'), 'https://example.com/foo');
+
+  // http: URL — returned encoded (allowlisted).
+  assert.equal(safePostUrl('http://example.com/foo'), 'http://example.com/foo');
+
+  // javascript: URL — rejected (empty string).
+  assert.equal(safePostUrl('javascript:alert(1)'), '');
+  assert.equal(safePostUrl('javascript:alert("x")<script>'), '');
+
+  // data: URL — rejected.
+  assert.equal(safePostUrl('data:text/html,<script>'), '');
+
+  // Other hostile schemes.
+  assert.equal(safePostUrl('vbscript:msgbox(1)'), '');
+  assert.equal(safePostUrl('file:///etc/passwd'), '');
+
+  // Empty / nullish — empty string.
+  assert.equal(safePostUrl(''), '');
+  /** @type {string | undefined} */
+  const undef = undefined;
+  assert.equal(safePostUrl(undef), '');
+
+  // Bare string that isn't a URL — rejected (new URL throws).
+  assert.equal(safePostUrl('not a url'), '');
 });

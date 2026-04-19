@@ -3,6 +3,7 @@
 const SW_VERSION = '__BUILD_VERSION__';
 
 const CACHE_NAME = `static-${SW_VERSION}`;
+const OFFLINE_FALLBACK_URL = '/offline/';
 
 /**
  * Pre-cache essential pages during install.
@@ -20,28 +21,35 @@ async function updateStaticCache () {
   // Blocking: wait for these before completing install
   await cache.addAll([
     '/avatar.jpg',
-    '/offline/',
+    OFFLINE_FALLBACK_URL,
     '/',
   ]);
 }
 
-// Install: pre-cache essential assets
+// Install: pre-cache essential assets, then activate immediately so the
+// newly-installed SW can take over on first load.
 self.addEventListener('install', (event) => {
-  event.waitUntil(updateStaticCache());
-});
-
-// Activate: remove old caches from previous versions
-self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys
-        .filter((key) => key !== CACHE_NAME)
-        .map((key) => caches.delete(key))
-    ))
+    updateStaticCache().then(() => self.skipWaiting())
   );
 });
 
-// Fetch: network-first for HTML, cache-first for other assets
+// Activate: remove old caches from previous versions and claim existing clients
+// so already-open tabs are controlled without requiring a reload.
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+// Fetch: network-first for HTML (with runtime cache warming + offline fallback),
+// cache-first for other assets.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -54,13 +62,24 @@ self.addEventListener('fetch', (event) => {
 
   const accept = request.headers.get('Accept') ?? '';
 
-  // HTML: try network first, fall back to cache, then offline page
+  // HTML: try network first; on success, warm the runtime cache; on failure,
+  // fall back to a previously-cached copy, then to the offline page.
   if (accept.includes('text/html')) {
     event.respondWith(
       fetch(request)
+        .then(async (response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            const cache = await caches.open(CACHE_NAME);
+            // Don't await — cache.put is fire-and-forget so the response
+            // reaches the client without extra latency.
+            cache.put(request, copy).catch(() => { /* ignore cache put errors */ });
+          }
+          return response;
+        })
         .catch(() =>
           caches.match(request)
-            .then((response) => response || caches.match('/offline/'))
+            .then((response) => response || caches.match(OFFLINE_FALLBACK_URL))
         )
     );
     return;

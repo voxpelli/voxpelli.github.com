@@ -88,6 +88,28 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
 }
 
 /**
+ * Restrict postUrl to safe schemes before href interpolation.
+ *
+ * Accepts same-origin absolute paths (starting with `/`) and explicit
+ * http(s): URLs. Anything else (including `javascript:` and `data:`) returns
+ * an empty string so callers can omit the link entirely. `encodeURI` alone is
+ * NOT a safe guard — it does not encode `:` or `<`/`>`, so a `javascript:`
+ * payload would survive unchanged.
+ *
+ * @param {string | undefined | null} url
+ * @returns {string}
+ */
+export function safePostUrl (url) {
+  if (!url) return '';
+  if (url.startsWith('/')) return encodeURI(url);
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') return encodeURI(url);
+  } catch { /* fall through */ }
+  return '';
+}
+
+/**
  * Render excerpt HTML with optional fade and "read full" link.
  *
  * @param {import('./excerpt.js').ExcerptResult} result
@@ -99,8 +121,9 @@ function renderExcerpt (result, postUrl) {
   const fade = result.truncated
     ? '<div class="post-excerpt-fade" aria-hidden="true"></div>'
     : '';
-  const readMore = result.truncated
-    ? `<a class="post-read-more" href="${postUrl}">Read full article \u2192</a>`
+  const safeUrl = safePostUrl(postUrl);
+  const readMore = result.truncated && safeUrl
+    ? `<a class="post-read-more" href="${safeUrl}">Read full article \u2192</a>`
     : '';
 
   return `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>${readMore}`;

@@ -4,7 +4,7 @@ import { renderPost } from './lib/render-post.js';
  * @typedef {{
  *   layout: 'root' | 'article',
  *   title?: string,
- *   category?: 'social' | 'links',
+ *   category?: 'social' | 'links' | 'til',
  *   frontpage?: boolean,
  *   hfeed?: boolean,
  *   webmentionable?: boolean,

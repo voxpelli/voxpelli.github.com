@@ -37,11 +37,13 @@ export default async function globalData ({ pages }) {
   const blogPosts = allPosts.filter(p => !p.category);
   const socialPosts = allPosts.filter(p => p.category === 'social');
   const linkPosts = allPosts.filter(p => p.category === 'links');
+  const tilPosts = allPosts.filter(p => p.category === 'til');
 
   // Recent posts for feeds
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = linkPosts.slice(0, 10);
+  const recentTils = tilPosts.slice(0, 10);
 
   // Render all blog posts to get content for excerpts and reading time.
   await Promise.all(blogPosts.map(async (post) => {
@@ -88,9 +90,11 @@ export default async function globalData ({ pages }) {
     blogPosts,
     socialPosts,
     linkPosts,
+    tilPosts,
     recentPosts,
     recentEnglishPosts,
     recentLinks,
+    recentTils,
     postsByYear,
     allTags,
     tagCounts,

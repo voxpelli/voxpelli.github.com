@@ -18,6 +18,7 @@
   --color-stone: #d1ccc5;
   --color-stone-light: #e0dcd5;
   --color-grid: #e0dcd5;
+  --color-btn-shadow: var(--color-stone);
 
   --font-serif: 'Newsreader', serif;
   --font-sans: 'Public Sans', sans-serif;
@@ -61,6 +62,7 @@
     --color-stone: #857f78;
     --color-stone-light: #5a5550;
     --color-grid: #2a2826;
+    --color-btn-shadow: var(--color-ink-light);
     --border-heavy: 2px solid var(--color-stone);
     --hl-bg: #2a2826;
     --hl-comment: #8a8580;
@@ -84,6 +86,7 @@
   --color-stone: #857f78;
   --color-stone-light: #5a5550;
   --color-grid: #2a2826;
+  --color-btn-shadow: var(--color-ink-light);
   --border-heavy: 2px solid var(--color-stone);
   --hl-bg: #2a2826;
   --hl-comment: #8a8580;
@@ -566,13 +569,13 @@ img {
   font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
-  box-shadow: 4px 4px 0 var(--color-stone);
+  box-shadow: 4px 4px 0 var(--color-btn-shadow);
   text-decoration: none;
 }
 
 .btn:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-stone);
+  box-shadow: 2px 2px 0 var(--color-btn-shadow);
   background-color: var(--color-falu-red);
   border-color: var(--color-falu-red);
   color: var(--color-canvas);
@@ -580,7 +583,7 @@ img {
 
 .btn:active {
   transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--color-stone);
+  box-shadow: 0 0 0 var(--color-btn-shadow);
 }
 
 /* === Content Area === */

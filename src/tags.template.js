@@ -1,3 +1,4 @@
+import { escapeXml } from './lib/escape.js';
 import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
@@ -29,7 +30,7 @@ export default function tagsTemplate ({ pages, vars }) {
   // Tag index page
   const tagLinks = tagCounts
     .map(({ count, tag }) =>
-      `<a href="/tags/${encodeURIComponent(tag)}/">${tag} <span>(${count})</span></a>`
+      `<a href="/tags/${encodeURIComponent(tag)}/">${escapeXml(tag)} <span>(${count})</span></a>`
     )
     .join('\n          ');
 
@@ -61,16 +62,20 @@ export default function tagsTemplate ({ pages, vars }) {
       }))
       .join('\n');
 
+    // Escape tag name before interpolating into HTML body and <title> via vars.title.
+    // Tag values come from post frontmatter — treat as untrusted input.
+    const safeTag = escapeXml(tag);
+
     output.push({
       outputName: `tags/${encodeURIComponent(tag)}/index.html`,
       content: rootLayout({
         children: `<div class="content-header">
-      <p class="content-title">Tag: ${tag}</p>
+      <p class="content-title">Tag: ${safeTag}</p>
     </div>
     <div class="post-list">
           ${postHtml}
         </div>`,
-        vars: { ...vars, title: `Tag: ${tag}`, pageUrl: `/tags/${encodeURIComponent(tag)}/` },
+        vars: { ...vars, title: `Tag: ${safeTag}`, pageUrl: `/tags/${encodeURIComponent(tag)}/` },
         styles,
         scripts,
       }),
