@@ -1856,23 +1856,19 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   }
 }
 
-/* Site footer (notbyai.fyi disclosure + future links) */
-.site-footer {
-  max-width: 65ch;
-  margin: var(--space-xl) auto var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  border-top: 1px solid var(--color-stone);
-  text-align: center;
-}
-
-/* notbyai.fyi badge — preserve per vendor's usage terms (link back, no modification) */
+/* notbyai.fyi badge — preserve per vendor's usage terms (link back, no modification).
+   Lives at the bottom of the sidebar flex-column (margin-top: auto pushes it there
+   without forcing sidebar scroll). */
 .notbyai-badge {
+  margin-top: auto;
+  align-self: center;
   display: inline-block;
   line-height: 0;
+  padding-top: var(--space-sm);
 }
 
 .notbyai-badge img {
   width: auto;
-  /* Minimum 30px height per notbyai.fyi badge guidelines; scaled up for legibility */
-  height: clamp(2rem, 3vw, 3rem);
+  /* Minimum 30px height per notbyai.fyi badge guidelines */
+  height: clamp(2rem, 2.4vw, 2.5rem);
 }
