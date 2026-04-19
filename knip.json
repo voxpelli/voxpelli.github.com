@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/**/page.{js,md,html}",
+    "src/**/*.layout.js",
+    "src/**/*.template.js",
+    "src/**/*.data.js",
+    "src/**/*.vars.js",
+    "src/**/*.settings.js",
+    "src/global.client.js",
+    "sw.js",
+    "e2e/**/*.test.js",
+    "test/**/*.spec.js"
+  ],
+  "project": [
+    "src/**/*.js",
+    "e2e/**/*.js",
+    "test/**/*.js",
+    "*.config.js"
+  ],
+  "ignoreDependencies": [
+    "serve",
+    "axe-core"
+  ]
+}

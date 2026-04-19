@@ -12,7 +12,7 @@ import { capitalize, extractDomain, extractFullDomain, extractName } from '../ut
  * @param {boolean} options.swedish
  * @returns {import('async-htm-to-string').HtmlTemplateValue}
  */
-export function LocalizedHeading ({ enText, headingLang, svText, swedish }) {
+function LocalizedHeading ({ enText, headingLang, svText, swedish }) {
   return html`<strong lang=${headingLang}>${swedish ? svText : enText}</strong>`;
 }
 
