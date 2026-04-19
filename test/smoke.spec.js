@@ -268,6 +268,19 @@ test('404 page exists', async () => {
   await access('public/404.html');
 });
 
+test('TIL topic pages built with matching topic content', async () => {
+  // topics.template.js groups TIL posts by frontmatter `topic` and renders
+  // per-topic index pages at /til/topics/<slug>/. Verify at least one page
+  // exists, has the right title, and lists the topic-tagged TILs.
+  await access('public/til/topics/css/index.html');
+  const html = await readFile('public/til/topics/css/index.html', 'utf8');
+
+  assert.match(html, /TILs(: | tagged with: )css/, 'topic page title must name the topic');
+  assert.match(html, /h-entry/, 'topic page must list at least one h-entry card');
+  assert.match(html, /til-card/, 'topic page must render TIL cards via renderTil');
+  assert.match(html, /\/til\/2026\/02\/hex-color-short-form-explained\//, 'css topic page should link the hex-color TIL');
+});
+
 test('XSS: escapeXml neutralizes <script>-bearing tag names', () => {
   // Regression: tags.template.js interpolates tag names into the page body and
   // into vars.title — a tag containing <script>alert(1)</script> must be escaped.

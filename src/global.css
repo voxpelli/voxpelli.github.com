@@ -1205,6 +1205,57 @@ input:focus-visible {
   aspect-ratio: 16 / 9;
 }
 
+/* === Markdown structural wrappers === */
+/* Applied by src/markdown-it.settings.js to give fenced code, tables,
+   titled images, and bare iframes semantic containers. */
+
+/* Video embed: constrain aspect ratio + let the iframe fill the wrapper */
+.video-embed {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+}
+
+.video-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Code block wrapper: horizontal scroll on overflow
+   (duplicates .e-content pre scrolling but scopes it to fenced blocks
+   regardless of nesting context — e.g. code blocks in templates). */
+.code-block {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Table wrapper: independent horizontal scroll for wide tables */
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Figure + figcaption: reset default UA margins, italic centered caption */
+figure {
+  margin: var(--space-md) 0;
+  padding: 0;
+}
+
+figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+figcaption {
+  margin-top: var(--space-xs);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.9em;
+  color: var(--color-ink-light);
+  text-align: center;
+  line-height: 1.45;
+}
+
 .content-area > .h-entry .e-content h2 {
   font-family: var(--font-sans);
   font-size: 1.35rem;

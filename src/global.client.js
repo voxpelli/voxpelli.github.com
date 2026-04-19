@@ -143,8 +143,8 @@ applyTheme(localStorage.getItem(STORAGE_KEY) || 'system');
 
 // Cross-tab sync via storage event
 globalThis.addEventListener('storage', (e) => {
-  if (e.key === STORAGE_KEY && typeof e.newValue === 'string') {
-    applyTheme(e.newValue);
+  if (e.key === STORAGE_KEY) {
+    applyTheme(e.newValue ?? 'system');
   }
 });
 
