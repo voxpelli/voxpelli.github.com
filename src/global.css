@@ -30,6 +30,23 @@
   --space-lg: clamp(1.5rem, 1.364rem + 0.682vw, 2.25rem);
   --space-xl: clamp(2.25rem, 2.045rem + 1.023vw, 3.375rem);
 
+  /* Font-size scale — consolidated per ni5, see RETRO-08.
+     Fluid tokens use clamp(min, preferred, max) for viewport-responsive sizing.
+     Fixed-rem tokens are used where elements shouldn't scale with viewport
+     (metadata, UI chrome, small labels). em-based values elsewhere remain
+     literal — they're intentionally relative to their parent context. */
+  --fs-xs: 0.8rem;        /* tiny mono metadata, reply verbs, domain badges */
+  --fs-sm: 0.85rem;       /* ubiquitous small — profile info, nav labels, footers */
+  --fs-sm-plus: 0.9rem;   /* nav items, content-header, elsewhere strong */
+  --fs-md: 0.95rem;       /* buttons, bookmark content, post-nav titles */
+  --fs-base: clamp(1rem, 0.955rem + 0.227vw, 1.125rem); /* body text */
+  --fs-code: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);     /* pre/code blocks */
+  --fs-article: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem); /* article body, about-page */
+  --fs-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);     /* bookmark title */
+  --fs-h2: clamp(1.5rem, 1.364rem + 0.682vw, 1.875rem); /* post-title (index summaries) */
+  --fs-h1: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);     /* article h1, about h1 */
+  --fs-display: clamp(3rem, 2.545rem + 2.273vw, 4.25rem); /* brand title, global h1 */
+
   --border-structural: 1px solid var(--color-stone);
   --border-heavy: 2px solid var(--color-ink);
 
@@ -118,7 +135,7 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: clamp(1rem, 0.955rem + 0.227vw, 1.125rem);
+  font-size: var(--fs-base);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   background-image: linear-gradient(var(--color-grid) 1px, transparent 1px),
@@ -158,6 +175,7 @@ body {
   }
 
   .brand-header .title {
+    /* Tablet-specific brand title size — unique clamp, doesn't fit the scale */
     font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
   }
 }
@@ -242,7 +260,7 @@ img {
 
 .brand-header .title {
   font-family: var(--font-serif);
-  font-size: clamp(3rem, 2.545rem + 2.273vw, 4.25rem);
+  font-size: var(--fs-display);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.04em;
@@ -263,7 +281,7 @@ img {
 
 .brand-header .subtitle {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   color: var(--color-ink-light);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -312,7 +330,7 @@ img {
 }
 
 .profile-info {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-family: var(--font-mono);
   color: var(--color-ink-light);
 }
@@ -330,6 +348,7 @@ img {
 .profile-info strong {
   display: block;
   font-family: var(--font-serif);
+  /* Profile name — bespoke size, sits between article h4 and bookmark title */
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -343,7 +362,7 @@ img {
 
 .nav-item {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: var(--fs-sm-plus);
   text-transform: uppercase;
   padding: 0.75rem 1rem;
   border-radius: 4px;
@@ -484,7 +503,8 @@ img {
   }
 
   .brand-header .title {
-    font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.5rem);
+    /* Mobile brand title — same clamp as article h1 (--fs-h1) */
+    font-size: var(--fs-h1);
     margin-bottom: 0;
     line-height: 1;
   }
@@ -567,6 +587,7 @@ img {
   }
 
   .nav-drawer .nav-item {
+    /* Mobile nav override — fixed 1rem (no fluid scaling in drawer) */
     font-size: 1rem;
     padding: 0.875rem 1rem;
   }
@@ -587,7 +608,7 @@ img {
   border: var(--border-heavy);
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   cursor: pointer;
   transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
   box-shadow: 4px 4px 0 var(--color-btn-shadow);
@@ -626,7 +647,7 @@ img {
 .content-header h3,
 .content-header .content-title {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: var(--fs-sm-plus);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
@@ -675,7 +696,7 @@ img {
   align-items: center;
   gap: var(--space-sm);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: var(--color-ink-light);
   font-variant-numeric: tabular-nums;
 }
@@ -690,7 +711,7 @@ img {
 
 .post-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.5rem, 1.364rem + 0.682vw, 1.875rem);
+  font-size: var(--fs-h2);
   font-weight: 500;
   line-height: 1.2;
   text-wrap: balance;
@@ -761,7 +782,7 @@ img {
 
 .post-read-more {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
@@ -776,7 +797,7 @@ img {
 /* === Headings === */
 h1 {
   font-family: var(--font-serif);
-  font-size: clamp(3rem, 2.545rem + 2.273vw, 4.25rem);
+  font-size: var(--fs-display);
   line-height: 0.9;
 }
 
@@ -817,7 +838,7 @@ ol {
 
 /* === Code highlighting === */
 pre:has(> code.hljs) {
-  font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
+  font-size: var(--fs-code);
   overflow: auto;
 }
 
@@ -871,6 +892,8 @@ article footer,
 .webmention-footer,
 .u-responses {
   color: var(--color-ink-light);
+  /* em-relative (not --fs-xs rem): scales with inherited body size so
+     metadata stays a fixed proportion below surrounding copy. */
   font-size: 0.8em;
 }
 
@@ -900,7 +923,7 @@ time a,
 
 .posts-extras a {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: var(--space-xs) var(--space-sm);
@@ -1026,7 +1049,7 @@ input[type=url] {
   border: var(--border-structural);
   padding: var(--space-xs);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   background: var(--color-canvas);
   color: var(--color-ink);
   border-radius: 4px;
@@ -1093,6 +1116,7 @@ form:has(#webmention-source) {
   width: 1em;
   height: 1em;
 
+  /* Webmention interaction presentation badge — bespoke 12px */
   font-size: 12px;
   line-height: 1;
   text-align: center;
@@ -1136,7 +1160,7 @@ form:has(#webmention-source) {
 /* === Relative time === */
 relative-time .relative-label {
   color: var(--color-ink-light);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
 }
 
 /* === Visually hidden (screen reader only) === */
@@ -1162,7 +1186,7 @@ relative-time .relative-label {
   background-color: var(--color-ink);
   color: var(--color-canvas);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   text-decoration: none;
   border-radius: 0 0 4px 4px;
 }
@@ -1206,7 +1230,7 @@ input:focus-visible {
 
 .content-area > .h-entry .e-content {
   font-family: var(--font-serif);
-  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
+  font-size: var(--fs-article);
   line-height: 1.7;
   max-width: 65ch;
   overflow-wrap: break-word;
@@ -1276,6 +1300,10 @@ figcaption {
   line-height: 1.45;
 }
 
+/* Article sub-heading scale: 1.35 / 1.15 / 1.05rem — a bespoke stepped
+   hierarchy that sits between body (--fs-article ≈ 1.05-1.2rem) and the
+   article h1 (--fs-h1). Kept as literal values rather than tokens because
+   these sizes only appear here and exist as a cohesive sub-scale. */
 .content-area > .h-entry .e-content h2 {
   font-family: var(--font-sans);
   font-size: 1.35rem;
@@ -1300,7 +1328,7 @@ figcaption {
 .content-area > .h-entry > header h1,
 .content-area > .h-entry > header h2 {
   font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+  font-size: var(--fs-h1);
   font-weight: 500;
   line-height: 1.15;
   margin-bottom: var(--space-sm);
@@ -1309,7 +1337,7 @@ figcaption {
 
 .content-area > .h-entry > footer {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   padding-top: var(--space-md);
   border-top: var(--border-structural);
   margin-top: var(--space-lg);
@@ -1339,7 +1367,7 @@ figcaption {
 /* Metadata section labels: mono uppercase */
 .linklist strong {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
@@ -1353,7 +1381,7 @@ figcaption {
   border-radius: 2px;
   background-color: var(--color-canvas);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   transition: border-color 0.2s var(--ease-out);
 }
 
@@ -1364,20 +1392,21 @@ figcaption {
 /* === About page === */
 .about-page {
   font-family: var(--font-serif);
-  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
+  font-size: var(--fs-article);
   line-height: 1.7;
   max-width: 65ch;
 }
 
 .about-page h1 {
   font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+  font-size: var(--fs-h1);
   font-weight: 500;
   line-height: 1.15;
   margin-bottom: var(--space-sm);
 }
 
 .about-lede {
+  /* About-page lede — unique size, sits between --fs-article and --fs-h3 */
   font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
   line-height: 1.65;
 }
@@ -1406,7 +1435,7 @@ figcaption {
 
 .about-page + section h2 {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
@@ -1449,7 +1478,7 @@ figcaption {
 
 .elsewhere-links strong {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: var(--fs-sm-plus);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -1460,7 +1489,7 @@ figcaption {
 
 .elsewhere-desc {
   color: var(--color-ink-light);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
 }
 
 /* === Syntax highlighting (highlight.js theme-aware) === */
@@ -1488,7 +1517,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 /* Likes: lightest weight — mono, muted, compact */
 .h-entry:has(.u-like-of) {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   color: var(--color-ink-light);
   padding-block: var(--space-xs);
   padding-inline: var(--space-lg);
@@ -1510,7 +1539,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 /* Reply verb label: mono uppercase */
 .h-entry:has(.u-in-reply-to) strong {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
@@ -1525,14 +1554,14 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 /* Bookmark title: serif, slightly smaller than articles */
 .h-entry:has(.u-bookmark-of) .p-name {
   font-family: var(--font-serif);
-  font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  font-size: var(--fs-h3);
   font-weight: 500;
 }
 
 /* Bookmark commentary: sans, subordinate to title */
 .h-entry:has(.u-bookmark-of) .e-content {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   line-height: 1.55;
   color: var(--color-ink);
 }
@@ -1556,7 +1585,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 .domain-badge {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: var(--color-ink-light);
   margin-top: 0.25rem;
 }
@@ -1586,6 +1615,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 
 .post-nav-label {
   font-family: var(--font-mono);
+  /* Smallest label — one tick below --fs-xs for hierarchical contrast */
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1594,7 +1624,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 
 .post-nav-title {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   color: var(--color-ink);
 }
 
@@ -1608,7 +1638,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   overflow-x: auto;
   border-bottom: var(--border-structural);
   background: var(--color-canvas);
@@ -1657,7 +1687,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 
 .tag-cloud a {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--color-stone);
   border-radius: 3px;
