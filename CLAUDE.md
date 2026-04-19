@@ -40,6 +40,10 @@ This site carries the [notbyai.fyi](https://notbyai.fyi/) "Written by Human, Not
 - **PESOS re-imports** (lifting human-authored content from elsewhere into this site) are ambiguous: the body is human, but titles, framing, tags, and citation footers are often AI-assembled. Treat them as placeholders under the same rules above until a human review pass lands.
 - **`AI-INELIGIBLE` beads flag.** Issues that require human authorship (prose microcopy, design-intent decisions, content strategy) must carry the flag as the leading line of the description: `AI-INELIGIBLE: <one-line reason>`. Wave planners filter on this flag to keep human-decision items out of autonomous execution. Reasons like `AI-INELIGIBLE: human microcopy` or `AI-INELIGIBLE-UNTIL-HUMAN-DRAFTS: implementation trivial after human copy lands` are both valid — the prefix is what the planner matches on.
 
+## URL Safety
+
+- **URL interpolation into `href` attributes**: always pass frontmatter URL values through `safePostUrl(url)` from `src/lib/safe-url.js` when using the `html` tagged template, or `safeHref(url)` for raw string concatenation. `encodeURI` alone is not safe — it does not encode `:`, so `javascript:` schemes pass through.
+
 ## Architecture
 
 DomStack (`@domstack/static` v11) static site generator with convention-based file routing.

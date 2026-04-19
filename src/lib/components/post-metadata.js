@@ -1,5 +1,6 @@
 import { html } from 'async-htm-to-string';
 
+import { safePostUrl } from '../safe-url.js';
 import { capitalize, extractDomain, extractFullDomain, extractName } from '../utils.js';
 
 /**
@@ -32,7 +33,7 @@ export function PostReply ({ headingLang, inReplyTo, swedish }) {
     return html`
       <div class="replies linklist">
         ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
-        <p><a class="u-in-reply-to" rel="in-reply-to" href=${inReplyTo[0]}>${extractFullDomain(/** @type {string} */ (inReplyTo[0]))}</a></p>
+        <p><a class="u-in-reply-to" rel="in-reply-to" href=${safePostUrl(inReplyTo[0])}>${extractFullDomain(/** @type {string} */ (inReplyTo[0]))}</a></p>
       </div>
     `;
   }
@@ -41,7 +42,7 @@ export function PostReply ({ headingLang, inReplyTo, swedish }) {
     <div class="replies linklist">
       ${LocalizedHeading({ enText: 'In reply to:', headingLang, svText: 'Svar p\u00E5:', swedish })}
       <ul>
-        ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${r}>${extractFullDomain(r)}</a></li>`)}
+        ${inReplyTo.map(r => html`<li><a class="u-in-reply-to" rel="in-reply-to" href=${safePostUrl(r)}>${extractFullDomain(r)}</a></li>`)}
       </ul>
     </div>
   `;
@@ -63,7 +64,7 @@ export function PostSyndication ({ headingLang, standalone, swedish, syndication
     <div class="elsewhere linklist">
         ${LocalizedHeading({ enText: 'Also posted on:', headingLang, svText: 'Ocks\u00E5 postat p\u00E5:', swedish })}
         <ul>
-          ${syndication.map(url => html`<li><a href=${url} class="u-syndication" rel=${standalone ? 'syndication' : false}>${capitalize(extractDomain(url))}</a></li>`)}
+          ${syndication.map(url => html`<li><a href=${safePostUrl(url)} class="u-syndication" rel=${standalone ? 'syndication' : false}>${capitalize(extractDomain(url))}</a></li>`)}
         </ul>
       </div>
   `;
@@ -84,7 +85,7 @@ export function PostPersonTags ({ headingLang, persontags, swedish }) {
     <div class="persons linklist">
         ${LocalizedHeading({ enText: 'Mentioned:', headingLang, svText: 'N\u00E4mnda:', swedish })}
         <ul>
-          ${persontags.map(url => html`<li><a href=${url} class="u-category h-card">${extractName(url)}</a></li>`)}
+          ${persontags.map(url => html`<li><a href=${safePostUrl(url)} class="u-category h-card">${extractName(url)}</a></li>`)}
         </ul>
       </div>
   `;
@@ -105,7 +106,7 @@ export function PostSubmitTo ({ headingLang, submitto, swedish }) {
     <div class="submitted-to linklist">
         ${LocalizedHeading({ enText: 'Submitted to:', headingLang, svText: 'Inskickad till:', swedish })}
         <ul>
-          ${submitto.map(url => html`<li><a href=${url} class="u-category">${extractFullDomain(url)}</a></li>`)}
+          ${submitto.map(url => html`<li><a href=${safePostUrl(url)} class="u-category">${extractFullDomain(url)}</a></li>`)}
         </ul>
       </div>
   `;

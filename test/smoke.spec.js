@@ -9,6 +9,7 @@ import { access, readFile } from 'node:fs/promises';
 
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';
+import { safeHref } from '../src/lib/safe-url.js';
 import { redirects } from '../src/redirects.template.js';
 
 test('homepage has h-feed and DomStack assets', async () => {
@@ -354,4 +355,60 @@ test('XSS: safePostUrl allowlists safe schemes for href interpolation', async ()
 
   // Bare string that isn't a URL — rejected (new URL throws).
   assert.equal(safePostUrl('not a url'), '');
+});
+
+test('XSS: post-metadata component wraps all href interpolations through safePostUrl', async () => {
+  // Source-level regression: every href=${...} interpolation in post-metadata.js
+  // must go through safePostUrl() (except the encoded-path PostTags case, which
+  // is safe-by-construction — encodeURIComponent on a slug string).
+  const src = await readFile('src/lib/components/post-metadata.js', 'utf8');
+  assert.match(src, /from '\.\.\/safe-url\.js'/, 'post-metadata.js must import from safe-url.js');
+  assert.match(src, /safePostUrl/, 'post-metadata.js must use safePostUrl');
+
+  // Strip the one permitted safe-by-construction path (PostTags encodeURIComponent slug)
+  // from the source before scanning for bare href interpolations.
+  const scanSrc = src.replaceAll(/href=\$\{`\/tags\/\$\{encodeURIComponent\([^`]+`\}/g, 'href=SAFE_SLUG');
+
+  // Find every `href=${...}` interpolation and ensure the argument begins with `safePostUrl(`.
+  const hrefPattern = /href=\$\{([^}]+)\}/g;
+  const matches = [...scanSrc.matchAll(hrefPattern)];
+  assert.ok(matches.length >= 5, `expected at least 5 href interpolations, found ${matches.length}`);
+  for (const m of matches) {
+    const expr = m[1] || '';
+    assert.ok(
+      expr.startsWith('safePostUrl('),
+      `href interpolation not wrapped in safePostUrl: href=\${${expr}}`
+    );
+  }
+});
+
+test('XSS: safeHref combines scheme guard with attribute escape', () => {
+  // javascript: scheme — rejected (safePostUrl returns '', escapeXml of '' is '').
+  assert.equal(safeHref('javascript:alert(1)'), '');
+
+  // Same-origin path with a `"` — encoded through encodeURI + escapeXml.
+  // encodeURI does NOT encode `"`, so escapeXml must.
+  const out = safeHref('/path/with"quote');
+  assert.ok(!out.includes('"'), `safeHref output contains literal quote: ${out}`);
+  assert.ok(out.includes('&quot;') || out.includes('%22'), `expected encoded quote in ${out}`);
+
+  // https URL — intact (encoded) and non-empty.
+  const httpsOut = safeHref('https://example.com/');
+  assert.ok(httpsOut.length > 0, 'https URL must not be emptied');
+  assert.equal(httpsOut, 'https://example.com/');
+
+  // Nullish — empty.
+  assert.equal(safeHref(''), '');
+  /** @type {string | undefined} */
+  const undef = undefined;
+  assert.equal(safeHref(undef), '');
+
+  // Whitespace-padded URLs (copy-paste from frontmatter) must be trimmed,
+  // not silently dropped. `new URL(' https://x.com ')` throws strict-parse;
+  // without trim this would produce '' and hide legitimate URLs.
+  assert.equal(safeHref('  https://example.com/  '), 'https://example.com/');
+  assert.equal(safeHref('  /path/here  '), '/path/here');
+  assert.equal(safeHref('   '), ''); // all-whitespace → empty
+  // Whitespace-prefixed hostile scheme still rejected.
+  assert.equal(safeHref('  javascript:alert(1)  '), '');
 });

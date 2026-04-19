@@ -5,7 +5,7 @@ import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 import { PostTags } from './components/post-metadata.js';
 import { extractExcerpt } from './excerpt.js';
 import { renderPostContent } from './render-post-content.js';
-import { safePostUrl } from './render-post.js';
+import { safeHref, safePostUrl } from './safe-url.js';
 import { slugifyTopic } from './slugify-topic.js';
 import { extractFullDomain, parseDateSafe } from './utils.js';
 
@@ -105,7 +105,7 @@ export function renderTil ({ authorName, compact, content, nonenglish, post, sit
 
   const excerptResult = content ? extractExcerpt(content) : undefined;
   const excerptHtml = excerptResult
-    ? renderTilExcerpt(excerptResult, safeUrl)
+    ? renderTilExcerpt(excerptResult, postUrl)
     : '';
 
   return renderToStringSync(html`
@@ -129,16 +129,17 @@ export function renderTil ({ authorName, compact, content, nonenglish, post, sit
  * Render TIL excerpt HTML with optional fade and "read full" link.
  *
  * @param {import('./excerpt.js').ExcerptResult} result
- * @param {string} safeUrl
+ * @param {string} postUrl
  * @returns {string}
  */
-function renderTilExcerpt (result, safeUrl) {
+function renderTilExcerpt (result, postUrl) {
   const mfClass = result.truncated ? 'p-summary' : 'e-content';
   const fade = result.truncated
     ? '<div class="post-excerpt-fade" aria-hidden="true"></div>'
     : '';
-  const readMore = result.truncated && safeUrl
-    ? `<a class="post-read-more" href="${safeUrl}">Read full TIL \u2192</a>`
+  const href = safeHref(postUrl);
+  const readMore = result.truncated && href
+    ? `<a class="post-read-more" href="${href}">Read full TIL \u2192</a>`
     : '';
   return `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>${readMore}`;
 }

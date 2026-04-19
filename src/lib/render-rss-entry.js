@@ -1,4 +1,5 @@
 import { escapeXml } from './escape.js';
+import { safePostUrl } from './safe-url.js';
 
 /**
  * Derive the tag URI authority (host) from a siteUrl.
@@ -58,7 +59,7 @@ export function renderRssEntry ({ content, post, siteUrl }) {
     : dateObj;
   const updatedIso = updatedSource.toISOString();
   const pageUrl = typeof post.pageUrl === 'string' ? post.pageUrl : '';
-  const postUrl = `${siteUrl}${pageUrl}`;
+  const postUrl = safePostUrl(`${siteUrl}${pageUrl}`);
   const entryId = buildEntryId(post, siteUrl, dateObj);
 
   return ` <entry>
