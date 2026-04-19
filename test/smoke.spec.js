@@ -83,6 +83,44 @@ test('feed has top-level <id> and entry <id> tags', async () => {
   }
 });
 
+test('feed entry <id>s are unique across the feed', async () => {
+  // Regression: <id>${siteUrl}${post.pageUrl || ''}</id> collapsed to the
+  // bare siteUrl whenever pageUrl was falsy, causing readers to dedupe all
+  // such entries into one. Every entry <id> must be distinct.
+  for (const feedPath of ['public/all.xml', 'public/english.xml']) {
+    const xml = await readFile(feedPath, 'utf8');
+    const entryIdPattern = /<entry>[\s\S]*?<id>([^<]*)<\/id>/g;
+    const ids = [...xml.matchAll(entryIdPattern)].map(m => m[1]);
+    const unique = new Set(ids);
+    assert.equal(
+      unique.size,
+      ids.length,
+      `${feedPath} entry <id>s must be unique (got ${ids.length} entries, ${unique.size} unique)`
+    );
+  }
+});
+
+test('feed entries emit both <published> and <updated>', async () => {
+  // Regression: entries used to omit <published>, leaving readers unable to
+  // distinguish first-publish from last-edit timestamps.
+  const xml = await readFile('public/all.xml', 'utf8');
+  const entryPattern = /<entry>[\s\S]*?<\/entry>/g;
+  const entries = xml.match(entryPattern) || [];
+  assert.ok(entries.length > 0, 'feed should contain at least one <entry>');
+
+  const isoPattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+  for (const entry of entries) {
+    const publishedMatch = entry.match(/<published>([^<]+)<\/published>/);
+    const updatedMatch = entry.match(/<updated>([^<]+)<\/updated>/);
+    assert.ok(publishedMatch, 'each entry must have a <published> element');
+    assert.ok(updatedMatch, 'each entry must have an <updated> element');
+    const publishedValue = publishedMatch && publishedMatch[1] ? publishedMatch[1] : '';
+    const updatedValue = updatedMatch && updatedMatch[1] ? updatedMatch[1] : '';
+    assert.match(publishedValue, isoPattern, `<published> "${publishedValue}" must be ISO datetime`);
+    assert.match(updatedValue, isoPattern, `<updated> "${updatedValue}" must be ISO datetime`);
+  }
+});
+
 test('article page has webmention form', async () => {
   const html = await readFile('public/2019/10/use-type-script-3-7-to-generate/index.html', 'utf8');
   assert.match(html, /webmention/);

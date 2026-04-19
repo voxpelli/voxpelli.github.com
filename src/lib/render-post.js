@@ -3,6 +3,7 @@ import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 import { extractExcerpt } from './excerpt.js';
 import { renderPostContent } from './render-post-content.js';
 import { renderPostLike } from './render-post-like.js';
+import { renderTil } from './render-til.js';
 import { parseDateSafe } from './utils.js';
 
 /**
@@ -67,6 +68,20 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
           ${rawHtml(excerptHtml)}
         </${tag}>
     `);
+  }
+
+  // TIL post — compact summary in listings, full content on standalone pages
+  if (post.category === 'til') {
+    return renderTil({
+      authorName,
+      compact: !standalone,
+      content,
+      nonenglish,
+      post,
+      siteUrl,
+      standalone,
+      swedish,
+    });
   }
 
   // Like post — compact in listings, full on standalone pages

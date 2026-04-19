@@ -414,6 +414,14 @@ img {
   line-height: 1;
 }
 
+/* Override generic focus ring: falu-red over dark canvas is only ~4.3:1.
+   --color-ink is near-white in dark mode (~11:1 over canvas) and deep ink
+   in light (~13:1), matching the site's asymmetric 10:1 contrast goal. */
+.hamburger-btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
 .hamburger-icon {
   display: flex;
   flex-direction: column;
@@ -1139,6 +1147,13 @@ relative-time .relative-label {
 .skip-link:focus {
   top: 0;
   color: var(--color-canvas);
+}
+
+/* Explicit focus ring so the outline is not cascade-dependent on the
+   generic :focus-visible rule (asymmetric semantics fix for mouse focus). */
+.skip-link:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
 }
 
 /* === Focus states === */

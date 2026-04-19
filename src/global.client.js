@@ -55,6 +55,12 @@ const TOGGLE_STYLES = `
     box-shadow: 1px 1px 0 var(--color-ink, #2c2a28);
   }
 
+  /* Shadow DOM is isolated from outer :focus-visible rules — inner rule required for WCAG 2.4.11 */
+  button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
   button[aria-pressed="true"] {
     border-width: 2px;
     border-color: var(--color-ink, #2c2a28);
