@@ -1862,18 +1862,17 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   margin: var(--space-xl) auto var(--space-lg);
   padding: var(--space-md) var(--space-lg);
   border-top: 1px solid var(--color-stone);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-ink-light);
   text-align: center;
 }
 
-.site-footer p {
-  margin: 0;
+/* notbyai.fyi badge — preserve per vendor's usage terms (link back, no modification) */
+.notbyai-badge {
+  display: inline-block;
+  line-height: 0;
 }
 
-.site-footer a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+.notbyai-badge img {
+  width: auto;
+  /* Minimum 30px height per notbyai.fyi badge guidelines; scaled up for legibility */
+  height: clamp(2rem, 3vw, 3rem);
 }

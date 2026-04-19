@@ -117,9 +117,12 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
       </main>
     </div>
     <footer class="site-footer">
-      <p>
-        <a href="https://notbyai.fyi/" rel="noopener">Written by Human, Not by AI</a>
-      </p>
+      <a class="notbyai-badge" href="https://notbyai.fyi/" rel="noopener" aria-label="Written by Human, Not by AI — visit notbyai.fyi">
+        <picture>
+          <source srcset="/badges/notbyai-human-white.svg" media="(prefers-color-scheme: dark)" />
+          <img src="/badges/notbyai-human-black.svg" alt="Written by Human, Not by AI" width="240" height="60" loading="lazy" />
+        </picture>
+      </a>
     </footer>
     ${scripts.map(src => html`<script type="module" src=${src}></script>`)}
   `);
