@@ -1,6 +1,7 @@
 import { escapeXml } from './lib/escape.js';
 
-const redirects = [
+/** @type {Array<{ from: string, to: string }>} */
+export const redirects = [
   { from: '2008/12/ny blogg', to: '/2008/12/ny-blogg/' },
   { from: '2009/01/backchannels och googlebuggar', to: '/2009/01/backchannels-och-googlebuggar/' },
   { from: '2009/01/pingback multiping och global redirect', to: '/2009/01/pingback-multiping-och-global-redirect/' },

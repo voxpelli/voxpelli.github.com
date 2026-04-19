@@ -157,6 +157,10 @@ globalThis.addEventListener('storage', (e) => {
  */
 class RelativeTime extends HTMLElement {
   connectedCallback () {
+    // Idempotency guard: custom element lifecycle can fire on reconnect
+    // (View Transitions, adoptNode, moveBefore) — avoid double-appending the label.
+    if (this.querySelector('.relative-label')) return;
+
     const time = this.querySelector('time[datetime]');
     if (!time) return;
 

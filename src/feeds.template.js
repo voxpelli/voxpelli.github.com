@@ -25,13 +25,14 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = allPosts.filter(p => p.category === 'links').slice(0, 10);
+  const recentTils = allPosts.filter(p => p.category === 'til').slice(0, 10);
 
   // Build page index for O(1) lookup instead of O(n) pages.find() per post
   /** @type {Map<string, typeof pages[0]>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all unique feed posts in parallel, with cache to avoid duplicates
-  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks].map(p => [p.path, p])).values()];
+  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks, ...recentTils].map(p => [p.path, p])).values()];
   /** @type {Map<string, string>} */
   const renderCache = new Map();
   await Promise.all(allFeedPosts.map(async (post) => {
@@ -99,6 +100,16 @@ ${entries.join('\n')}
       htmlUrl: '/links/',
       subtitle: 'Links',
       posts: recentLinks,
+    }),
+  };
+
+  yield {
+    outputName: 'til/feed.atom',
+    content: buildFeed({
+      selfUrl: '/til/feed.atom',
+      htmlUrl: '/til/',
+      subtitle: 'TIL',
+      posts: recentTils,
     }),
   };
 }

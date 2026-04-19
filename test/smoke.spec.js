@@ -9,6 +9,7 @@ import { access, readFile } from 'node:fs/promises';
 
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';
+import { redirects } from '../src/redirects.template.js';
 
 test('homepage has h-feed and DomStack assets', async () => {
   const html = await readFile('public/index.html', 'utf8');
@@ -121,6 +122,37 @@ test('feed entries emit both <published> and <updated>', async () => {
   }
 });
 
+test('TIL Atom feed exists with valid structure', async () => {
+  await access('public/til/feed.atom');
+  const xml = await readFile('public/til/feed.atom', 'utf8');
+
+  // Valid Atom root
+  assert.match(xml, /<feed xmlns="http:\/\/www\.w3\.org\/2005\/Atom">/, 'must have <feed> root element');
+
+  // Self-link points at /til/feed.atom
+  assert.match(xml, /href="[^"]*\/til\/feed\.atom"[^>]*rel="self"/, 'must have self link to /til/feed.atom');
+
+  // Valid ISO datetime in top-level <updated>
+  const feedUpdatedMatch = xml.match(/<feed[^>]*>[\s\S]*?<updated>([^<]+)<\/updated>/);
+  assert.ok(feedUpdatedMatch, 'TIL feed must have top-level <updated>');
+  const feedUpdated = feedUpdatedMatch && feedUpdatedMatch[1] ? feedUpdatedMatch[1] : '';
+  assert.match(feedUpdated, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, '<updated> must be ISO datetime');
+
+  // Entries (if any) must all be TIL posts — <id> should include /til/ path
+  const entryPattern = /<entry>[\s\S]*?<\/entry>/g;
+  const entries = xml.match(entryPattern) || [];
+  for (const entry of entries) {
+    const linkMatch = entry.match(/<link[^>]*href="([^"]+)"/);
+    const idMatch = entry.match(/<id>([^<]+)<\/id>/);
+    const href = linkMatch && linkMatch[1] ? linkMatch[1] : '';
+    const entryId = idMatch && idMatch[1] ? idMatch[1] : '';
+    assert.ok(
+      href.includes('/til/') || entryId.includes('/til/'),
+      `TIL feed entry must be a TIL post (href=${href}, id=${entryId})`
+    );
+  }
+});
+
 test('article page has webmention form', async () => {
   const html = await readFile('public/2019/10/use-type-script-3-7-to-generate/index.html', 'utf8');
   assert.match(html, /webmention/);
@@ -147,6 +179,32 @@ test('sitemap has URLs', async () => {
   const xml = await readFile('public/sitemap.xml', 'utf8');
   assert.match(xml, /<urlset/);
   assert.match(xml, /<url>/);
+});
+
+test('sitemap excludes redirect stubs, feeds, and the 404 page', async () => {
+  const xml = await readFile('public/sitemap.xml', 'utf8');
+  const locPattern = /<loc>([^<]+)<\/loc>/g;
+  const locs = [...xml.matchAll(locPattern)].map(m => m[1] || '');
+
+  assert.ok(locs.length > 0, 'sitemap should have at least one <loc>');
+
+  for (const loc of locs) {
+    // Strip siteUrl to get the path (plus trailing slash)
+    const path = loc.replace(/^https?:\/\/[^/]+/, '');
+    assert.notEqual(path, '/404/', 'sitemap must not list the 404 page');
+    assert.doesNotMatch(loc, /\.xml(\/)?$/, `sitemap must not list feed/XML files: ${loc}`);
+  }
+
+  for (const { from } of redirects) {
+    // Redirect stubs live at `/${from}/` — ensure none appear in the sitemap.
+    const redirectUrl = `/${from}/`;
+    const encoded = `/${encodeURI(from)}/`;
+    for (const loc of locs) {
+      const path = loc.replace(/^https?:\/\/[^/]+/, '');
+      assert.notEqual(path, redirectUrl, `sitemap must not list redirect path: ${redirectUrl}`);
+      assert.notEqual(path, encoded, `sitemap must not list encoded redirect path: ${encoded}`);
+    }
+  }
 });
 
 test('service worker exists', async () => {
