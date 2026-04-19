@@ -1,0 +1,45 @@
+/**
+ * Category registry — single source of truth for post-category metadata.
+ *
+ * Each category (`blog` default, `social`, `links`, `til`) has its own
+ * collection in `global.data.js`, its own index page URL, and its own feed
+ * URL. Consumers that previously hand-rolled if/else ladders over these
+ * four categories now consult this registry instead. Adding a new category
+ * becomes a single-file edit here plus a corresponding filter in
+ * `global.data.js` — not a six-file hunt.
+ *
+ * The `undefined` key represents the default blog category, matching the
+ * `!p.category` filter in global.data.js exactly. No magic string needed.
+ *
+ * @typedef {object} CategoryDescriptor
+ * @property {string} collectionKey  Key in global.data output (e.g. 'tilPosts').
+ * @property {string} feedUrl        Self URL for the Atom feed ('' if none).
+ * @property {string} indexUrl       HTML section index page URL.
+ * @property {string} feedSubtitle   Subtitle shown in feed metadata.
+ */
+
+/** @type {Map<string | undefined, CategoryDescriptor>} */
+export const CATEGORIES = new Map([
+  [undefined, { collectionKey: 'blogPosts', feedUrl: '/all.xml', indexUrl: '/', feedSubtitle: '' }],
+  ['social', { collectionKey: 'socialPosts', feedUrl: '', indexUrl: '/social/', feedSubtitle: 'Social' }],
+  ['links', { collectionKey: 'linkPosts', feedUrl: '/links/all.xml', indexUrl: '/links/', feedSubtitle: 'Links' }],
+  ['til', { collectionKey: 'tilPosts', feedUrl: '/til/feed.atom', indexUrl: '/til/', feedSubtitle: 'TIL' }],
+]);
+
+/**
+ * Lookup the post collection for a given category, falling back to blogPosts
+ * when the category is unregistered. Returns an empty array rather than
+ * undefined so callers can freely chain `.findIndex` / `.map` without guards.
+ *
+ * @param {string | undefined} category
+ * @param {Record<string, unknown>} vars
+ * @returns {Array<Record<string, unknown>>}
+ */
+export function getCategoryCollection (category, vars) {
+  const descriptor = CATEGORIES.get(category) ?? CATEGORIES.get();
+  const key = descriptor?.collectionKey ?? 'blogPosts';
+  const collection = vars[key];
+  return Array.isArray(collection)
+    ? /** @type {Array<Record<string, unknown>>} */ (collection)
+    : [];
+}

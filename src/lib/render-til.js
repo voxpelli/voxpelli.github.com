@@ -1,4 +1,4 @@
-/** @import { PostVars } from './render-post.js' */
+/** @import { PostVars, TilPostVars } from './render-post.js' */
 
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
@@ -8,20 +8,6 @@ import { renderPostContent } from './render-post-content.js';
 import { safeHref, safePostUrl } from './safe-url.js';
 import { slugifyTopic } from './slugify-topic.js';
 import { extractFullDomain, parseDateSafe } from './utils.js';
-
-/**
- * @typedef {object} TilVarsBase
- * @property {'til'} category
- * @property {string} [title]
- * @property {string} [date]
- * @property {string} [lang]
- * @property {string} [pageUrl]
- * @property {string[]} [tags]
- * @property {string} [topic]
- * @property {string} [via]
- */
-
-/** @typedef {TilVarsBase & Record<string, unknown>} TilVars */
 
 /**
  * Render a TIL (Today I Learned) post.
@@ -39,7 +25,7 @@ import { extractFullDomain, parseDateSafe } from './utils.js';
  * - tags
  *
  * @param {object} options
- * @param {PostVars} options.post
+ * @param {PostVars} options.post - renderPost only dispatches here when category==='til', so post is narrowed to TilPostVars
  * @param {string} [options.content] - Rendered markdown content
  * @param {boolean} [options.standalone]
  * @param {boolean} [options.compact] - When true, suppress author attribution and webmention link (standalone only)
@@ -50,10 +36,15 @@ import { extractFullDomain, parseDateSafe } from './utils.js';
  * @param {string} [options.webmentionEndpoint]
  * @returns {string}
  */
-export function renderTil ({ authorName, compact, content, nonenglish, post, siteUrl, standalone, swedish, webmentionEndpoint }) {
-  const via = typeof post['via'] === 'string' ? /** @type {string} */ (post['via']) : undefined;
+export function renderTil ({ authorName, compact, content, nonenglish, post: rawPost, siteUrl, standalone, swedish, webmentionEndpoint }) {
+  // renderTil is only reachable from the renderPost dispatcher's TIL branch,
+  // so this cast is safe and removes the Record<string, unknown> bracket-access
+  // escape hatch for topic/via. Narrowing by category check would also work but
+  // cost a useless runtime branch on every render.
+  const post = /** @type {TilPostVars} */ (rawPost);
+  const via = post.via;
   const viaSafe = via ? safePostUrl(via) : '';
-  const topic = typeof post['topic'] === 'string' ? /** @type {string} */ (post['topic']) : undefined;
+  const topic = post.topic;
 
   if (standalone) {
     // Standalone article page: delegate to the generic renderPostContent (for

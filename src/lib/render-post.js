@@ -22,7 +22,25 @@ export { safePostUrl } from './safe-url.js';
  * @property {string} [content]
  */
 
-/** @typedef {PostVarsBase & Record<string, unknown>} PostVars */
+/**
+ * @typedef {object} TilPostVarsExtra
+ * @property {'til'} category
+ * @property {string} [topic]
+ * @property {string} [via]
+ */
+
+/** @typedef {PostVarsBase & TilPostVarsExtra} TilPostVars */
+/** @typedef {PostVarsBase & { category?: undefined | 'social' | 'links' }} BasePostVars */
+
+/**
+ * Discriminated union over post category. Narrowing via
+ * `if (post.category === 'til')` exposes topic/via as typed fields without
+ * bracket-access escape hatches. Consumers expecting the old
+ * `PostVarsBase & Record<string, unknown>` shape are unaffected because
+ * every branch of the union exposes every PostVarsBase field.
+ *
+ * @typedef {TilPostVars | BasePostVars} PostVars
+ */
 
 /**
  * Smart post dispatcher - renders as blog summary, like, or full content

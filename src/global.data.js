@@ -1,3 +1,4 @@
+import { CATEGORIES } from './lib/categories.js';
 import { filterAndSortPosts } from './lib/posts.js';
 
 /**
@@ -32,6 +33,21 @@ export default async function globalData ({ pages }) {
       submitto: vars?.submitto,
     };
   });
+
+  // Runtime drift guard — fail build if a post carries an unregistered
+  // category. Prevents silent "new category added, registry not updated"
+  // regressions where prev/next navigation and feed emission would drop
+  // the category through. See src/lib/categories.js for the registry.
+  const knownCategories = new Set(CATEGORIES.keys());
+  for (const post of allPosts) {
+    const cat = post.category;
+    if (cat !== undefined && !knownCategories.has(/** @type {string} */ (cat))) {
+      throw new Error(
+        `Unknown post category "${String(cat)}" at ${String(post.path)} — ` +
+        'register it in src/lib/categories.js'
+      );
+    }
+  }
 
   // Categorize posts
   const blogPosts = allPosts.filter(p => !p.category);

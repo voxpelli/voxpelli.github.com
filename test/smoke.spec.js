@@ -292,6 +292,30 @@ test('TIL topic pages built with matching topic content', async () => {
   assert.match(html, /\/til\/2026\/02\/hex-color-short-form-explained\//, 'css topic page should link the hex-color TIL');
 });
 
+test('TIL standalone page renders post-nav (prev/next)', async () => {
+  // SWARM-10 R2-1: TIL standalone pages previously fell through the
+  // article.layout.js category ladder to blogPosts, where findIndex
+  // returned -1 (tilPosts are filter-excluded from blogPosts), so
+  // prev/next silently suppressed. Wave B routes through getCategoryCollection
+  // so TIL posts now consult tilPosts. Verify the nav actually renders.
+  // All current TIL posts are .draft.md and only exist under build:drafts.
+  const tilIndexHtml = await readFile('public/til/index.html', 'utf8').catch(() => '');
+  if (!tilIndexHtml) return; // TIL index missing entirely — prod build edge
+  const firstTilHref = tilIndexHtml.match(/href="(\/til\/\d{4}\/[^"]+\/)"/);
+  if (!firstTilHref) return; // All TIL posts are drafts in prod build — skip
+  const tilPagePath = `public${firstTilHref[1]}index.html`;
+  const tilPageHtml = await readFile(tilPagePath, 'utf8').catch(() => '');
+  if (!tilPageHtml) return;
+  // post-nav only renders when at least one of prev/next exists. If this is
+  // the only TIL post, neither side has a neighbour and the widget is absent
+  // by design; skip in that case rather than asserting.
+  const hasNav = /class="post-nav"/.test(tilPageHtml);
+  const hasNeighbours = tilIndexHtml.match(/href="\/til\/\d{4}\//g);
+  if (hasNeighbours && hasNeighbours.length >= 2) {
+    assert.ok(hasNav, 'TIL standalone page with ≥2 siblings must render post-nav');
+  }
+});
+
 test('XSS: escapeXml neutralizes <script>-bearing tag names', () => {
   // Regression: tags.template.js interpolates tag names into the page body and
   // into vars.title — a tag containing <script>alert(1)</script> must be escaped.

@@ -1,5 +1,6 @@
 import { html, renderToStringSync } from 'async-htm-to-string';
 
+import { getCategoryCollection } from './lib/categories.js';
 import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
@@ -45,18 +46,14 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
     <script defer src=${`${wmEndpoint}/js/cutting-edge.js`}></script>
   `);
 
-  // Find adjacent posts for prev/next navigation (scoped to same content category)
-  const category = vars.category;
-  /** @type {Array<Record<string, unknown>>} */
-  let postList;
-
-  if (category === 'social') {
-    postList = /** @type {Array<Record<string, unknown>>} */ (vars.socialPosts) || [];
-  } else if (category === 'links') {
-    postList = /** @type {Array<Record<string, unknown>>} */ (vars.linkPosts) || [];
-  } else {
-    postList = /** @type {Array<Record<string, unknown>>} */ (vars.blogPosts) || [];
-  }
+  // Find adjacent posts for prev/next navigation (scoped to same content category).
+  // Dispatch via CATEGORIES registry so new categories automatically get prev/next
+  // — the previous if/else ladder silently dropped TIL into blogPosts, where
+  // tilPosts were filter-excluded and currentIndex was always -1.
+  const postList = getCategoryCollection(
+    typeof vars.category === 'string' ? vars.category : undefined,
+    vars
+  );
   const currentIndex = postList.findIndex(p => String(p.pageUrl) === pageUrl);
   const prevPost = currentIndex !== -1 ? postList[currentIndex + 1] : undefined; // older
   const nextPost = currentIndex > 0 ? postList[currentIndex - 1] : undefined; // newer
