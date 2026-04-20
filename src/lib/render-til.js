@@ -104,12 +104,14 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
   const isRelease = rawPost.category === 'release';
 
   const excerptResult = content ? extractExcerpt(content) : undefined;
-  const excerptHtml = excerptResult
+  const excerpt = excerptResult
     ? renderTilExcerpt(excerptResult, postUrl, isRelease ? { readMoreLabel: 'My full release notes' } : {})
-    : '';
+    : { excerptHtml: '', readMoreHtml: '' };
 
   // Density pass: header row (pill + title), body (excerpt), footer rail
-  // (date + topic + via-domain + tags). Footer links need position:relative +
+  // containing read-more + right-aligned meta (date + topic + via-domain +
+  // tags) on the same row at desktop widths. Flex-wrap lets meta drop below
+  // read-more at narrow widths. Footer links need position:relative +
   // z-index:1 so they escape the .post-title a::after card-cover-link overlay.
   return renderToStringSync(html`
     <article class=${isRelease ? 'h-entry til-card til-card--release' : 'h-entry til-card'} lang=${lang}>
@@ -120,27 +122,31 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
           <h3 class="post-title p-name"><a class="u-url u-uid" href=${safeUrl}>${post.title || ''}</a></h3>
         </div>
         <span class="p-category" hidden>til</span>
-        ${rawHtml(excerptHtml)}
+        ${rawHtml(excerpt.excerptHtml)}
         <div class="til-card-footer">
-          <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
-          ${topic ? html`<a class="til-topic" href=${`/til/topics/${slugifyTopic(topic)}/`}>${topic}</a>` : ''}
-          ${via && viaSafe
-            ? html`<a class="domain-badge u-bookmark-of" href=${viaSafe}>${extractFullDomain(via)}</a>`
-            : ''}
-          ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+          ${rawHtml(excerpt.readMoreHtml)}
+          <div class="til-card-meta">
+            <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
+            ${topic ? html`<a class="til-topic" href=${`/til/topics/${slugifyTopic(topic)}/`}>${topic}</a>` : ''}
+            ${via && viaSafe
+              ? html`<a class="domain-badge u-bookmark-of" href=${viaSafe}>${extractFullDomain(via)}</a>`
+              : ''}
+            ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+          </div>
         </div>
       </article>
   `);
 }
 
 /**
- * Render TIL excerpt HTML with optional fade and "read full" link.
+ * Render TIL excerpt HTML, split from the read-more link so callers can place
+ * each piece independently (excerpt in card body, read-more in card footer).
  *
  * @param {import('./excerpt.js').ExcerptResult} result
  * @param {string} postUrl
  * @param {object} [options]
  * @param {string} [options.readMoreLabel] - Label for the read-more link (default: 'Read full TIL')
- * @returns {string}
+ * @returns {{ excerptHtml: string, readMoreHtml: string }}
  */
 function renderTilExcerpt (result, postUrl, options = {}) {
   const { readMoreLabel = 'Read full TIL' } = options;
@@ -149,8 +155,9 @@ function renderTilExcerpt (result, postUrl, options = {}) {
     ? '<div class="post-excerpt-fade" aria-hidden="true"></div>'
     : '';
   const href = safeHref(postUrl);
-  const readMore = result.truncated && href
+  const excerptHtml = `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>`;
+  const readMoreHtml = result.truncated && href
     ? `<a class="post-read-more" href="${href}">${readMoreLabel} \u2192</a>`
     : '';
-  return `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>${readMore}`;
+  return { excerptHtml, readMoreHtml };
 }

@@ -756,7 +756,7 @@ img {
   color: var(--color-ink-light);
   position: relative;
   overflow: hidden;
-  max-height: 8em;
+  max-height: 14em;
 }
 
 .post-excerpt p {
@@ -1589,7 +1589,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 .til-card .post-excerpt {
-  max-height: 5em;
+  max-height: 8em;
   overflow: hidden;
 }
 
@@ -1599,8 +1599,8 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 /* Header row: pill + title. Baseline-align so the mono pill sits on the
-   serif title's text baseline rather than above it. Wrap-friendly so long
-   titles don't push the pill off-screen at 375px. */
+   serif title's text baseline rather than floating mid-row. Wrap-friendly
+   so long titles don't push the pill off-screen at 375px. */
 .til-card-header {
   display: flex;
   align-items: baseline;
@@ -1615,24 +1615,35 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 /* Pill sits above the .post-title a::after cover-link overlay. Same
-   escape-hatch pattern as .post-read-more. */
+   escape-hatch pattern as .post-read-more. Baseline-aligned (via parent's
+   align-items: baseline) so the mono text sits on the serif title's
+   baseline rather than centered-above. */
 .til-card-header .post-type-badge {
   position: relative;
   z-index: 1;
-  align-self: center;
 }
 
-/* Footer rail: date + topic + via-domain + tags on one low-weight row.
-   Mono/xs/ink-light unifies the metadata visually. All interactive
-   descendants escape the card-cover-link overlay via z-index. */
+/* Footer row: read-more (left) + right-aligned meta rail (date + topic +
+   domain + tags). When no read-more (excerpt didn't truncate), meta
+   auto-pushes right via margin-left:auto; with read-more, read-more sits
+   left, meta sits right, sharing one row on desktop. Flex-wrap drops meta
+   below read-more at narrow widths. */
 .til-card-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-xs) var(--space-sm);
+  gap: var(--space-xs) var(--space-md);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   color: var(--color-ink-light);
+}
+
+.til-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  margin-left: auto;
 }
 
 .til-card-footer a,
@@ -1696,6 +1707,26 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   inset: auto;
 }
 
+/* Bookmark cards carry two nav targets: the title (external bookmark-of URL)
+   and the permalink (author's commentary). The read-more anchor ("Read full
+   note →") is the permalink entry, but users click body text instinctively.
+   Extend the read-more's hit area to cover the whole card via an invisible
+   ::before; the title's u-bookmark-of anchor and the pill + footer links sit
+   above the cover via z-index:1 so they stay independently clickable. No
+   duplicate anchor is introduced — screen readers still see one "Read full
+   note" link, not an extra "excerpt-body" link. */
+.til-card--bookmark .post-read-more::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.til-card--bookmark .p-name a.u-bookmark-of {
+  position: relative;
+  z-index: 1;
+}
+
 /* Variant: .til-card--release (release notes posts).
    Falu-red left-edge accent signals a product-release post (npm package
    shipped, GitHub release), distinct from cloudberry bookmarks and the
@@ -1719,7 +1750,11 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   }
 }
 
-/* === Post type badge (pill) === */
+/* === Post type badge (pill) ===
+   Bordered + slight tinted fill in the pill's own colour. color-mix gives
+   a restrained wash (~10% alpha of currentColor) that lets the pill read
+   as a filled chip rather than a hollow outline while staying well below
+   Sovereign Warmth's noise floor. */
 .post-type-badge {
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
@@ -1728,6 +1763,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   padding: 0.1em 0.4em;
   border-radius: 2px;
   border: 1px solid currentColor;
+  background-color: color-mix(in oklab, currentColor 10%, transparent);
   line-height: 1.4;
   text-decoration: none;
   white-space: nowrap;

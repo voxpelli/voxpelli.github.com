@@ -76,11 +76,14 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
     const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
     const postUrl = post.pageUrl || '';
 
-    // Extract excerpt when requested and content is available
+    // Extract excerpt when requested and content is available. Blog cards keep
+    // the legacy stacked layout (excerpt above, read-more below) — concatenate
+    // the split halves back into one HTML chunk.
     const excerptResult = excerpt && content ? extractExcerpt(content) : undefined;
-    const excerptHtml = excerptResult
+    const excerptPair = excerptResult
       ? renderExcerpt(excerptResult, postUrl)
-      : '';
+      : { excerptHtml: '', readMoreHtml: '' };
+    const excerptHtml = excerptPair.excerptHtml + excerptPair.readMoreHtml;
 
     return renderToStringSync(html`
       <${tag} class="post-card h-entry">
@@ -172,15 +175,17 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
   const excerptResult = content ? extractExcerpt(content) : undefined;
-  // "My full bookmark notes →" signals the permalink carries the full
-  // commentary (more than fits in the card excerpt). Title (above) already
-  // targets the external bookmark-of URL.
-  const excerptHtml = excerptResult
-    ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'My full bookmark notes' })
-    : '';
+  // "Read full note →" signals the permalink carries the author's commentary
+  // (more than fits in the card excerpt). Title (above) already targets the
+  // external bookmark-of URL; the read-more and its card-body cover (::before
+  // in global.css) both go to the permalink.
+  const excerpt = excerptResult
+    ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'Read full note' })
+    : { excerptHtml: '', readMoreHtml: '' };
 
-  // Density pass: header (pill + title), body (excerpt), footer rail
-  // (date + domain-badge + tags). Mirrors renderTil structure.
+  // Density pass: header (pill + title), body (excerpt), footer with
+  // read-more left + right-aligned meta (date + domain + tags). Mirrors
+  // renderTil structure.
   return renderToStringSync(html`
     <article class="h-entry til-card til-card--bookmark" lang=${lang}>
         <div class="til-card-header">
@@ -192,27 +197,29 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
           </h3>
         </div>
         <span class="p-category" hidden>links</span>
-        ${rawHtml(excerptHtml)}
+        ${rawHtml(excerpt.excerptHtml)}
         <div class="til-card-footer">
-          <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
-          ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}
-          ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+          ${rawHtml(excerpt.readMoreHtml)}
+          <div class="til-card-meta">
+            <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
+            ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}
+            ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+          </div>
         </div>
       </article>
   `);
 }
 
 /**
- * Render excerpt HTML with optional fade and "read more" link.
- *
- * The read-more label varies by post type: blog/TIL excerpts say "Read full
- * article"; bookmark cards point at internal commentary via "My notes" since
- * their title already targets the external source.
+ * Render excerpt HTML, returning the excerpt and read-more as separate strings
+ * so callers can place them independently. Blog cards concatenate them (excerpt
+ * then read-more, stacked). Lifestream cards (bookmark/TIL/release) place the
+ * excerpt in the body and the read-more inside the footer alongside meta.
  *
  * @param {import('./excerpt.js').ExcerptResult} result
  * @param {string} postUrl
  * @param {{ readMoreLabel?: string }} [options]
- * @returns {string}
+ * @returns {{ excerptHtml: string, readMoreHtml: string }}
  */
 function renderExcerpt (result, postUrl, options = {}) {
   const { readMoreLabel = 'Read full article' } = options;
@@ -221,9 +228,9 @@ function renderExcerpt (result, postUrl, options = {}) {
     ? '<div class="post-excerpt-fade" aria-hidden="true"></div>'
     : '';
   const href = safeHref(postUrl);
-  const readMore = result.truncated && href
+  const excerptHtml = `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>`;
+  const readMoreHtml = result.truncated && href
     ? `<a class="post-read-more" href="${href}">${readMoreLabel} \u2192</a>`
     : '';
-
-  return `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>${readMore}`;
+  return { excerptHtml, readMoreHtml };
 }
