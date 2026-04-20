@@ -12,12 +12,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:tsc` — TypeScript type checking only
 - `npm run test:build` — smoke tests only (requires prior build): `node --test 'test/**/*.spec.js'`
 - `npm run e2e` — Playwright e2e tests (requires prior build): chromium + mobile viewports
-- `npm run build-drafts` — include `.draft.*` pages
+- `npm run build-drafts` / `npm run dev-drafts` — production build / watch mode including `.draft.*` pages
 - `npm run check:knip` — dead-code + unused-dep detection (runs in `check`)
 
 **Tooling dep rule:** if a config file names a tool (e.g. `knip.json` references `knip`), that tool IS a `devDependencies` entry. Don't rely on `npx`-auto-install — it masks the dependency and `npm ci` won't reproduce the toolchain. Add config → add dep.
 
 **Commit staging rule:** stage wave commits by explicit path, not `git add -A`. The repo root routinely accumulates untracked research notes and audit screenshots that aren't covered by `.gitignore` patterns. `-A` has swept a research artifact into a wave commit before — recovery via stash + `reset --soft HEAD~N` + recommit + stash-pop worked, but never-shipped beats recovered. Name the files at commit time.
+
+**npm script naming rule:** reserve `:` for genuine sub-tasks that can be glob-matched by `npm-run-all2` (e.g. `run-p check:*` runs `check:lint`, `check:tsc`, `check:knip` concurrently). Use flat kebab-case for flag variants of a single command (`build-drafts` not `build:drafts`). Tell: would `run-p foo:*` ever make sense? If no, use kebab.
 
 ## Code Style
 
