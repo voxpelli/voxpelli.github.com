@@ -11,7 +11,7 @@ via: 'https://bsky.app/profile/voxpelli.com/post/3mdybmqjvz22o'
 
 > **⚠️ AI-packaged PESOS placeholder — not shipped content.**
 >
-> This post was assembled by a coding agent as a development fixture while building the `/til/` scaffolding. The body text originates from a Bluesky thread written by Pelle (voxpelli), but the title, tags, topic, section heading, quoted-post framing, and citation footer were produced by AI. The site abides by [notbyai.fyi](https://notbyai.fyi/) for written content (≥90% human-written), so this entry must be hand-edited or removed before publication. Marked `draft: true` so it does not ship by default (`npm run build` excludes it; `npm run build:drafts` includes it).
+> This post was assembled by a coding agent as a development fixture while building the `/til/` scaffolding. The body text originates from a Bluesky thread written by Pelle (voxpelli), but the title, tags, topic, section heading, quoted-post framing, and citation footer were produced by AI. The site abides by [notbyai.fyi](https://notbyai.fyi/) for written content (≥90% human-written), so this entry must be hand-edited or removed before publication. Marked `draft: true` so it does not ship by default (`npm run build` excludes it; `npm run build-drafts` includes it).
 
 Quoting [Ben Hong](https://bsky.app/profile/bencodezen.io/post/3mdxy5j6gqs2k):
 

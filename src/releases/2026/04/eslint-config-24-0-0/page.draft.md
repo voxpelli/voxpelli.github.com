@@ -11,7 +11,7 @@ mf-bookmark-of:
 
 > **⚠️ AI-packaged placeholder — not shipped content.**
 >
-> This post was assembled by a coding agent as a backfill fixture while building the `/releases/` section. The release notes below summarize/quote the actual GitHub release at [the bookmark URL above], but the post framing and any editorial commentary are AI-assembled. The site abides by [notbyai.fyi](https://notbyai.fyi/) for written content (≥90% human-written), so this entry must be hand-edited or removed before publication. Marked via `.draft.md` filename so it does not ship by default (`npm run build` excludes it; `npm run build:drafts` includes it).
+> This post was assembled by a coding agent as a backfill fixture while building the `/releases/` section. The release notes below summarize/quote the actual GitHub release at [the bookmark URL above], but the post framing and any editorial commentary are AI-assembled. The site abides by [notbyai.fyi](https://notbyai.fyi/) for written content (≥90% human-written), so this entry must be hand-edited or removed before publication. Marked via `.draft.md` filename so it does not ship by default (`npm run build` excludes it; `npm run build-drafts` includes it).
 
 ## What's new
 

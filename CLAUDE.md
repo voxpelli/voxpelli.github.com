@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:tsc` — TypeScript type checking only
 - `npm run test:build` — smoke tests only (requires prior build): `node --test 'test/**/*.spec.js'`
 - `npm run e2e` — Playwright e2e tests (requires prior build): chromium + mobile viewports
-- `npm run build:drafts` — include `.draft.*` pages
+- `npm run build-drafts` — include `.draft.*` pages
 - `npm run check:knip` — dead-code + unused-dep detection (runs in `check`)
 
 **Tooling dep rule:** if a config file names a tool (e.g. `knip.json` references `knip`), that tool IS a `devDependencies` entry. Don't rely on `npx`-auto-install — it masks the dependency and `npm ci` won't reproduce the toolchain. Add config → add dep.
@@ -64,7 +64,7 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 - **Template data access**: Templates receive `{ vars, pages }` where `vars` is `global.vars.js` only. Access `global.data.js` output via `pages[0].vars` (the `PageData.vars` getter includes `globalDataVars`)
 - **`PageData.vars` is a getter**: Creates a fresh merged object each call — setting `page.vars.x = y` writes to a temporary object. Mutate `post.content` on array items from `global.data.js` instead
 - **Code blocks render as bare `<pre><code class="hljs">`**: `markdown-it-highlightjs` does NOT wrap in `.highlight` — CSS targeting `.highlight` won't match built output
-- **Drafts are filename-based, not frontmatter**: `page.draft.md` / `page.draft.html` / `page.draft.js` excludes from default build; `npm run build:drafts` includes them. Frontmatter `draft: true` has zero effect. Source: `@domstack/static/lib/identify-pages.js:29-30`
+- **Drafts are filename-based, not frontmatter**: `page.draft.md` / `page.draft.html` / `page.draft.js` excludes from default build; `npm run build-drafts` includes them. Frontmatter `draft: true` has zero effect. Source: `@domstack/static/lib/identify-pages.js:29-30`
 - **`--copy images` flattens the top-level directory**: `images/foo.png` → `public/foo.png` (not `public/images/foo.png`). Anything you want at `public/<subdir>/` should be named `<subdir>/` at the top of your copied tree, e.g. `images/badges/x.svg` → `public/badges/x.svg`
 
 ### Rendering Pipeline

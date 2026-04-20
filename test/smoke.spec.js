@@ -294,7 +294,7 @@ test('TIL topic pages built with matching topic content', async () => {
   // topics.template.js groups TIL posts by frontmatter `topic` and renders
   // per-topic index pages at /til/topics/<slug>/. Seed TIL posts are currently
   // `.draft.md` (AI-packaged PESOS placeholders — see notbyai.fyi policy), so
-  // they only render under `npm run build:drafts`. In that mode we verify the
+  // they only render under `npm run build-drafts`. In that mode we verify the
   // topic page content; in the default prod build we just verify the template
   // didn't crash by confirming the TIL index and feed exist.
   try {
@@ -319,7 +319,7 @@ test('TIL standalone page renders post-nav (prev/next)', async () => {
   // returned -1 (tilPosts are filter-excluded from blogPosts), so
   // prev/next silently suppressed. Wave B routes through getCategoryCollection
   // so TIL posts now consult tilPosts. Verify the nav actually renders.
-  // All current TIL posts are .draft.md and only exist under build:drafts.
+  // All current TIL posts are .draft.md and only exist under build-drafts.
   const tilIndexHtml = await readFile('public/til/index.html', 'utf8').catch(() => '');
   if (!tilIndexHtml) return; // TIL index missing entirely — prod build edge
   const firstTilHref = tilIndexHtml.match(/href="(\/til\/\d{4}\/[^"]+\/)"/);

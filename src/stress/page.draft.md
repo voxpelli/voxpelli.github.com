@@ -8,7 +8,7 @@ tags: [stress-test, ai-placeholder]
 
 > ⚠️ **Developer-only stress-test page (draft).**
 > Not for publication. File is named `page.draft.md` — excluded from the default
-> `npm run build`. Include with `npm run build:drafts` for local inspection only.
+> `npm run build`. Include with `npm run build-drafts` for local inspection only.
 > Verifies overflow, hyphenation, fluid type, responsive iframes, and print rules.
 
 ## Contents
