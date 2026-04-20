@@ -11,6 +11,8 @@ const pages = [
   { name: 'about', path: '/about/' },
   { name: 'til-index', path: '/til/' },
   { name: 'til-topic', path: '/til/topics/css/' },
+  { name: 'articles', path: '/articles/' },
+  { name: 'feeds', path: '/feeds/' },
 ];
 
 /**

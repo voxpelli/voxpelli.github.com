@@ -84,7 +84,7 @@ test.describe('Mobile hamburger menu — 375px viewport', () => {
     await page.locator('.hamburger-btn').click();
     await expect(page.locator('#nav-drawer')).toHaveClass(/is-open/);
 
-    // Pick a non-current nav link inside the drawer (first link is "Blog Posts"
+    // Pick a non-current nav link inside the drawer (first link is "Home"
     // pointing at "/" which is the current page — would produce same URL after click).
     const navLink = page.locator('#nav-drawer .nav-menu a[href="/about/"]').first();
     await expect(navLink).toBeVisible();

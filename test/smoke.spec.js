@@ -584,3 +584,73 @@ test('XSS: safeHref combines scheme guard with attribute escape', () => {
   // Whitespace-prefixed hostile scheme still rejected.
   assert.equal(safeHref('  javascript:alert(1)  '), '');
 });
+
+test('SWARM-13 /articles/ page renders post-cards, no til-cards, ≤10 entries', async () => {
+  // New /articles/ listing page (SWARM-13 Wave 1 Agent A1). Long-form article
+  // summaries only — must not render TIL/bookmark/release cards (those live
+  // in /til/, /links/, /releases/).
+  const html = await readFile('public/articles/index.html', 'utf8').catch(() => '');
+  if (!html) return; // Not built yet (pre-A1) — graceful skip
+  assert.match(html, /class="post-card[\s"]/, '/articles/ must contain at least one .post-card');
+  assert.doesNotMatch(html, /class="til-card[\s"]/, '/articles/ must not render TIL cards');
+  const postCardCount = (html.match(/class="post-card[\s"]/g) || []).length;
+  assert.ok(
+    postCardCount <= 10,
+    `/articles/ must render at most 10 post-card entries, got ${postCardCount}`
+  );
+});
+
+test('SWARM-13 /feeds/ page lists all four primary feed URLs', async () => {
+  // New /feeds/ listing page (SWARM-13 Wave 1 Agent A2). Must surface the
+  // four canonical feeds: stream (everything), articles, TIL, releases.
+  const html = await readFile('public/feeds/index.html', 'utf8').catch(() => '');
+  if (!html) return; // Not built yet (pre-A2) — graceful skip
+  const expected = ['/stream.xml', '/all.xml', '/til/feed.atom', '/releases/feed.atom'];
+  for (const feedUrl of expected) {
+    assert.ok(
+      html.includes(feedUrl),
+      `/feeds/ page must surface ${feedUrl} as a link`
+    );
+  }
+});
+
+test('SWARM-13 homepage emits rel=alternate → /stream.xml', async () => {
+  // Agent A3 rewires root.layout.js per-category rel=alternate routing. The
+  // homepage (the full-stream view) must point readers at /stream.xml.
+  const html = await readFile('public/index.html', 'utf8');
+  assert.match(
+    html,
+    /<link[^>]+rel="alternate"[^>]+href="\/stream\.xml"|<link[^>]+href="\/stream\.xml"[^>]+rel="alternate"/,
+    'homepage must emit <link rel="alternate" href="/stream.xml">'
+  );
+});
+
+test('SWARM-13 active-nav regression fence — correct nav item marked per path', async () => {
+  // Agent A3 adds a navActive(itemHref, currentPath) helper. Each page in the
+  // site should mark exactly the nav item matching its path as active. We
+  // detect active-state via `aria-current="page"` on the nav link whose href
+  // matches the expected target. `/links/` and `/releases/` live under the
+  // TIL-superset nav item (per plan), so they activate "TIL".
+  /** @type {Array<{ file: string, activeHref: string, label: string }>} */
+  const cases = [
+    { file: 'public/index.html', activeHref: '/', label: 'Home' },
+    { file: 'public/articles/index.html', activeHref: '/articles/', label: 'Articles' },
+    { file: 'public/til/index.html', activeHref: '/til/', label: 'TIL' },
+    { file: 'public/links/index.html', activeHref: '/til/', label: 'TIL (via /links/)' },
+    { file: 'public/releases/index.html', activeHref: '/til/', label: 'TIL (via /releases/)' },
+  ];
+
+  for (const { activeHref, file, label } of cases) {
+    const html = await readFile(file, 'utf8').catch(() => '');
+    if (!html) continue; // Page not built (e.g. drafts-only /releases/) — graceful skip
+    // Match an <a> nav-item whose href matches the expected target and which
+    // carries aria-current="page" (attribute order-agnostic).
+    const escaped = activeHref.replaceAll('/', '\\/');
+    const ariaCurrentFirst = new RegExp(`<a[^>]*aria-current="page"[^>]*href="${escaped}"`);
+    const hrefFirst = new RegExp(`<a[^>]*href="${escaped}"[^>]*aria-current="page"`);
+    assert.ok(
+      ariaCurrentFirst.test(html) || hrefFirst.test(html),
+      `${file}: expected nav item ${label} (href="${activeHref}") to carry aria-current="page"`
+    );
+  }
+});

@@ -1,7 +1,33 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 /**
- * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
+ * Path-based active-nav predicate.
+ * - Home matches only exactly `/`.
+ * - Articles matches `/articles/` + standalone blog posts `/YYYY/...` + `/archive/`.
+ * - TIL matches `/til/`, `/links/`, and `/releases/` (the TIL superset).
+ * - Others: exact or prefix match.
+ *
+ * @param {string} itemHref
+ * @param {string} currentPath
+ * @returns {boolean}
+ */
+function navActive (itemHref, currentPath) {
+  if (itemHref === '/') return currentPath === '/';
+  if (itemHref === '/articles/') {
+    return currentPath === '/articles/' ||
+      /^\/\d{4}\//.test(currentPath) ||
+      currentPath.startsWith('/archive/');
+  }
+  if (itemHref === '/til/') {
+    return currentPath.startsWith('/til/') ||
+      currentPath.startsWith('/links/') ||
+      currentPath.startsWith('/releases/');
+  }
+  return currentPath === itemHref || currentPath.startsWith(itemHref);
+}
+
+/**
+ * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown> & { noFeedAlternates?: boolean }, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
 export default function rootLayout ({ children, page, scripts = [], styles = [], vars }) {
@@ -24,11 +50,12 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
   // Determine active nav item
   const navItems = [
-    { label: 'Blog Posts', href: '/', active: !!vars.frontpage },
-    { label: 'TIL', href: '/til/', active: vars.category === 'til' || pageUrl === '/til/' || pageUrl.startsWith('/til/') },
-    { label: 'Social Feed', href: '/social/', active: vars.category === 'social' || pageUrl === '/social/' },
-    { label: 'About', href: '/about/', active: pageUrl === '/about/' },
-  ];
+    { label: 'Home', href: '/' },
+    { label: 'Articles', href: '/articles/' },
+    { label: 'TIL', href: '/til/' },
+    { label: 'Social Feed', href: '/social/' },
+    { label: 'About', href: '/about/' },
+  ].map(item => ({ ...item, active: navActive(item.href, pageUrl) }));
 
   const headContent = renderToStringSync(html`
     <meta charset="utf-8" />
@@ -49,9 +76,30 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
     ${styles.map(href => html`<link rel="stylesheet" href=${href} />`)}
 
-    ${vars.category === 'links' ? html`<link rel="alternate" type="application/atom+xml" href="/links/all.xml" title="All links" />` : ''}
-    <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/all.xml" title="All posts" />
-    <link rel=${vars.frontpage ? 'alternate' : 'home alternate'} type="application/atom+xml" href="/english.xml" title="English posts" />
+    ${!vars.noFeedAlternates
+      ? html`<link rel="alternate" type="application/atom+xml" href="/stream.xml" title="Pelle Wessman — Stream (everything)" />`
+      : ''}
+    ${vars.category === undefined && !vars.frontpage && !vars.noFeedAlternates
+      ? html`
+        <link rel="home alternate" type="application/atom+xml" href="/all.xml" title="All posts" />
+        <link rel="home alternate" type="application/atom+xml" href="/english.xml" title="English posts" />
+      `
+      : ''}
+    ${vars.category === 'til'
+      ? html`<link rel="alternate" type="application/atom+xml" href="/til/feed.atom" title="TIL" />`
+      : ''}
+    ${vars.category === 'links'
+      ? html`
+        <link rel="alternate" type="application/atom+xml" href="/links/all.xml" title="All links" />
+        <link rel="alternate" type="application/atom+xml" href="/til/feed.atom" title="TIL" />
+      `
+      : ''}
+    ${vars.category === 'release'
+      ? html`
+        <link rel="alternate" type="application/atom+xml" href="/releases/feed.atom" title="Releases" />
+        <link rel="alternate" type="application/atom+xml" href="/til/feed.atom" title="TIL" />
+      `
+      : ''}
 
     ${!vars.noCanonical ? html`<link rel="canonical" href=${canonicalUrl} />` : ''}
 

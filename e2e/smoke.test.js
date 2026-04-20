@@ -19,7 +19,7 @@ test('homepage has post cards with links', async ({ page }) => {
 test('navigation highlights active page', async ({ page }) => {
   await page.goto('/');
   const activeNav = page.locator('.nav-item.active');
-  await expect(activeNav).toHaveText(/Blog Posts/);
+  await expect(activeNav).toHaveText(/Home/);
 });
 
 test('theme toggle is interactive', async ({ page }) => {
