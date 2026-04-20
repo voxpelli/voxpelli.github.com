@@ -17,6 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Tooling dep rule:** if a config file names a tool (e.g. `knip.json` references `knip`), that tool IS a `devDependencies` entry. Don't rely on `npx`-auto-install — it masks the dependency and `npm ci` won't reproduce the toolchain. Add config → add dep.
 
+**Commit staging rule:** stage wave commits by explicit path, not `git add -A`. The repo root routinely accumulates untracked research notes and audit screenshots that aren't covered by `.gitignore` patterns. `-A` has swept a research artifact into a wave commit before — recovery via stash + `reset --soft HEAD~N` + recommit + stash-pop worked, but never-shipped beats recovered. Name the files at commit time.
+
 ## Code Style
 
 - ESM only (`"type": "module"`), JSDoc types, neostandard style via `@voxpelli/eslint-config`
