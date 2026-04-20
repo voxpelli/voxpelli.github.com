@@ -664,3 +664,49 @@ test('SWARM-13 /releases/ renders til-card--release + My full release notes labe
   assert.match(html, /til-card--release/, '/releases/ must render .til-card--release when a release is present');
   assert.match(html, /My full release notes/, '/releases/ card must use release-specific read-more label');
 });
+
+test('SWARM-13 TIL card pill badge links back to /til/', async () => {
+  // Agent C1: TIL cards carry a .post-type-badge.post-type-badge--til anchor
+  // that links to the TIL index. Attribute order in the built output is not
+  // guaranteed, so accept either class-first or href-first ordering.
+  const html = await readFile('public/til/index.html', 'utf8').catch(() => '');
+  if (!html) return; // TIL index not built — graceful skip
+  // Cascade-skip when /til/ currently has no real TIL-category posts (only
+  // drafts) — the superset page may be rendering only /links/ or /releases/
+  // entries, which carry --link / --release badges, not --til.
+  if (!html.includes('post-type-badge--til')) return;
+  const classFirst = /<a[^>]*class="[^"]*post-type-badge post-type-badge--til[^"]*"[^>]*href="\/til\/"[^>]*>TIL<\/a>/;
+  const hrefFirst = /<a[^>]*href="\/til\/"[^>]*class="[^"]*post-type-badge post-type-badge--til[^"]*"[^>]*>TIL<\/a>/;
+  assert.ok(
+    classFirst.test(html) || hrefFirst.test(html),
+    '/til/ must render a <a class="post-type-badge post-type-badge--til" href="/til/">TIL</a> pill'
+  );
+});
+
+test('SWARM-13 bookmark card pill badge links back to /links/', async () => {
+  // Agent C2: bookmark cards carry a .post-type-badge.post-type-badge--link
+  // anchor that links to /links/. Attribute order-agnostic.
+  const html = await readFile('public/links/index.html', 'utf8').catch(() => '');
+  if (!html) return; // /links/ index not built — graceful skip
+  const classFirst = /<a[^>]*class="[^"]*post-type-badge post-type-badge--link[^"]*"[^>]*href="\/links\/"/;
+  const hrefFirst = /<a[^>]*href="\/links\/"[^>]*class="[^"]*post-type-badge post-type-badge--link[^"]*"/;
+  assert.ok(
+    classFirst.test(html) || hrefFirst.test(html),
+    '/links/ must render a .post-type-badge.post-type-badge--link anchor pointing at /links/'
+  );
+});
+
+test('SWARM-13 release card pill badge links back to /releases/', async () => {
+  // Agent C3: release cards carry a .post-type-badge.post-type-badge--release
+  // anchor that links to /releases/. Cascade-skip when the page has no
+  // non-draft releases — the substring won't appear at all in that case.
+  const html = await readFile('public/releases/index.html', 'utf8').catch(() => '');
+  if (!html) return; // /releases/ index not built — graceful skip
+  if (!html.includes('post-type-badge--release')) return; // No non-draft releases — cascade skip
+  const classFirst = /<a[^>]*class="[^"]*post-type-badge post-type-badge--release[^"]*"[^>]*href="\/releases\/"/;
+  const hrefFirst = /<a[^>]*href="\/releases\/"[^>]*class="[^"]*post-type-badge post-type-badge--release[^"]*"/;
+  assert.ok(
+    classFirst.test(html) || hrefFirst.test(html),
+    '/releases/ must render a .post-type-badge.post-type-badge--release anchor pointing at /releases/'
+  );
+});

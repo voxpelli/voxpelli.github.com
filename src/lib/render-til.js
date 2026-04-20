@@ -111,6 +111,9 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
   return renderToStringSync(html`
     <article class=${isRelease ? 'h-entry til-card til-card--release' : 'h-entry til-card'} lang=${lang}>
         <div class="post-meta">
+          ${isRelease
+            ? html`<a class="post-type-badge post-type-badge--release" href="/releases/">RELEASE</a>`
+            : html`<a class="post-type-badge post-type-badge--til" href="/til/">TIL</a>`}
           <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
           <span class="p-category" hidden>til</span>
           ${topic ? html`<a class="til-topic" href=${`/til/topics/${slugifyTopic(topic)}/`}>${topic}</a>` : ''}

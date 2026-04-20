@@ -182,6 +182,7 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
   return renderToStringSync(html`
     <article class="h-entry til-card til-card--bookmark" lang=${lang}>
         <div class="post-meta">
+          <a class="post-type-badge post-type-badge--link" href="/links/">LINK</a>
           <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
           <span class="p-category" hidden>links</span>
           ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}

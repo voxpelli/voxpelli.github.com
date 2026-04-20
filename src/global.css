@@ -1574,16 +1574,28 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
    hover-accent (unlike .post-card) — bookmark + release variants get
    their own left-edge inset-shadow accents instead. */
 .til-card {
-  padding: var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border-bottom: var(--border-structural);
   display: grid;
   gap: var(--space-xs);
   transition: background-color 0.2s var(--ease-out);
   position: relative;
+  line-height: 1.45;
+  box-shadow: inset 3px 0 0 var(--color-stone);
 }
 
 .til-card:hover {
   background-color: var(--color-canvas-alt);
+}
+
+.til-card .post-excerpt {
+  max-height: 5em;
+  overflow: hidden;
+}
+
+.til-card--bookmark,
+.til-card--release {
+  padding-inline-start: calc(var(--space-md) + 3px);
 }
 
 /* Variant: .til-card--bookmark (links posts).
@@ -1634,7 +1646,6 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 
 .til-card--release {
   box-shadow: inset 3px 0 0 var(--color-falu-red);
-  padding-inline-start: calc(var(--space-lg) + 3px);
 }
 
 @media (max-width: 500px) {
@@ -1649,6 +1660,37 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
     display: inline-block;
     vertical-align: bottom;
   }
+}
+
+/* === Post type badge (pill) === */
+.post-type-badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.1em 0.4em;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.post-type-badge--til     { color: var(--color-ink);        border-color: var(--color-stone); }
+.post-type-badge--link    { color: var(--color-cloudberry); border-color: var(--color-cloudberry); }
+.post-type-badge--release { color: var(--color-falu-red);   border-color: var(--color-falu-red); }
+
+/* === TIL topic affordance === */
+.til-topic {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--color-stone);
+  text-underline-offset: 2px;
+}
+
+.til-topic:hover {
+  text-decoration-style: solid;
+  text-decoration-color: currentColor;
 }
 
 /* Like grouping: override content-area section padding for compact likes */
