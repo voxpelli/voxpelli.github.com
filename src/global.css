@@ -1567,13 +1567,30 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   color: var(--color-ink);
 }
 
-/* === TIL/bookmark card variant (merged /til/ superset) ===
-   renderBookmarkCard emits .til-card .til-card--bookmark for links posts
-   in the mixed /til/ stream. The base .h-entry:has(.u-bookmark-of) rule
-   above already provides the stone-light inset accent + serif title — this
-   variant upgrades the accent to cloudberry to differentiate "link I
-   curated" from "I wrote this," and normalizes title size + domain-badge
-   treatment so bookmark and TIL cards read as peer content in the stream. */
+/* === TIL card shell (base for .til-card and .til-card--bookmark) ===
+   Mirrors .post-card's padding + border + grid so til-cards and post-cards
+   can co-exist in the same .post-list (homepage lifestream) without
+   collapsing into a broken-masonry visual. Deliberately no ::before
+   hover-accent (unlike .post-card) — bookmark + release variants get
+   their own left-edge inset-shadow accents instead. */
+.til-card {
+  padding: var(--space-lg);
+  border-bottom: var(--border-structural);
+  display: grid;
+  gap: var(--space-xs);
+  transition: background-color 0.2s var(--ease-out);
+  position: relative;
+}
+
+.til-card:hover {
+  background-color: var(--color-canvas-alt);
+}
+
+/* Variant: .til-card--bookmark (links posts).
+   The base .h-entry:has(.u-bookmark-of) rule earlier in the file provides
+   the serif title + smaller size for any bookmark h-entry; this variant
+   layers the cloudberry left-edge accent + domain-badge restyle + external
+   link glyph that differentiate "link I curated" from "I wrote this." */
 
 .til-card--bookmark {
   /* Warm amber left edge — signals external origin (link curated) distinct

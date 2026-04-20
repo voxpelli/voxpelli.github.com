@@ -139,10 +139,11 @@ test('TIL Atom feed exists with valid structure', async () => {
   const feedUpdated = feedUpdatedMatch && feedUpdatedMatch[1] ? feedUpdatedMatch[1] : '';
   assert.match(feedUpdated, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, '<updated> must be ISO datetime');
 
-  // Entries must all be short-form posts: either TIL (/til/) or bookmark-style
-  // links (/links/). SWARM-12 merged links into the TIL superset, so the feed
-  // surfaces both. Reject entries pointing anywhere else (/social/, bare blog
-  // post URLs, etc.) — those belong in /all.xml, not the TIL feed.
+  // Entries must all be short-form posts: TIL (/til/), bookmark-style links
+  // (/links/), or release (/releases/). SWARM-12 merged links into the TIL
+  // superset; SWARM-13 extends the superset to include releases. Reject
+  // entries pointing anywhere else (/social/, bare blog post URLs, etc.) —
+  // those belong in /all.xml or /stream.xml, not the TIL feed.
   const entryPattern = /<entry>[\s\S]*?<\/entry>/g;
   const entries = xml.match(entryPattern) || [];
   for (const entry of entries) {
@@ -150,10 +151,10 @@ test('TIL Atom feed exists with valid structure', async () => {
     const idMatch = entry.match(/<id>([^<]+)<\/id>/);
     const href = linkMatch && linkMatch[1] ? linkMatch[1] : '';
     const entryId = idMatch && idMatch[1] ? idMatch[1] : '';
-    const isShortForm = /\/(?:til|links)\//.test(href) || /\/(?:til|links)\//.test(entryId);
+    const isShortForm = /\/(?:til|links|releases)\//.test(href) || /\/(?:til|links|releases)\//.test(entryId);
     assert.ok(
       isShortForm,
-      `TIL feed entry must be a TIL or links post (href=${href}, id=${entryId})`
+      `TIL feed entry must be a TIL / links / release post (href=${href}, id=${entryId})`
     );
   }
 });
