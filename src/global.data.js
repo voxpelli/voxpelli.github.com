@@ -49,23 +49,45 @@ export default async function globalData ({ pages }) {
     }
   }
 
-  // Categorize posts. tilPosts is a SUPERSET including link posts — TIL is
-  // the user-facing "short-form" section and absorbs bookmark-style link
-  // posts in listings and feeds. linkPosts stays as the strict subset so
-  // /links/ can still render a bookmark-only view. Individual post pages
-  // keep their URL paths (src/links/... vs src/til/...) and their distinct
-  // frontmatter (`mf-bookmark-of` for bookmarks, `via:` for jvns-style
-  // soft citations — TIL author picks per post).
+  // Categorize posts. tilPosts is a SUPERSET including link posts AND release
+  // posts — TIL is the user-facing "short-form" section and absorbs bookmark-
+  // style link posts + release announcements in listings and feeds. linkPosts
+  // and releasePosts stay as strict subsets so /links/ and /releases/ render
+  // their bookmark-only / release-only views. Individual post pages keep
+  // their URL paths (src/links/... vs src/til/... vs src/releases/...) and
+  // their distinct frontmatter (`mf-bookmark-of` for bookmarks and releases,
+  // `via:` for jvns-style soft citations — TIL author picks per post).
   const blogPosts = allPosts.filter(p => !p.category);
   const socialPosts = allPosts.filter(p => p.category === 'social');
   const linkPosts = allPosts.filter(p => p.category === 'links');
-  const tilPosts = allPosts.filter(p => p.category === 'til' || p.category === 'links');
+  const releasePosts = allPosts.filter(p => p.category === 'release');
+  const tilPosts = allPosts.filter(p =>
+    p.category === 'til' || p.category === 'links' || p.category === 'release'
+  );
 
   // Recent posts for feeds
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   const recentLinks = linkPosts.slice(0, 10);
   const recentTils = tilPosts.slice(0, 10);
+  const recentReleases = releasePosts.slice(0, 10);
+
+  // Lifestream — the "everything except social" firehose (homepage + /stream.xml).
+  // Weighted slot selection: blog posts count as 2 slots (they carry more visual
+  // presence per entry), short-form posts (TIL/links/releases) count as 1. Fill
+  // up to 20 slots total. Result is a mixed chronological stream that feels
+  // visually balanced rather than dominated by whichever type posts fastest.
+  const lifestreamCandidates = allPosts.filter(p => p.category !== 'social');
+  /** @type {typeof allPosts} */
+  const lifestreamPosts = [];
+  let lifestreamWeight = 0;
+  const LIFESTREAM_WEIGHT_CAP = 20;
+  for (const post of lifestreamCandidates) {
+    const slots = post.category === undefined ? 2 : 1;
+    if (lifestreamWeight + slots > LIFESTREAM_WEIGHT_CAP) break;
+    lifestreamPosts.push(post);
+    lifestreamWeight += slots;
+  }
 
   // Render all blog posts to get content for excerpts and reading time.
   await Promise.all(blogPosts.map(async (post) => {
@@ -127,11 +149,14 @@ export default async function globalData ({ pages }) {
     blogPosts,
     socialPosts,
     linkPosts,
+    releasePosts,
     tilPosts,
+    lifestreamPosts,
     recentPosts,
     recentEnglishPosts,
     recentLinks,
     recentTils,
+    recentReleases,
     postsByYear,
     allTags,
     tagCounts,

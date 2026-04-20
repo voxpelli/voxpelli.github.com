@@ -25,19 +25,23 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
   // /links/all.xml stays as the strict bookmark-only subset.
-  // /til/feed.atom is the superset — TIL absorbs link posts in the user-facing feed.
-  // Same selector as global.data.js's tilPosts; kept in sync by convention.
+  // /releases/feed.atom stays as the strict release-only subset.
+  // /til/feed.atom is the short-form superset — TIL absorbs link + release posts
+  // in the user-facing feed. /stream.xml is the firehose — everything except
+  // social. Same selectors as global.data.js; kept in sync by convention.
   const recentLinks = allPosts.filter(p => p.category === 'links').slice(0, 10);
+  const recentReleases = allPosts.filter(p => p.category === 'release').slice(0, 10);
   const recentTils = allPosts
-    .filter(p => p.category === 'til' || p.category === 'links')
+    .filter(p => p.category === 'til' || p.category === 'links' || p.category === 'release')
     .slice(0, 10);
+  const recentStream = allPosts.filter(p => p.category !== 'social').slice(0, 20);
 
   // Build page index for O(1) lookup instead of O(n) pages.find() per post
   /** @type {Map<string, typeof pages[0]>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all unique feed posts in parallel, with cache to avoid duplicates
-  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks, ...recentTils].map(p => [p.path, p])).values()];
+  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks, ...recentTils, ...recentReleases, ...recentStream].map(p => [p.path, p])).values()];
   /** @type {Map<string, string>} */
   const renderCache = new Map();
   await Promise.all(allFeedPosts.map(async (post) => {
@@ -115,6 +119,27 @@ ${entries.join('\n')}
       htmlUrl: '/til/',
       subtitle: 'TIL',
       posts: recentTils,
+    }),
+  };
+
+  yield {
+    outputName: 'releases/feed.atom',
+    content: buildFeed({
+      selfUrl: '/releases/feed.atom',
+      htmlUrl: '/releases/',
+      subtitle: 'Releases',
+      posts: recentReleases,
+    }),
+  };
+
+  // Firehose: everything except social posts — the unified stream.
+  yield {
+    outputName: 'stream.xml',
+    content: buildFeed({
+      selfUrl: '/stream.xml',
+      htmlUrl: '/',
+      subtitle: 'Stream',
+      posts: recentStream,
     }),
   };
 }

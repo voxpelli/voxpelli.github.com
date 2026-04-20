@@ -28,6 +28,8 @@ export const CATEGORIES = new Map([
   // /links/ index + /links/all.xml for the archive-style view.
   ['links', { collectionKey: 'tilPosts', feedUrl: '/links/all.xml', indexUrl: '/links/', feedSubtitle: 'Links' }],
   ['til', { collectionKey: 'tilPosts', feedUrl: '/til/feed.atom', indexUrl: '/til/', feedSubtitle: 'TIL' }],
+  // Release posts: dedicated feed + index, absorbs into the /til/ superset too.
+  ['release', { collectionKey: 'releasePosts', feedUrl: '/releases/feed.atom', indexUrl: '/releases/', feedSubtitle: 'Releases' }],
 ]);
 
 /**

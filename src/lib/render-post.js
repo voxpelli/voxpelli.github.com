@@ -31,7 +31,7 @@ export { safePostUrl } from './safe-url.js';
  */
 
 /** @typedef {PostVarsBase & TilPostVarsExtra & Record<string, unknown>} TilPostVars */
-/** @typedef {PostVarsBase & { category?: undefined | 'social' | 'links' } & Record<string, unknown>} BasePostVars */
+/** @typedef {PostVarsBase & { category?: undefined | 'social' | 'links' | 'release' } & Record<string, unknown>} BasePostVars */
 
 /**
  * Discriminated union over post category. Narrowing (e.g. the cast inside
@@ -94,8 +94,11 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
     `);
   }
 
-  // TIL post — compact summary in listings, full content on standalone pages
-  if (post.category === 'til') {
+  // TIL or release post — compact card in listings, full content on
+  // standalone pages. Release posts share the TIL card shape (title →
+  // internal permalink; external GitHub release URL surfaces as "via"
+  // via renderTil's mf-bookmark-of fallback) per SWARM-13 Q3 decision.
+  if (post.category === 'til' || post.category === 'release') {
     return renderTil({
       authorName,
       compact: !standalone,

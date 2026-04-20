@@ -4,7 +4,7 @@ import { renderPost } from './lib/render-post.js';
  * @typedef {{
  *   layout: 'root' | 'article',
  *   title?: string,
- *   category?: 'social' | 'links' | 'til',
+ *   category?: 'social' | 'links' | 'til' | 'release',
  *   frontpage?: boolean,
  *   hfeed?: boolean,
  *   webmentionable?: boolean,
@@ -24,9 +24,12 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
  * @returns {string}
  */
 export default function homePage ({ vars: pageVars }) {
-  const recentPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.recentPosts) || [];
+  // Homepage renders the lifestream — blog posts + TIL + links + releases
+  // in one chronological stream. Weight-capped at 20 slots in global.data.js
+  // (blog = 2 slots, others = 1). Social posts excluded.
+  const lifestreamPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.lifestreamPosts) || [];
 
-  const postListItems = recentPosts.map(post =>
+  const postListItems = lifestreamPosts.map(post =>
     renderPost({
       post,
       content: /** @type {string} */ (post.content) || '',

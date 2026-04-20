@@ -42,7 +42,14 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
   // escape hatch for topic/via. Narrowing by category check would also work but
   // cost a useless runtime branch on every render.
   const post = /** @type {TilPostVars} */ (rawPost);
-  const via = post.via;
+  // Accept either `via:` (TIL soft citation) or `mf-bookmark-of` (release /
+  // bookmark target). Release posts shipped in SWARM-13 use mf-bookmark-of to
+  // point at the GitHub release URL; surfacing it as "via github.com" in the
+  // compact card gives readers a direct source link without a dedicated
+  // release-card variant.
+  const bookmarkOf = Array.isArray(rawPost['mf-bookmark-of']) ? rawPost['mf-bookmark-of'] : undefined;
+  const bookmarkOfFirst = typeof bookmarkOf?.[0] === 'string' ? bookmarkOf[0] : undefined;
+  const via = post.via || bookmarkOfFirst;
   const viaSafe = via ? safePostUrl(via) : '';
   const topic = post.topic;
 
