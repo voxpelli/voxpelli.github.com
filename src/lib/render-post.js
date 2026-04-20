@@ -179,21 +179,25 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
     ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'My full bookmark notes' })
     : '';
 
+  // Density pass: header (pill + title), body (excerpt), footer rail
+  // (date + domain-badge + tags). Mirrors renderTil structure.
   return renderToStringSync(html`
     <article class="h-entry til-card til-card--bookmark" lang=${lang}>
-        <div class="post-meta">
+        <div class="til-card-header">
           <a class="post-type-badge post-type-badge--link" href="/links/">LINK</a>
-          <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
-          <span class="p-category" hidden>links</span>
-          ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}
+          <h3 class="post-title p-name">
+            ${safeBookmarkUrl
+              ? html`<a class="u-bookmark-of" href=${safeBookmarkUrl}>${post.title || ''}</a>`
+              : html`<a class="u-url u-uid" href=${safeUrl}>${post.title || ''}</a>`}
+          </h3>
         </div>
-        <h3 class="post-title p-name">
-          ${safeBookmarkUrl
-            ? html`<a class="u-bookmark-of" href=${safeBookmarkUrl}>${post.title || ''}</a>`
-            : html`<a class="u-url u-uid" href=${safeUrl}>${post.title || ''}</a>`}
-        </h3>
+        <span class="p-category" hidden>links</span>
         ${rawHtml(excerptHtml)}
-        ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+        <div class="til-card-footer">
+          <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
+          ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}
+          ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+        </div>
       </article>
   `);
 }

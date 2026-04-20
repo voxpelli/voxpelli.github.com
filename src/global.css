@@ -1598,6 +1598,61 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   padding-inline-start: calc(var(--space-md) + 3px);
 }
 
+/* Header row: pill + title. Baseline-align so the mono pill sits on the
+   serif title's text baseline rather than above it. Wrap-friendly so long
+   titles don't push the pill off-screen at 375px. */
+.til-card-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.til-card-header .post-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Pill sits above the .post-title a::after cover-link overlay. Same
+   escape-hatch pattern as .post-read-more. */
+.til-card-header .post-type-badge {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+}
+
+/* Footer rail: date + topic + via-domain + tags on one low-weight row.
+   Mono/xs/ink-light unifies the metadata visually. All interactive
+   descendants escape the card-cover-link overlay via z-index. */
+.til-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-ink-light);
+}
+
+.til-card-footer a,
+.til-card-footer .linklist {
+  position: relative;
+  z-index: 1;
+}
+
+/* Inside the compact footer rail, the "Tags:" label reads as form-field
+   scaffolding next to date and domain. Drop it visually; the tag chips
+   still read as tags. Keep the string in DOM for screen readers. */
+.til-card-footer .linklist strong {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* Variant: .til-card--bookmark (links posts).
    The base .h-entry:has(.u-bookmark-of) rule earlier in the file provides
    the serif title + smaller size for any bookmark h-entry; this variant
@@ -1616,13 +1671,15 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   font-size: var(--fs-h2);
 }
 
-.til-card--bookmark .domain-badge {
-  /* Audit P1: .domain-badge + .til-topic looked identical as clickable pills.
-     Strip affordance: inline flow, no border/bg, ink-light for secondary weight. */
+.til-card-footer .domain-badge {
+  /* Footer rail: inline flow next to date + tags. Strip block/margin from
+     the base .domain-badge rule, inherit footer font/colour vocabulary.
+     Applies to both bookmark (aria-hidden span) and release/TIL (u-bookmark-of
+     link) domain-badge usages in the compact card footer. */
   display: inline;
   margin-top: 0;
-  color: var(--color-ink-light);
-  font-size: var(--fs-xs);
+  color: inherit;
+  font-size: inherit;
 }
 
 .til-card--bookmark .p-name a.u-bookmark-of::after {
@@ -1652,7 +1709,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   /* Long domains (e.g. aaronparecki.com, githubengineering.com) can force
      overflow at 375px. Cap + ellipsis; domain is aria-hidden, so truncation
      is purely cosmetic and doesn't lose screen-reader info. */
-  .til-card--bookmark .domain-badge {
+  .til-card-footer .domain-badge {
     max-width: 16ch;
     overflow: hidden;
     text-overflow: ellipsis;
