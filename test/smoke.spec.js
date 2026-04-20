@@ -139,7 +139,10 @@ test('TIL Atom feed exists with valid structure', async () => {
   const feedUpdated = feedUpdatedMatch && feedUpdatedMatch[1] ? feedUpdatedMatch[1] : '';
   assert.match(feedUpdated, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, '<updated> must be ISO datetime');
 
-  // Entries (if any) must all be TIL posts — <id> should include /til/ path
+  // Entries must all be short-form posts: either TIL (/til/) or bookmark-style
+  // links (/links/). SWARM-12 merged links into the TIL superset, so the feed
+  // surfaces both. Reject entries pointing anywhere else (/social/, bare blog
+  // post URLs, etc.) — those belong in /all.xml, not the TIL feed.
   const entryPattern = /<entry>[\s\S]*?<\/entry>/g;
   const entries = xml.match(entryPattern) || [];
   for (const entry of entries) {
@@ -147,11 +150,28 @@ test('TIL Atom feed exists with valid structure', async () => {
     const idMatch = entry.match(/<id>([^<]+)<\/id>/);
     const href = linkMatch && linkMatch[1] ? linkMatch[1] : '';
     const entryId = idMatch && idMatch[1] ? idMatch[1] : '';
+    const isShortForm = /\/(?:til|links)\//.test(href) || /\/(?:til|links)\//.test(entryId);
     assert.ok(
-      href.includes('/til/') || entryId.includes('/til/'),
-      `TIL feed entry must be a TIL post (href=${href}, id=${entryId})`
+      isShortForm,
+      `TIL feed entry must be a TIL or links post (href=${href}, id=${entryId})`
     );
   }
+});
+
+test('TIL feed is the SWARM-12 superset — includes /links/ entries', async () => {
+  // Regression fence: /til/feed.atom absorbs link posts. /links/all.xml stays
+  // strict. This test documents the merge shape — if a future revert removes
+  // the superset aggregation, this test catches it.
+  const tilFeed = await readFile('public/til/feed.atom', 'utf8');
+  const linkEntries = (tilFeed.match(/<entry>[\s\S]*?\/links\/[\s\S]*?<\/entry>/g) || []).length;
+  assert.ok(linkEntries > 0, 'TIL feed must include at least one /links/ entry after SWARM-12 merge');
+
+  // Companion assertion: /links/all.xml stays strict. It must NOT contain
+  // any /til/ entries (the subset-view is unchanged; TIL entries belong
+  // in the superset feed, not the other way around).
+  const linksFeed = await readFile('public/links/all.xml', 'utf8');
+  const tilEntriesInLinks = (linksFeed.match(/<entry>[\s\S]*?\/til\/[\s\S]*?<\/entry>/g) || []).length;
+  assert.equal(tilEntriesInLinks, 0, '/links/all.xml must not contain /til/ entries — subset is strict');
 });
 
 test('article page has webmention form', async () => {
@@ -407,12 +427,19 @@ test('TIL card subcomponents (til-topic link + relative-time)', async () => {
   const hasCard = tilIndexHtml.includes('til-card');
   if (!hasCard) return; // Prod build with drafts excluded — no cards to check
 
-  // til-topic link pattern — <a class="til-topic" href="/til/topics/<slug>/">
-  assert.match(
-    tilIndexHtml,
-    /<a class="til-topic" href="\/til\/topics\/[^"/]+\/"/,
-    'TIL card must have .til-topic link pointing to /til/topics/<slug>/'
-  );
+  // til-topic link pattern — <a class="til-topic" href="/til/topics/<slug>/">.
+  // Only present on TIL-proper cards (not .til-card--bookmark variants —
+  // links posts use .domain-badge instead of .til-topic). If no til-topic
+  // is rendered at all (e.g. prod build where TIL drafts excluded and only
+  // bookmark-style links cards remain), skip the assertion rather than
+  // false-fail on a valid mixed listing.
+  if (tilIndexHtml.includes('class="til-topic"')) {
+    assert.match(
+      tilIndexHtml,
+      /<a class="til-topic" href="\/til\/topics\/[^"/]+\/"/,
+      'TIL card .til-topic link must target /til/topics/<slug>/'
+    );
+  }
 
   // <relative-time> wraps the <time class="dt-published">
   assert.match(

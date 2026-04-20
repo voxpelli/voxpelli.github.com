@@ -49,11 +49,17 @@ export default async function globalData ({ pages }) {
     }
   }
 
-  // Categorize posts
+  // Categorize posts. tilPosts is a SUPERSET including link posts — TIL is
+  // the user-facing "short-form" section and absorbs bookmark-style link
+  // posts in listings and feeds. linkPosts stays as the strict subset so
+  // /links/ can still render a bookmark-only view. Individual post pages
+  // keep their URL paths (src/links/... vs src/til/...) and their distinct
+  // frontmatter (`mf-bookmark-of` for bookmarks, `via:` for jvns-style
+  // soft citations — TIL author picks per post).
   const blogPosts = allPosts.filter(p => !p.category);
   const socialPosts = allPosts.filter(p => p.category === 'social');
   const linkPosts = allPosts.filter(p => p.category === 'links');
-  const tilPosts = allPosts.filter(p => p.category === 'til');
+  const tilPosts = allPosts.filter(p => p.category === 'til' || p.category === 'links');
 
   // Recent posts for feeds
   const recentPosts = blogPosts.slice(0, 10);

@@ -24,8 +24,13 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const blogPosts = allPosts.filter(p => !p.category);
   const recentPosts = blogPosts.slice(0, 10);
   const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
+  // /links/all.xml stays as the strict bookmark-only subset.
+  // /til/feed.atom is the superset — TIL absorbs link posts in the user-facing feed.
+  // Same selector as global.data.js's tilPosts; kept in sync by convention.
   const recentLinks = allPosts.filter(p => p.category === 'links').slice(0, 10);
-  const recentTils = allPosts.filter(p => p.category === 'til').slice(0, 10);
+  const recentTils = allPosts
+    .filter(p => p.category === 'til' || p.category === 'links')
+    .slice(0, 10);
 
   // Build page index for O(1) lookup instead of O(n) pages.find() per post
   /** @type {Map<string, typeof pages[0]>} */

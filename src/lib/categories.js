@@ -22,7 +22,11 @@
 export const CATEGORIES = new Map([
   [undefined, { collectionKey: 'blogPosts', feedUrl: '/all.xml', indexUrl: '/', feedSubtitle: '' }],
   ['social', { collectionKey: 'socialPosts', feedUrl: '', indexUrl: '/social/', feedSubtitle: 'Social' }],
-  ['links', { collectionKey: 'linkPosts', feedUrl: '/links/all.xml', indexUrl: '/links/', feedSubtitle: 'Links' }],
+  // 'links' points at tilPosts (the superset) so prev/next on a links
+  // article walks the full merged stream — consistent with /til/ being
+  // the user-facing aggregation. The strict linkPosts subset still backs
+  // /links/ index + /links/all.xml for the archive-style view.
+  ['links', { collectionKey: 'tilPosts', feedUrl: '/links/all.xml', indexUrl: '/links/', feedSubtitle: 'Links' }],
   ['til', { collectionKey: 'tilPosts', feedUrl: '/til/feed.atom', indexUrl: '/til/', feedSubtitle: 'TIL' }],
 ]);
 

@@ -1567,6 +1567,63 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   color: var(--color-ink);
 }
 
+/* === TIL/bookmark card variant (merged /til/ superset) ===
+   renderBookmarkCard emits .til-card .til-card--bookmark for links posts
+   in the mixed /til/ stream. The base .h-entry:has(.u-bookmark-of) rule
+   above already provides the stone-light inset accent + serif title — this
+   variant upgrades the accent to cloudberry to differentiate "link I
+   curated" from "I wrote this," and normalizes title size + domain-badge
+   treatment so bookmark and TIL cards read as peer content in the stream. */
+
+.til-card--bookmark {
+  /* Warm amber left edge — signals external origin (link curated) distinct
+     from the structural stone accent on the base bookmark rule. */
+  box-shadow: inset 3px 0 0 var(--color-cloudberry);
+}
+
+.til-card--bookmark .p-name {
+  /* Match TIL card title size. Audit P1: 24px vs 30px reads as unintended
+     hierarchy; bookmarks are peer content, accent does the differentiation. */
+  font-size: var(--fs-h2);
+}
+
+.til-card--bookmark .domain-badge {
+  /* Audit P1: .domain-badge + .til-topic looked identical as clickable pills.
+     Strip affordance: inline flow, no border/bg, ink-light for secondary weight. */
+  display: inline;
+  margin-top: 0;
+  color: var(--color-ink-light);
+  font-size: var(--fs-xs);
+}
+
+.til-card--bookmark .p-name a.u-bookmark-of::after {
+  /* External-link glyph (P2 audit): NBSP + ↗ after bookmark title so readers
+     see the title goes off-site. Cloudberry ties it to the left-edge accent.
+     position:static + inset:auto overrides the base .post-title a::after
+     cover-link trick (which stretches the anchor over the whole card). */
+  content: '\00A0\2197';
+  font-size: 0.8em;
+  color: var(--color-cloudberry);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  position: static;
+  inset: auto;
+}
+
+@media (max-width: 500px) {
+  /* Long domains (e.g. aaronparecki.com, githubengineering.com) can force
+     overflow at 375px. Cap + ellipsis; domain is aria-hidden, so truncation
+     is purely cosmetic and doesn't lose screen-reader info. */
+  .til-card--bookmark .domain-badge {
+    max-width: 16ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
+
 /* Like grouping: override content-area section padding for compact likes */
 .content-area > .likelist {
   padding: var(--space-sm) var(--space-lg);
