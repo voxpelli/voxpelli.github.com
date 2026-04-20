@@ -169,10 +169,11 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
   const excerptResult = content ? extractExcerpt(content) : undefined;
-  // "My notes →" signals the permalink is commentary, not the primary
-  // destination. The bookmark title (above) already links external.
+  // "My full bookmark notes →" signals the permalink carries the full
+  // commentary (more than fits in the card excerpt). Title (above) already
+  // targets the external bookmark-of URL.
   const excerptHtml = excerptResult
-    ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'My notes' })
+    ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'My full bookmark notes' })
     : '';
 
   return renderToStringSync(html`
