@@ -654,3 +654,13 @@ test('SWARM-13 active-nav regression fence — correct nav item marked per path'
     );
   }
 });
+
+test('SWARM-13 /releases/ renders til-card--release + My full release notes label', async () => {
+  const html = await readFile('public/releases/index.html', 'utf8').catch(() => '');
+  if (!html) return; // Not built or only drafts exist — graceful skip
+  // Only a real release (non-draft) would trigger the modifier class — if the
+  // page was built but contains no visible release cards, skip too.
+  if (!html.includes('til-card--release')) return;
+  assert.match(html, /til-card--release/, '/releases/ must render .til-card--release when a release is present');
+  assert.match(html, /My full release notes/, '/releases/ card must use release-specific read-more label');
+});

@@ -101,13 +101,15 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
 
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);
 
+  const isRelease = rawPost.category === 'release';
+
   const excerptResult = content ? extractExcerpt(content) : undefined;
   const excerptHtml = excerptResult
-    ? renderTilExcerpt(excerptResult, postUrl)
+    ? renderTilExcerpt(excerptResult, postUrl, isRelease ? { readMoreLabel: 'My full release notes' } : {})
     : '';
 
   return renderToStringSync(html`
-    <article class="h-entry til-card" lang=${lang}>
+    <article class=${isRelease ? 'h-entry til-card til-card--release' : 'h-entry til-card'} lang=${lang}>
         <div class="post-meta">
           <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
           <span class="p-category" hidden>til</span>
@@ -128,16 +130,19 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
  *
  * @param {import('./excerpt.js').ExcerptResult} result
  * @param {string} postUrl
+ * @param {object} [options]
+ * @param {string} [options.readMoreLabel] - Label for the read-more link (default: 'Read full TIL')
  * @returns {string}
  */
-function renderTilExcerpt (result, postUrl) {
+function renderTilExcerpt (result, postUrl, options = {}) {
+  const { readMoreLabel = 'Read full TIL' } = options;
   const mfClass = result.truncated ? 'p-summary' : 'e-content';
   const fade = result.truncated
     ? '<div class="post-excerpt-fade" aria-hidden="true"></div>'
     : '';
   const href = safeHref(postUrl);
   const readMore = result.truncated && href
-    ? `<a class="post-read-more" href="${href}">Read full TIL \u2192</a>`
+    ? `<a class="post-read-more" href="${href}">${readMoreLabel} \u2192</a>`
     : '';
   return `<div class="post-excerpt ${mfClass}">${result.html}${fade}</div>${readMore}`;
 }

@@ -1627,6 +1627,16 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   inset: auto;
 }
 
+/* Variant: .til-card--release (release notes posts).
+   Falu-red left-edge accent signals a product-release post (npm package
+   shipped, GitHub release), distinct from cloudberry bookmarks and the
+   base stone TIL. */
+
+.til-card--release {
+  box-shadow: inset 3px 0 0 var(--color-falu-red);
+  padding-inline-start: calc(var(--space-lg) + 3px);
+}
+
 @media (max-width: 500px) {
   /* Long domains (e.g. aaronparecki.com, githubengineering.com) can force
      overflow at 375px. Cap + ellipsis; domain is aria-hidden, so truncation
