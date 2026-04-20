@@ -1745,6 +1745,15 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
       grid-template-columns: subgrid;
     }
 
+    /* Til-cards live alongside post-cards on the homepage lifestream. They
+       don't participate in the archive's 3-column subgrid (date/title/tags)
+       — they have their own internal layout. Force full-width span + single-
+       column internal grid so they stack cleanly in the column flow. */
+    .post-list > .til-card {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+    }
+
     /* Excerpt cards need vertical stacking, not 3-column subgrid */
     .post-list > .post-card:has(.post-excerpt) {
       grid-template-columns: 1fr;
