@@ -5,9 +5,10 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "build": "domstack --copy images --copy media && sed \"s/__BUILD_VERSION__/$(git rev-parse --short HEAD)/\" sw.js > public/sw.js && cp public/404/index.html public/404.html",
+    "clean:hashed": "rm -f public/global-*.css public/global.client-*.js",
+    "build": "npm run clean:hashed && domstack --copy images --copy media && sed \"s/__BUILD_VERSION__/$(git rev-parse --short HEAD)/\" sw.js > public/sw.js && cp public/404/index.html public/404.html",
     "dev": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --copy images --copy media",
-    "build:drafts": "domstack --drafts --copy images --copy media",
+    "build:drafts": "npm run clean:hashed && domstack --drafts --copy images --copy media",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
     "check:tsc-browser": "tsc -p tsconfig.browser.json",
