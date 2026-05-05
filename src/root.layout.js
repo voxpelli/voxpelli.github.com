@@ -1,5 +1,8 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
+import { escapeXml } from './lib/escape.js';
+import { safePostUrl } from './lib/safe-url.js';
+
 /**
  * Path-based active-nav predicate.
  * - Home matches only exactly `/`.
@@ -111,12 +114,12 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
     ${vars.frontpage
       ? html`
-        ${pushHub ? html`<link rel="hub" href=${pushHub} />` : ''}
-        ${micropubEndpoint ? html`<link rel="micropub" href=${micropubEndpoint} />` : ''}
+        ${pushHub ? html`<link rel="hub" href=${safePostUrl(pushHub)} />` : ''}
+        ${micropubEndpoint ? html`<link rel="micropub" href=${safePostUrl(micropubEndpoint)} />` : ''}
       `
       : ''}
     ${vars.author ? html`<link rel="author" type="text/html" href="/" title=${authorName} />` : ''}
-    ${vars.webmentionable ? html`<link rel="webmention" href=${`${webmentionEndpoint}/api/webmention`} />` : ''}
+    ${vars.webmentionable ? html`<link rel="webmention" href=${safePostUrl(`${webmentionEndpoint}/api/webmention`)} />` : ''}
   `);
 
   const navHtml = navItems.map(item => renderToStringSync(html`
@@ -180,11 +183,12 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
     ${scripts.map(src => html`<script type="module" src=${src}></script>`)}
   `);
 
-  // Classes from page vars are sanitized to prevent attribute breakout
-  const classes = String(vars.classes || '').replaceAll('"', '');
+  // Classes from page vars are HTML-encoded — escapeXml covers all five
+  // attribute-breaker chars. Stripping `"` alone leaves `<` / `>` paths open.
+  const classes = escapeXml(String(vars.classes || ''));
 
   return `<!DOCTYPE html>
-<html lang="${lang}" class="no-js${classes ? ` ${classes}` : ''}">
+<html lang="${escapeXml(lang)}" class="no-js${classes ? ` ${classes}` : ''}">
 <head>${headContent}</head>
 <body>${bodyContent}</body>
 </html>`;

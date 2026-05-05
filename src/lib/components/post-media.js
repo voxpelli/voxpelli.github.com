@@ -1,5 +1,7 @@
 import { html } from 'async-htm-to-string';
 
+import { safePostUrl } from '../safe-url.js';
+
 /**
  * Render video or photo media block.
  *
@@ -13,8 +15,8 @@ export function PostMedia ({ photos, videos }) {
     return html`
       <div class="media">
             ${videos.map(v => html`
-              <video class="u-video" src=${v} controls loop>
-                      <p lang="en">Looks like you can't see this video. <a href=${v} download>Download it</a> instead.</p>
+              <video class="u-video" src=${safePostUrl(v)} controls loop>
+                      <p lang="en">Looks like you can't see this video. <a href=${safePostUrl(v)} download>Download it</a> instead.</p>
                     </video>
             `)}
           </div>
@@ -23,7 +25,7 @@ export function PostMedia ({ photos, videos }) {
   if (photos && photos.length > 0) {
     return html`
       <div class="media">
-            ${photos.map(p => html`<img class="u-photo" src=${p} alt="" />`)}
+            ${photos.map(p => html`<img class="u-photo" src=${safePostUrl(p)} alt="" />`)}
           </div>
     `;
   }

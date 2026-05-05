@@ -1,5 +1,14 @@
 import { CATEGORIES } from './lib/categories.js';
 import { filterAndSortPosts } from './lib/posts.js';
+import { safePostUrl } from './lib/safe-url.js';
+
+// URL-bearing frontmatter fields scanned by the parse-time warning layer.
+// Listed once so the warning loop and any future schema docs share a source.
+const URL_FIELDS = [
+  'mf-bookmark-of', 'mf-in-reply-to', 'mf-like-of', 'mf-repost-of',
+  'mf-photo', 'mf-video', 'mf-syndication',
+  'via', 'persontags', 'submitto',
+];
 
 /**
  * @typedef {object} PageData
@@ -33,6 +42,30 @@ export default async function globalData ({ pages }) {
       submitto: vars?.submitto,
     };
   });
+
+  // Parse-time URL safety warning layer — non-mutating. Calls safePostUrl
+  // on every URL-bearing frontmatter field; if the result is '' for a
+  // non-empty input, the URL was rejected (hostile scheme, malformed) and
+  // we surface the post path + field. Render code remains the source of
+  // truth for context-aware encoding (HTML attrs vs XML feeds vs JS forms),
+  // so we don't mutate the post — the warning is just a build-time canary.
+  for (const post of allPosts) {
+    const record = /** @type {Record<string, unknown>} */ (post);
+    for (const field of URL_FIELDS) {
+      const value = record[field];
+      if (!value) continue;
+      const urls = Array.isArray(value) ? value : [value];
+      for (const url of urls) {
+        if (typeof url !== 'string' || !url) continue;
+        if (safePostUrl(url) === '') {
+          // eslint-disable-next-line no-console -- Build-time warning to stderr.
+          console.warn(
+            `URL safety: ${String(post.path)} field "${field}" contains a rejected URL: ${JSON.stringify(url)} — render layer will emit empty href`
+          );
+        }
+      }
+    }
+  }
 
   // Runtime drift guard — fail build if a post carries an unregistered
   // category. Prevents silent "new category added, registry not updated"

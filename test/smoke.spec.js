@@ -696,6 +696,26 @@ test('SWARM-13 bookmark card pill badge links back to /links/', async () => {
   );
 });
 
+test('XSS: built output contains no javascript:/data:/vbscript: URLs in href/src attrs', async () => {
+  // End-to-end backstop for the URL safety convention: walk every built HTML
+  // and feed file under public/ and assert that no hostile URL scheme survived
+  // attribute-position rendering. async-htm-to-string's html`` tag escapes
+  // <>"'& but NOT URL schemes, so this is the only smoke test that catches a
+  // bypass-safePostUrl regression in the full render pipeline. Pairs with the
+  // local/no-unsafe-url-interpolation ESLint rule (write-time prevention).
+  const HOSTILE_RE = /(?:href|src)="\s*(?:javascript|data|vbscript|file):/i;
+  const entries = await readdir('public', { recursive: true, withFileTypes: true });
+  const files = entries
+    .filter(e => e.isFile() && /\.(?:html|xml|atom)$/.test(e.name))
+    .map(e => `${e.parentPath}/${e.name}`);
+
+  for (const file of files) {
+    const content = await readFile(file, 'utf8');
+    const m = HOSTILE_RE.exec(content);
+    assert.ok(!m, `${file} contains hostile URL scheme: ${m && m[0]}`);
+  }
+});
+
 test('SWARM-13 release card pill badge links back to /releases/', async () => {
   // Agent C3: release cards carry a .post-type-badge.post-type-badge--release
   // anchor that links to /releases/. Cascade-skip when the page has no

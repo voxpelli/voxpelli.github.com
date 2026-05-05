@@ -3,6 +3,7 @@
 import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { PostFooter } from './render-post-footer.js';
+import { safePostUrl } from './safe-url.js';
 import { extractFullDomain, parseDateSafe } from './utils.js';
 
 /**
@@ -19,7 +20,7 @@ export function renderPostLike ({ authorName, compact, post }) {
     const isSecondToLast = i === likes.length - 2;
     const isLast = i === likes.length - 1;
     const suffix = isSecondToLast ? ' and ' : (!isLast ? ', ' : '');
-    return html`<a class="u-like-of" href=${like}>${extractFullDomain(like)}</a>${suffix}`;
+    return html`<a class="u-like-of" href=${safePostUrl(like)}>${extractFullDomain(like)}</a>${suffix}`;
   });
 
   if (compact) {
@@ -32,7 +33,7 @@ export function renderPostLike ({ authorName, compact, post }) {
       <p class="h-entry">
         <span class="p-name">Liked${' '}${likeLinks}</span>${' \u2014 '}
         <time class="dt-published" datetime=${isoDate}>
-          <a class="u-url u-uid" href=${pageUrl}>${shortDate}</a>
+          <a class="u-url u-uid" href=${safePostUrl(pageUrl)}>${shortDate}</a>
         </time>
       </p>
     `);

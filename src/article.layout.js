@@ -2,6 +2,7 @@ import { html, renderToStringSync } from 'async-htm-to-string';
 
 import { getCategoryCollection } from './lib/categories.js';
 import { renderPost } from './lib/render-post.js';
+import { safePostUrl } from './lib/safe-url.js';
 import rootLayout from './root.layout.js';
 
 /**
@@ -35,7 +36,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
 
   const webmentionForm = renderToStringSync(html`
     <section class="webmention-form">
-      <form action=${`${wmEndpoint}/api/webmention`} method="post">
+      <form action=${safePostUrl(`${wmEndpoint}/api/webmention`)} method="post">
         <label for="webmention-source">Have you written a response to this? Let me know the URL:</label>
         <input id="webmention-source" name="source" type="url" placeholder="http://example.com/my-cool-post" />
         <input name="target" value=${`${vars.siteUrl}${pageUrl}`} type="hidden" />
@@ -43,7 +44,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
       </form>
     </section>
 
-    <script defer src=${`${wmEndpoint}/js/cutting-edge.js`}></script>
+    <script defer src=${safePostUrl(`${wmEndpoint}/js/cutting-edge.js`)}></script>
   `);
 
   // Find adjacent posts for prev/next navigation (scoped to same content category).
@@ -63,7 +64,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
       <nav class="post-nav" aria-label="Post navigation">
         ${prevPost
           ? html`
-            <a class="post-nav-link post-nav-prev" href=${String(prevPost.pageUrl || '')} rel="prev">
+            <a class="post-nav-link post-nav-prev" href=${safePostUrl(String(prevPost.pageUrl || ''))} rel="prev">
               <span class="post-nav-label">Older</span>
               <span class="post-nav-title">${String(prevPost.title || '')}</span>
             </a>
@@ -71,7 +72,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
           : ''}
         ${nextPost
           ? html`
-            <a class="post-nav-link post-nav-next" href=${String(nextPost.pageUrl || '')} rel="next">
+            <a class="post-nav-link post-nav-next" href=${safePostUrl(String(nextPost.pageUrl || ''))} rel="next">
               <span class="post-nav-label">Newer</span>
               <span class="post-nav-title">${String(nextPost.title || '')}</span>
             </a>
