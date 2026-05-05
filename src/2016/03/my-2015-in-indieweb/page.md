@@ -28,7 +28,7 @@ With [Micropub](http://indiewebcamp.com/micropub) becoming the standard API with
 
 By connecting those I got a service with which I could finally accept posts to my blog from tools like [OwnYourGram](http://ownyourgram.com/) and [Quill](https://quill.p3k.io). I even got support for uploading images and videos that are part of those posts.
 
-My [Jekyll theme](https://github.com/voxpelli/voxpelli.github.com) also got extended so that it could present the now much more rich posts in an appropriate way, through some more [complex templating](https://github.com/voxpelli/voxpelli.github.com/blob/master/_includes/post.html), and I also added two new lists on my site, [Links](http://voxpelli.com/links/) and [Social](http://voxpelli.com/social/), so any non-blog content had somewhere to go.
+My [Jekyll theme](https://github.com/voxpelli/voxpelli.github.com) also got extended so that it could present the now much more rich posts in an appropriate way, through some more [complex templating](https://github.com/voxpelli/voxpelli.github.com/blob/e2b2b6f/_includes/post.html), and I also added two new lists on my site, [Links](http://voxpelli.com/links/) and [Social](http://voxpelli.com/social/), so any non-blog content had somewhere to go.
 
 I've yet to polish the glue that binds the three modules into a service and the Jekyll templates that renders the posts. When I have they will be released as their own projects as well.
 
