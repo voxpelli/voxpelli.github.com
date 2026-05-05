@@ -19,7 +19,6 @@
     "*.config.js"
   ],
   "ignoreDependencies": [
-    "serve",
-    "axe-core"
+    "serve"
   ]
 }

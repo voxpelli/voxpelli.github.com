@@ -35,12 +35,12 @@ const ALLOWED_MEMBER_PATHS = new Set([
 const PASSTHROUGH_CALLEES = new Set(['String']);
 
 /**
- * @param {object} node
+ * @param {import('estree').Node} node
  * @returns {string | undefined}
  */
 function memberPath (node) {
   const parts = [];
-  let cur = /** @type {Record<string, any>} */ (node);
+  let cur = /** @type {import('estree').Expression} */ (node);
   while (cur.type === 'MemberExpression' && !cur.computed) {
     if (cur.property.type !== 'Identifier') return;
     parts.unshift(cur.property.name);
@@ -53,7 +53,7 @@ function memberPath (node) {
 }
 
 /**
- * @param {Record<string, any> | null | undefined} node
+ * @param {import('estree').Node | null | undefined} node
  * @returns {boolean}
  */
 function isAllowedExpr (node) {
@@ -103,7 +103,7 @@ const noUnsafeUrlInterpolation = {
    */
   create (context) {
     return {
-      /** @param {Record<string, any>} node */
+      /** @param {import('estree').TaggedTemplateExpression} node */
       TaggedTemplateExpression (node) {
         if (node.tag.type !== 'Identifier' || node.tag.name !== 'html') return;
         const { expressions, quasis } = node.quasi;
