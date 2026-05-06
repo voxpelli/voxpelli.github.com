@@ -3,11 +3,13 @@ import { escapeXml } from './escape.js';
 /**
  * Restrict postUrl to safe schemes before href interpolation.
  *
- * Accepts same-origin absolute paths (starting with `/`) and explicit
- * http(s): URLs. Anything else (including `javascript:` and `data:`) returns
- * an empty string so callers can omit the link entirely. `encodeURI` alone is
- * NOT a safe guard — it does not encode `:` or `<`/`>`, so a `javascript:`
- * payload would survive unchanged.
+ * Accepts same-origin absolute paths (starting with a single `/`) and
+ * explicit http(s): URLs. Rejects (returns '') for: dangerous schemes
+ * (javascript:, data:, vbscript:, file:), protocol-relative URLs
+ * (//evil.com — these resolve to external origins under the page's scheme,
+ * so they are NOT same-origin despite the leading `/`), and unparseable
+ * inputs. `encodeURI` alone is NOT a safe guard — it does not encode `:`
+ * or `<`/`>`, so a `javascript:` payload would survive unchanged.
  *
  * Use from `html` tagged-template href positions — the template engine will
  * handle attribute escaping. For raw-string concatenation into an attribute,
@@ -24,7 +26,10 @@ export function safePostUrl (url) {
   // encoding the space into %20 and keeping them usable.
   url = url.trim();
   if (!url) return '';
-  if (url.startsWith('/')) return encodeURI(url);
+  // Same-origin path: starts with `/` but NOT `//`. Protocol-relative URLs
+  // (`//evil.com/x`) start with `/` too, but resolve to external origins —
+  // they're an open-redirect vector if accepted as same-origin.
+  if (url.startsWith('/') && !url.startsWith('//')) return encodeURI(url);
   try {
     const parsed = new URL(url);
     if (parsed.protocol === 'https:' || parsed.protocol === 'http:') return encodeURI(url);

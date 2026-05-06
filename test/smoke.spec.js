@@ -519,6 +519,11 @@ test('XSS: safePostUrl allowlists safe schemes for href interpolation', async ()
   assert.equal(safePostUrl('vbscript:msgbox(1)'), '');
   assert.equal(safePostUrl('file:///etc/passwd'), '');
 
+  // Protocol-relative URL — rejected. //evil.com starts with `/` but resolves
+  // to an external origin under the page's scheme, so it is NOT same-origin.
+  assert.equal(safePostUrl('//evil.com/path'), '');
+  assert.equal(safePostUrl('//cdn.example.com/x.js'), '');
+
   // Empty / nullish — empty string.
   assert.equal(safePostUrl(''), '');
   /** @type {string | undefined} */
@@ -703,7 +708,11 @@ test('XSS: built output contains no javascript:/data:/vbscript: URLs in href/src
   // <>"'& but NOT URL schemes, so this is the only smoke test that catches a
   // bypass-safePostUrl regression in the full render pipeline. Pairs with the
   // local/no-unsafe-url-interpolation ESLint rule (write-time prevention).
-  const HOSTILE_RE = /(?:href|src)="\s*(?:javascript|data|vbscript|file):/i;
+  // Cover the same URL attribute set as the local/no-unsafe-url-interpolation
+  // ESLint rule (eslint.config.js URL_ATTR_RE) so write-time and built-output
+  // gates protect the same surface. Adds `action` (webmention forms), plus
+  // formaction/poster/cite/manifest for completeness.
+  const HOSTILE_RE = /(?:href|src|action|formaction|poster|cite|manifest)="\s*(?:javascript|data|vbscript|file):/i;
   const entries = await readdir('public', { recursive: true, withFileTypes: true });
   const files = entries
     .filter(e => e.isFile() && /\.(?:html|xml|atom)$/.test(e.name))

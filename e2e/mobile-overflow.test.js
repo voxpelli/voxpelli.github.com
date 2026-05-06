@@ -24,7 +24,15 @@ test.describe('Mobile horizontal overflow @ 375px', () => {
 
   for (const { label, path } of fixtures) {
     test(`no horizontal scroll @ ${path} (${label})`, async ({ page }) => {
-      await page.goto(path);
+      // Status guard: a 404 trivially passes scrollWidth <= clientWidth, so
+      // a moved/renamed fixture would silently report green. Assert the page
+      // actually loaded before measuring overflow.
+      const response = await page.goto(path);
+      expect(
+        response?.status(),
+        `${path} returned HTTP ${String(response?.status())} — fixture path may have moved`
+      ).toBe(200);
+
       const overflow = await page.evaluate(() => ({
         scroll: document.body.scrollWidth,
         client: document.documentElement.clientWidth,

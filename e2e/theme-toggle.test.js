@@ -12,9 +12,13 @@ import { test, expect } from '@playwright/test';
  * `force: true` does NOT bypass the viewport check (only non-essential
  * actionability checks). `scrollIntoViewIfNeeded` runs the same pipeline
  * `click()` already tries internally. Programmatic HTMLElement.click()
- * fires the full synthesized event chain (mousedown/mouseup/click) so the
- * theme-toggle handler runs identically; we keep the toBeVisible()
- * assertion before each call as the regression catch for "button vanished".
+ * dispatches a synthetic `click` event ONLY (per DOM Living Standard — not
+ * `mousedown`/`mouseup`/`pointerdown`). That's sufficient here because the
+ * theme-toggle handler attaches to `click` via shadow.addEventListener at
+ * src/global.client.js:131. If a future component listens for pointer or
+ * mouse events instead, this helper won't fire those — use a real click()
+ * with explicit scroll setup for that case. We keep toBeVisible() before
+ * each call as the regression catch for "button vanished".
  *
  * Revival trigger: if Playwright fixes #3105 (sticky-host scroll geometry),
  * replace these helper calls with direct locator.click().
