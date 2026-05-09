@@ -21,6 +21,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **npm script naming rule:** reserve `:` for genuine sub-tasks that can be glob-matched by `npm-run-all2` (e.g. `run-p check:*` runs `check:lint`, `check:tsc`, `check:knip` concurrently). Use flat kebab-case for flag variants of a single command (`build-drafts` not `build:drafts`). Tell: would `run-p foo:*` ever make sense? If no, use kebab.
 
+**Bead filing rule:** every `bd create` call should include `--acceptance="..."` (and `--description="..."`) up front. `bd lint` flags task/bug/feature issues missing `## Acceptance Criteria`; backfilling via `bd update` is more friction than getting it right at creation. Applies to manual single-bead filings AND batch heredoc'd scripts. Tell: did you pass `--acceptance`? If not, the bead is incomplete — fix it now while context is fresh.
+
 ## Code Style
 
 - ESM only (`"type": "module"`), JSDoc types, neostandard style via `@voxpelli/eslint-config`

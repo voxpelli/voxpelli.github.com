@@ -11,8 +11,12 @@ yarn-error.log
 # Retrospectives and sprint plans (local session notes)
 RETRO-*.md
 SWARM-*.md
-SYNERGY-*.md
+SYNERGY-*
 PR_COMMENTS*.md
+
+# Machine-specific .claude/ state (synergy registry + any *.local.json)
+.claude/*.local.json
+.claude/synergy-*
 
 # Playwright
 /test-results/
