@@ -20,8 +20,8 @@ function isIndexable (pagePath) {
 }
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string, outputRelname: string } }> }} options
- * @returns {{outputName: string, content: string}}
+ * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
+ * @returns {import('@domstack/static').TemplateOutputOverride}
  */
 export default function sitemapTemplate ({ pages, vars }) {
   const { siteUrl } = getSiteVars(vars);

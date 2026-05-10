@@ -30,7 +30,7 @@ function navActive (itemHref, currentPath) {
 }
 
 /**
- * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown> & { noFeedAlternates?: boolean }, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars & { noFeedAlternates?: boolean }, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
 export default function rootLayout ({ children, page, scripts = [], styles = [], vars }) {

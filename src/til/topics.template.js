@@ -17,8 +17,8 @@ import rootLayout from '../root.layout.js';
  * global.data.js output (including `tilPosts`) is exposed via the
  * `PageData.vars` getter on any rendered page, so we pull it from `pages[0]`.
  *
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, styles: string[], scripts: string[] }> }} options
- * @returns {Array<{outputName: string, content: string}>}
+ * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
+ * @returns {import('@domstack/static').TemplateOutputOverride[]}
  */
 export default function topicsTemplate ({ pages, vars }) {
   const { authorName, siteUrl } = getSiteVars(vars);
@@ -49,7 +49,7 @@ export default function topicsTemplate ({ pages, vars }) {
     }
   }
 
-  /** @type {Array<{outputName: string, content: string}>} */
+  /** @type {import('@domstack/static').TemplateOutputOverride[]} */
   const output = [];
 
   // Emit one index page per topic. No index-of-topics page here — discovery

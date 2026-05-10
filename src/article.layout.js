@@ -8,7 +8,7 @@ import rootLayout from './root.layout.js';
 /**
  * Article/post layout - extends root layout with webmention form and post rendering
  *
- * @param {{ children: string, page?: { path: string }, vars: Record<string, unknown>, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, page?: { path: string }, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
 export default function articleLayout ({ children, page, scripts = [], styles = [], vars }) {
@@ -24,15 +24,15 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
   // own affordances on standalone article pages. Generic posts fall through
   // to renderPostContent, matching the prior direct-call behaviour.
   const articleHtml = renderPost({
-    authorName: /** @type {string} */ (vars.authorName),
+    authorName: vars.authorName,
     content: children,
     post: postVars,
-    siteUrl: /** @type {string} */ (vars.siteUrl),
+    siteUrl: vars.siteUrl,
     standalone: true,
-    webmentionEndpoint: /** @type {string} */ (vars.webmentionEndpoint),
+    webmentionEndpoint: vars.webmentionEndpoint,
   });
 
-  const wmEndpoint = /** @type {string} */ (vars.webmentionEndpoint);
+  const wmEndpoint = vars.webmentionEndpoint;
 
   const webmentionForm = renderToStringSync(html`
     <section class="webmention-form">

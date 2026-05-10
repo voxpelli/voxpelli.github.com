@@ -9,7 +9,8 @@ import { renderRssEntry } from './lib/render-rss-entry.js';
  * Templates receive { vars, pages } where vars is global.vars only (not global.data).
  * Pages are full PageData objects with renderInnerPage() available for getting rendered HTML.
  *
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
+ * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
+ * @returns {AsyncIterable<import('@domstack/static').TemplateOutputOverride>}
  */
 export default async function * feedsTemplate ({ pages, vars }) {
   const { authorEmail, authorName, blogName, pushHub, siteUrl } = getSiteVars(vars);
@@ -34,7 +35,7 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const recentStream = allPosts.filter(p => p.category !== 'social').slice(0, 20);
 
   // Build page index for O(1) lookup instead of O(n) pages.find() per post
-  /** @type {Map<string, typeof pages[0]>} */
+  /** @type {Map<string, import('./global-types.d.ts').PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all unique feed posts in parallel, with cache to avoid duplicates
@@ -43,7 +44,9 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const renderCache = new Map();
   await Promise.all(allFeedPosts.map(async (post) => {
     const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    const html = page?.renderInnerPage
+      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
+      : '';
     renderCache.set(/** @type {string} */ (post.path), html);
   }));
 

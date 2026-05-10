@@ -10,11 +10,11 @@ import rootLayout from './root.layout.js';
  * However, pages[].vars (the PageData getter) includes global.data output, so we
  * access pre-computed allTags/tagCounts from there — posts already have rendered content.
  *
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, styles: string[], scripts: string[] }> }} options
- * @returns {Array<{outputName: string, content: string}>}
+ * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
+ * @returns {import('@domstack/static').TemplateOutputOverride[]}
  */
 export default function tagsTemplate ({ pages, vars }) {
-  const { authorName } = getSiteVars(vars);
+  const { authorName, siteUrl } = getSiteVars(vars);
 
   // Extract global styles/scripts from any initialized page
   const styles = pages[0]?.styles ?? [];
@@ -25,7 +25,7 @@ export default function tagsTemplate ({ pages, vars }) {
   const allTags = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.allTags) || {};
   const tagCounts = /** @type {Array<{tag: string, count: number}>} */ (pageVars.tagCounts) || [];
 
-  /** @type {Array<{outputName: string, content: string}>} */
+  /** @type {import('@domstack/static').TemplateOutputOverride[]} */
   const output = [];
 
   // Tag index page
@@ -59,7 +59,7 @@ export default function tagsTemplate ({ pages, vars }) {
         content: /** @type {string} */ (post.content) || '',
         excerpt: true,
         authorName,
-        siteUrl: /** @type {string} */ (vars.siteUrl),
+        siteUrl,
       }))
       .join('\n');
 
