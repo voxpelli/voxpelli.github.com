@@ -8,6 +8,8 @@ import {
   extractName,
 } from '../utils.js';
 
+/** @import { HtmlTemplateValue } from 'async-htm-to-string' */
+
 /**
  * Render a bilingual heading with optional lang attribute.
  *
@@ -29,7 +31,7 @@ function LocalizedHeading ({ enText, headingLang, svText, swedish }) {
  * @param {string|false} options.headingLang
  * @param {string[]|undefined} [options.inReplyTo]
  * @param {boolean} options.swedish
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostReply ({ headingLang, inReplyTo, swedish }) {
   if (!inReplyTo || inReplyTo.length === 0) return;
@@ -61,7 +63,7 @@ export function PostReply ({ headingLang, inReplyTo, swedish }) {
  * @param {boolean} [options.standalone]
  * @param {boolean} options.swedish
  * @param {string[]|undefined} [options.syndication]
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostSyndication ({ headingLang, standalone, swedish, syndication }) {
   if (!syndication || syndication.length === 0) return;
@@ -82,7 +84,7 @@ export function PostSyndication ({ headingLang, standalone, swedish, syndication
  * @param {string|false} options.headingLang
  * @param {string[]|undefined} [options.persontags]
  * @param {boolean} options.swedish
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostPersonTags ({ headingLang, persontags, swedish }) {
   if (!persontags || persontags.length === 0) return;
@@ -103,7 +105,7 @@ export function PostPersonTags ({ headingLang, persontags, swedish }) {
  * @param {string|false} options.headingLang
  * @param {string[]|undefined} [options.submitto]
  * @param {boolean} options.swedish
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostSubmitTo ({ headingLang, submitto, swedish }) {
   if (!submitto || submitto.length === 0) return;
@@ -124,7 +126,7 @@ export function PostSubmitTo ({ headingLang, submitto, swedish }) {
  * @param {string|false} options.headingLang
  * @param {boolean} options.swedish
  * @param {string[]|undefined} [options.tags]
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostTags ({ headingLang, swedish, tags }) {
   if (!tags || tags.length === 0) return;

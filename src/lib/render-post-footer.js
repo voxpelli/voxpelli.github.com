@@ -1,4 +1,5 @@
 /** @import { PostVars } from './render-post.js' */
+/** @import { HtmlTemplateValue } from 'async-htm-to-string' */
 
 import { html } from 'async-htm-to-string';
 
@@ -13,7 +14,7 @@ import { parseDateSafe } from './utils.js';
  * @param {boolean} [options.nonenglish]
  * @param {string} options.authorName
  * @param {boolean} [options.compact] - When true, omit author attribution (for social feeds)
- * @returns {import('async-htm-to-string').HtmlTemplateValue}
+ * @returns {HtmlTemplateValue}
  */
 export function PostFooter ({ authorName, compact, nonenglish, post }) {
   const dateObj = parseDateSafe(post.date);

@@ -7,7 +7,7 @@ import { assertKeyWithType, assertOptionalKeyWithType } from '@voxpelli/typed-ut
  * Throws TypeHelpersAssertionError if validation fails.
  *
  * @param {Record<string, unknown>} vars - Template vars object
- * @returns {import('../global-types.d.ts').ValidatedSiteVars}
+ * @returns {import('../global-types.d.ts').SiteVars}
  * @throws {TypeHelpersAssertionError} if required keys are missing or not strings
  * @example
  * export default async function * feedsTemplate ({ pages, vars }) {
@@ -20,9 +20,12 @@ export function getSiteVars (vars) {
   assertKeyWithType(vars, 'blogName', 'string');
   assertKeyWithType(vars, 'authorName', 'string');
   assertKeyWithType(vars, 'authorEmail', 'string');
+  assertKeyWithType(vars, 'themeColor', 'string');
+  assertKeyWithType(vars, 'micropubEndpoint', 'string');
+  assertKeyWithType(vars, 'webmentionEndpoint', 'string');
   assertOptionalKeyWithType(vars, 'pushHub', 'string');
 
-  const { authorEmail, authorName, blogName, pushHub = '', siteUrl } = vars;
+  const { authorEmail, authorName, blogName, micropubEndpoint, pushHub = '', siteUrl, themeColor, webmentionEndpoint } = vars;
 
-  return { authorEmail, authorName, blogName, pushHub, siteUrl };
+  return { authorEmail, authorName, blogName, micropubEndpoint, pushHub, siteUrl, themeColor, webmentionEndpoint };
 }

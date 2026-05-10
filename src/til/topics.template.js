@@ -4,6 +4,9 @@ import { renderPost } from '../lib/render-post.js';
 import { slugifyTopic } from '../lib/slugify-topic.js';
 import rootLayout from '../root.layout.js';
 
+/** @import { TemplateOutputOverride } from '@domstack/static' */
+/** @import { PageData } from '../global-types.d.ts' */
+
 /**
  * Generate per-topic TIL index pages at /til/topics/<slug>/.
  *
@@ -17,11 +20,12 @@ import rootLayout from '../root.layout.js';
  * global.data.js output (including `tilPosts`) is exposed via the
  * `PageData.vars` getter on any rendered page, so we pull it from `pages[0]`.
  *
- * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
- * @returns {import('@domstack/static').TemplateOutputOverride[]}
+ * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @returns {TemplateOutputOverride[]}
  */
 export default function topicsTemplate ({ pages, vars }) {
-  const { authorName, siteUrl } = getSiteVars(vars);
+  const siteVars = getSiteVars(vars);
+  const { authorName, siteUrl } = siteVars;
 
   const styles = pages[0]?.styles ?? [];
   const scripts = pages[0]?.scripts ?? [];
@@ -38,8 +42,7 @@ export default function topicsTemplate ({ pages, vars }) {
   for (const post of tilPosts) {
     const rawTopic = post['topic'];
     const topic = typeof rawTopic === 'string' ? rawTopic.trim() : '';
-    if (!topic) continue;
-    const slug = slugifyTopic(topic);
+    const slug = topic && slugifyTopic(topic);
     if (!slug) continue;
     const existing = topicsBySlug.get(slug);
     if (existing) {
@@ -76,7 +79,7 @@ export default function topicsTemplate ({ pages, vars }) {
           ${postHtml}
         </div>`,
         vars: {
-          ...vars,
+          ...siteVars,
           title: `TILs: ${safeDisplay}`,
           pageUrl: `/til/topics/${slug}/`,
         },

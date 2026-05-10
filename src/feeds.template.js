@@ -3,14 +3,17 @@ import { getSiteVars } from './lib/get-site-vars.js';
 import { filterAndSortPosts } from './lib/posts.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
+/** @import { PageData } from './global-types.d.ts' */
+/** @import { TemplateOutputOverride } from '@domstack/static' */
+
 /**
  * Generate multiple Atom feeds using async generator pattern.
  *
  * Templates receive { vars, pages } where vars is global.vars only (not global.data).
  * Pages are full PageData objects with renderInnerPage() available for getting rendered HTML.
  *
- * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
- * @returns {AsyncIterable<import('@domstack/static').TemplateOutputOverride>}
+ * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @returns {AsyncIterable<TemplateOutputOverride>}
  */
 export default async function * feedsTemplate ({ pages, vars }) {
   const { authorEmail, authorName, blogName, pushHub, siteUrl } = getSiteVars(vars);
@@ -35,7 +38,7 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const recentStream = allPosts.filter(p => p.category !== 'social').slice(0, 20);
 
   // Build page index for O(1) lookup instead of O(n) pages.find() per post
-  /** @type {Map<string, import('./global-types.d.ts').PageData>} */
+  /** @type {Map<string, PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all unique feed posts in parallel, with cache to avoid duplicates

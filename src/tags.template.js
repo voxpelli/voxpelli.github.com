@@ -3,6 +3,10 @@ import { getSiteVars } from './lib/get-site-vars.js';
 import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
+/** @import { PageData } from './global-types.d.ts' */
+/** @import { PostVars } from './lib/render-post.js' */
+/** @import { TemplateOutputOverride } from '@domstack/static' */
+
 /**
  * Generate tag index page and individual tag pages.
  *
@@ -10,11 +14,12 @@ import rootLayout from './root.layout.js';
  * However, pages[].vars (the PageData getter) includes global.data output, so we
  * access pre-computed allTags/tagCounts from there — posts already have rendered content.
  *
- * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
- * @returns {import('@domstack/static').TemplateOutputOverride[]}
+ * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @returns {TemplateOutputOverride[]}
  */
 export default function tagsTemplate ({ pages, vars }) {
-  const { authorName, siteUrl } = getSiteVars(vars);
+  const siteVars = getSiteVars(vars);
+  const { authorName, siteUrl } = siteVars;
 
   // Extract global styles/scripts from any initialized page
   const styles = pages[0]?.styles ?? [];
@@ -25,7 +30,7 @@ export default function tagsTemplate ({ pages, vars }) {
   const allTags = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.allTags) || {};
   const tagCounts = /** @type {Array<{tag: string, count: number}>} */ (pageVars.tagCounts) || [];
 
-  /** @type {import('@domstack/static').TemplateOutputOverride[]} */
+  /** @type {TemplateOutputOverride[]} */
   const output = [];
 
   // Tag index page
@@ -44,7 +49,11 @@ export default function tagsTemplate ({ pages, vars }) {
     <div class="tag-cloud">
           ${tagLinks}
         </div>`,
-      vars: { ...vars, title: 'Tags', pageUrl: '/tags/' },
+      vars: {
+        ...siteVars,
+        title: 'Tags',
+        pageUrl: '/tags/',
+      },
       styles,
       scripts,
     }),
@@ -55,7 +64,7 @@ export default function tagsTemplate ({ pages, vars }) {
     const posts = allTags[tag] || [];
     const postHtml = posts
       .map(post => renderPost({
-        post: /** @type {import('./lib/render-post.js').PostVars} */ (post),
+        post: /** @type {PostVars} */ (post),
         content: /** @type {string} */ (post.content) || '',
         excerpt: true,
         authorName,
@@ -76,7 +85,11 @@ export default function tagsTemplate ({ pages, vars }) {
     <div class="post-list">
           ${postHtml}
         </div>`,
-        vars: { ...vars, title: `Tag: ${safeTag}`, pageUrl: `/tags/${encodeURIComponent(tag)}/` },
+        vars: {
+          ...siteVars,
+          title: `Tag: ${safeTag}`,
+          pageUrl: `/tags/${encodeURIComponent(tag)}/`,
+        },
         styles,
         scripts,
       }),

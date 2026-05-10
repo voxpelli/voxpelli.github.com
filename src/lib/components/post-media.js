@@ -2,13 +2,15 @@ import { html } from 'async-htm-to-string';
 
 import { safePostUrl } from '../safe-url.js';
 
+/** @import { HtmlTemplateValue } from 'async-htm-to-string' */
+
 /**
  * Render video or photo media block.
  *
  * @param {object} options
  * @param {string[]|undefined} [options.photos]
  * @param {string[]|undefined} [options.videos]
- * @returns {import('async-htm-to-string').HtmlTemplateValue | undefined}
+ * @returns {HtmlTemplateValue | undefined}
  */
 export function PostMedia ({ photos, videos }) {
   if (videos && videos.length > 0) {

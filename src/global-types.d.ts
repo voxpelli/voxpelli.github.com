@@ -9,10 +9,7 @@ export interface SiteVars {
   webmentionEndpoint: string;
 }
 
-export type ValidatedSiteVars = Pick<
-  SiteVars,
-  'siteUrl' | 'blogName' | 'authorName' | 'authorEmail' | 'pushHub'
->;
+export type ValidatedSiteVars = SiteVars;
 
 /**
  * Temporary shared stopgap until `@domstack/static` exports `PageData`.
