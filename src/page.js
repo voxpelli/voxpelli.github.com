@@ -20,7 +20,7 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
 }));
 
 /**
- * @param {{ vars: Record<string, unknown> }} options
+ * @param {{ vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars }} options
  * @returns {string}
  */
 export default function homePage ({ vars: pageVars }) {
