@@ -1,4 +1,5 @@
 import { escapeXml } from './lib/escape.js';
+import { getSiteVars } from './lib/get-site-vars.js';
 import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
@@ -13,7 +14,7 @@ import rootLayout from './root.layout.js';
  * @returns {Array<{outputName: string, content: string}>}
  */
 export default function tagsTemplate ({ pages, vars }) {
-  const authorName = /** @type {string} */ (vars.authorName);
+  const { authorName } = getSiteVars(vars);
 
   // Extract global styles/scripts from any initialized page
   const styles = pages[0]?.styles ?? [];

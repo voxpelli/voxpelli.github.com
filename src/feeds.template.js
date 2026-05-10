@@ -1,4 +1,5 @@
 import { escapeXml } from './lib/escape.js';
+import { getSiteVars } from './lib/get-site-vars.js';
 import { filterAndSortPosts } from './lib/posts.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
@@ -11,11 +12,7 @@ import { renderRssEntry } from './lib/render-rss-entry.js';
  * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
  */
 export default async function * feedsTemplate ({ pages, vars }) {
-  const siteUrl = /** @type {string} */ (vars.siteUrl);
-  const blogName = /** @type {string} */ (vars.blogName);
-  const authorName = /** @type {string} */ (vars.authorName);
-  const authorEmail = /** @type {string} */ (vars.authorEmail);
-  const pushHub = /** @type {string} */ (vars.pushHub) || '';
+  const { authorEmail, authorName, blogName, pushHub, siteUrl } = getSiteVars(vars);
   const now = new Date().toISOString();
 
   // Filter and sort posts using shared helper

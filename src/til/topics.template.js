@@ -1,4 +1,5 @@
 import { escapeXml } from '../lib/escape.js';
+import { getSiteVars } from '../lib/get-site-vars.js';
 import { renderPost } from '../lib/render-post.js';
 import { slugifyTopic } from '../lib/slugify-topic.js';
 import rootLayout from '../root.layout.js';
@@ -20,8 +21,7 @@ import rootLayout from '../root.layout.js';
  * @returns {Array<{outputName: string, content: string}>}
  */
 export default function topicsTemplate ({ pages, vars }) {
-  const authorName = /** @type {string} */ (vars.authorName);
-  const siteUrl = /** @type {string} */ (vars.siteUrl);
+  const { authorName, siteUrl } = getSiteVars(vars);
 
   const styles = pages[0]?.styles ?? [];
   const scripts = pages[0]?.scripts ?? [];

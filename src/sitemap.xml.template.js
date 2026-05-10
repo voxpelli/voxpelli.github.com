@@ -1,4 +1,5 @@
 import { escapeXml } from './lib/escape.js';
+import { getSiteVars } from './lib/get-site-vars.js';
 import { redirects } from './redirects.template.js';
 
 // Redirect stubs (meta-refresh), feed files, and the 404 page are not
@@ -23,7 +24,7 @@ function isIndexable (pagePath) {
  * @returns {{outputName: string, content: string}}
  */
 export default function sitemapTemplate ({ pages, vars }) {
-  const siteUrl = /** @type {string} */ (vars.siteUrl);
+  const { siteUrl } = getSiteVars(vars);
 
   const urls = pages
     .filter(p => isIndexable(p.pageInfo?.path || ''))
