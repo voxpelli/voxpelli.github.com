@@ -35,7 +35,7 @@ async function clickShadowButton (page, hostSelector, shadowButtonSelector) {
       const btn = /** @type {HTMLElement | undefined} */ (host?.shadowRoot?.querySelector(/** @type {string} */ (b)) ?? undefined);
       btn?.click();
     },
-    [hostSelector, shadowButtonSelector],
+    [hostSelector, shadowButtonSelector]
   );
 }
 

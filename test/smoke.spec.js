@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
+
 /**
  * Smoke tests that verify the build output in public/.
  * Run after `npm run build` — the test script runs build first.
@@ -651,7 +653,9 @@ test('SWARM-13 active-nav regression fence — correct nav item marked per path'
     // Match an <a> nav-item whose href matches the expected target and which
     // carries aria-current="page" (attribute order-agnostic).
     const escaped = activeHref.replaceAll('/', '\\/');
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const ariaCurrentFirst = new RegExp(`<a[^>]*aria-current="page"[^>]*href="${escaped}"`);
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const hrefFirst = new RegExp(`<a[^>]*href="${escaped}"[^>]*aria-current="page"`);
     assert.ok(
       ariaCurrentFirst.test(html) || hrefFirst.test(html),
