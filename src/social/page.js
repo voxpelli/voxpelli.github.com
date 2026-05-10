@@ -11,7 +11,7 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
 }));
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
+ * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
  * @returns {Promise<string>}
  */
 export default async function socialPage ({ pages, vars: pageVars }) {
@@ -19,7 +19,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
   const recentSocial = socialPosts.slice(0, 10);
 
   // Build page index for O(1) lookup
-  /** @type {Map<string, typeof pages[0]>} */
+  /** @type {Map<string, import('../global-types.d.ts').PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render non-like posts in parallel (likes work from frontmatter alone)
@@ -28,7 +28,9 @@ export default async function socialPage ({ pages, vars: pageVars }) {
   const nonLikePosts = recentSocial.filter(post => !post['mf-like-of']);
   await Promise.all(nonLikePosts.map(async (post) => {
     const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    const html = page?.renderInnerPage
+      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
+      : '';
     renderCache.set(/** @type {string} */ (post.path), html);
   }));
 

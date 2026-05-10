@@ -3,14 +3,14 @@ import { renderPost } from '../../lib/render-post.js';
 /**
  * Full archive — all post types (blog, social, links) in chronological order.
  *
- * @param {{ pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }>, vars: Record<string, unknown> }} options
+ * @param {{ pages: import('../../global-types.d.ts').PageData[], vars: Record<string, unknown> }} options
  * @returns {Promise<string>}
  */
 export default async function fullArchivePage ({ pages, vars: pageVars }) {
   const allPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.allPosts) || [];
 
   // Build page index for content rendering
-  /** @type {Map<string, typeof pages[0]>} */
+  /** @type {Map<string, import('../../global-types.d.ts').PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all posts in parallel
@@ -18,7 +18,7 @@ export default async function fullArchivePage ({ pages, vars: pageVars }) {
   const renderCache = new Map();
   await Promise.all(allPosts.map(async (post) => {
     const page = pagesByPath.get(/** @type {string} */ (post.path));
-    if (page) {
+    if (page?.renderInnerPage) {
       renderCache.set(/** @type {string} */ (post.path), await page.renderInnerPage({ pages }));
     }
   }));

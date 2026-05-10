@@ -10,7 +10,7 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
 }));
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: Array<{ pageInfo: { path: string }, vars: Record<string, unknown>, renderInnerPage: (opts: { pages: unknown[] }) => Promise<string> }> }} options
+ * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
  * @returns {Promise<string>}
  */
 export default async function tilPage ({ pages, vars: pageVars }) {
@@ -18,7 +18,7 @@ export default async function tilPage ({ pages, vars: pageVars }) {
   const recentTils = tilPosts.slice(0, 20);
 
   // Build page index for O(1) lookup
-  /** @type {Map<string, typeof pages[0]>} */
+  /** @type {Map<string, import('../global-types.d.ts').PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Pre-render all TIL posts in parallel
@@ -26,7 +26,9 @@ export default async function tilPage ({ pages, vars: pageVars }) {
   const renderCache = new Map();
   await Promise.all(recentTils.map(async (post) => {
     const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page ? /** @type {string} */ (await page.renderInnerPage({ pages })) : '';
+    const html = page?.renderInnerPage
+      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
+      : '';
     renderCache.set(/** @type {string} */ (post.path), html);
   }));
 
