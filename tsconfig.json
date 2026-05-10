@@ -4,8 +4,10 @@
     "types": ["node"],
     "noPropertyAccessFromIndexSignature": false
   },
+  "files": ["eslint.config.js"],
   "include": [
     "src/**/*.js",
+    "tools/**/*.js",
     "test/**/*.js"
   ],
   "exclude": [
