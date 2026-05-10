@@ -7,7 +7,7 @@ import { assertKeyWithType, assertOptionalKeyWithType } from '@voxpelli/typed-ut
  * Throws TypeHelpersAssertionError if validation fails.
  *
  * @param {Record<string, unknown>} vars - Template vars object
- * @returns {{ siteUrl: string, blogName: string, authorName: string, authorEmail: string, pushHub: string }}
+ * @returns {import('../global-types.d.ts').ValidatedSiteVars}
  * @throws {TypeHelpersAssertionError} if required keys are missing or not strings
  * @example
  * export default async function * feedsTemplate ({ pages, vars }) {

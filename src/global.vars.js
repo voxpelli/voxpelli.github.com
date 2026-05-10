@@ -1,16 +1,4 @@
-/**
- * @typedef {object} SiteVars
- * @property {string} blogName
- * @property {string} siteUrl
- * @property {string} authorName
- * @property {string} authorEmail
- * @property {string} pushHub
- * @property {string} themeColor
- * @property {string} micropubEndpoint
- * @property {string} webmentionEndpoint
- */
-
-/** @satisfies {SiteVars} */
+/** @satisfies {import('./global-types.d.ts').SiteVars} */
 const vars = {
   blogName: 'VoxPelli',
   siteUrl: 'https://voxpelli.com',

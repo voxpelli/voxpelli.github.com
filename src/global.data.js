@@ -11,24 +11,17 @@ const URL_FIELDS = [
 ];
 
 /**
- * @typedef {object} PageData
- * @property {{ path: string, outputRelname: string }} pageInfo
- * @property {Record<string, unknown>} vars
- * @property {(opts: { pages: PageData[] }) => Promise<string>} [renderInnerPage]
- */
-
-/**
  * Aggregate page data for indexes, feeds, and archives.
  * Pages are DomStack PageData objects with .pageInfo and .vars properties.
  *
- * @param {{ pages: PageData[] }} options
+ * @param {{ pages: import('./global-types.d.ts').PageData[] }} options
  * @returns {Promise<Record<string, unknown>>}
  */
 export default async function globalData ({ pages }) {
   // Build page index for enriching base posts with extra fields
   /** @type {Map<string, Record<string, unknown>>} */
   const varsByPath = new Map(pages.map(p => [p.pageInfo.path, p.vars]));
-  /** @type {Map<string, PageData>} */
+  /** @type {Map<string, import('./global-types.d.ts').PageData>} */
   const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
 
   // Filter and sort posts using shared helper, then enrich with extra fields
