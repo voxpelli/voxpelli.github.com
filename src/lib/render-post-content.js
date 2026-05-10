@@ -4,8 +4,14 @@ import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
 import { PostHeader } from './components/post-header.js';
 import { PostMedia } from './components/post-media.js';
-import { PostPersonTags, PostReply, PostSubmitTo, PostSyndication, PostTags } from './components/post-metadata.js';
 import { PostFooter } from './render-post-footer.js';
+import {
+  PostPersonTags,
+  PostReply,
+  PostSubmitTo,
+  PostSyndication,
+  PostTags,
+} from './components/post-metadata.js';
 
 /**
  * Render full post content with all microformats.
@@ -32,7 +38,7 @@ export function renderPostContent ({ authorName, compact, content, nonenglish, p
   const persontags = Array.isArray(post.persontags) ? post.persontags : undefined;
   const submitto = Array.isArray(post.submitto) ? post.submitto : undefined;
   const tags = Array.isArray(post.tags) ? post.tags : undefined;
-  const title = post.title;
+  const { title } = post;
   const pageUrl = post.pageUrl || '';
 
   const lang = swedish ? 'sv' : (nonenglish ? /** @type {string} */ (post.lang) : false);

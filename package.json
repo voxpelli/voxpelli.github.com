@@ -1,28 +1,29 @@
 {
+  "description": "My personal blog",
   "private": true,
   "type": "module",
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "clean-hashed": "rm -f public/global-*.css public/global.client-*.js",
     "build": "npm run clean-hashed && domstack --copy images --copy media && sed \"s/__BUILD_VERSION__/$(git rev-parse --short HEAD)/\" sw.js > public/sw.js && cp public/404/index.html public/404.html",
-    "dev": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --copy images --copy media",
-    "dev-drafts": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --drafts --copy images --copy media",
     "build-drafts": "npm run clean-hashed && domstack --drafts --copy images --copy media",
+    "check": "run-p check:* --continue-on-error",
+    "check:knip": "knip",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
     "check:tsc-browser": "tsc -p tsconfig.browser.json",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
-    "check:knip": "knip",
-    "check": "run-p check:* --continue-on-error",
+    "clean-hashed": "rm -f public/global-*.css public/global.client-*.js",
+    "dev": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --copy images --copy media",
+    "dev-drafts": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --drafts --copy images --copy media",
     "e2e": "playwright test",
-    "test:e2e": "playwright test --project=chromium",
-    "test:build": "node --test 'test/**/*.spec.js'",
-    "test": "run-s check build test:build",
-    "husky-enable": "husky",
     "husky-disable": "git config --unset core.hooksPath",
-    "prepare": "husky"
+    "husky-enable": "husky",
+    "prepare": "husky",
+    "test": "run-s check build test:build",
+    "test:build": "node --test 'test/**/*.spec.js'",
+    "test:e2e": "playwright test --project=chromium"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
@@ -30,7 +31,7 @@
     "@playwright/test": "^1.59.1",
     "@types/estree": "^1.0.8",
     "@types/node": "^22",
-    "@voxpelli/eslint-config": "^24",
+    "@voxpelli/eslint-config": "^25.1.0",
     "@voxpelli/tsconfig": "^16",
     "axe-core": "^4.11.4",
     "eslint": "^9",

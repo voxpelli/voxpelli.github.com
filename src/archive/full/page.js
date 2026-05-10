@@ -32,7 +32,7 @@ export default async function fullArchivePage ({ pages, vars: pageVars }) {
     postsByYear[year].push(post);
   }
 
-  const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+  const years = Object.keys(postsByYear).toSorted((a, b) => Number(b) - Number(a));
 
   let result = '<div class="content-header">\n  <h2>Full Archive // All Content</h2>\n</div>\n\n';
 

@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('microformats', () => {
   test('h-feed on homepage contains h-entry children', async ({ page }) => {

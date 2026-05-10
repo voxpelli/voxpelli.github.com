@@ -5,9 +5,9 @@
  * Run after `npm run build` — the test script runs build first.
  */
 
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { access, readdir, readFile } from 'node:fs/promises';
+import { test } from 'node:test';
 
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';

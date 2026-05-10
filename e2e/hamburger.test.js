@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 // Enable JS discovery — the hamburger only activates when the <html class="no-js">
 // has been replaced with `.js` by global.client.js. We rely on that happening

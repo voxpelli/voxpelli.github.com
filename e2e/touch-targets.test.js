@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const MOBILE_VIEWPORT = { width: 375, height: 667 };
 const MIN_TARGET_SIZE = 44;

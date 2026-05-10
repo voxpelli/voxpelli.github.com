@@ -51,7 +51,7 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
   const bookmarkOfFirst = typeof bookmarkOf?.[0] === 'string' ? bookmarkOf[0] : undefined;
   const via = post.via || bookmarkOfFirst;
   const viaSafe = via ? safePostUrl(via) : '';
-  const topic = post.topic;
+  const { topic } = post;
 
   if (standalone) {
     // Standalone article page: delegate to the generic renderPostContent (for

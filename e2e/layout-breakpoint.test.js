@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('layout breakpoint at 1024px', () => {
   test('below mobile breakpoint (767px) — single-column stacked layout', async ({ page }) => {

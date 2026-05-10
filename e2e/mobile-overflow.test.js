@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 // Per CLAUDE.md: detect horizontal overflow via scrollWidth > clientWidth
 // at 375px viewport. Fixtures chosen for high overflow risk: YouTube iframes

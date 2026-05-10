@@ -2,7 +2,7 @@
  * Dark-mode sync test.
  *
  * src/global.css has two dark-mode blocks that MUST stay in sync:
- *   1. @media (prefers-color-scheme: dark) { :root:not([data-theme]) { ... } }
+ *   1. \@media (prefers-color-scheme: dark) { :root:not([data-theme]) { ... } }
  *      — OS auto-follow when JS has not set data-theme
  *   2. [data-theme="dark"] { ... }
  *      — explicit user override
@@ -14,9 +14,9 @@
  * This test catches that drift.
  */
 
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { test } from 'node:test';
 
 const EXPECTED_DECLARATION_COUNT = 20;
 

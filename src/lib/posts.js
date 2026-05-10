@@ -24,7 +24,7 @@ export function filterAndSortPosts (pages) {
   return pages
     .filter(p => p.vars && p.vars.layout === 'article' && p.vars.date)
     .map(p => {
-      const vars = p.vars;
+      const { vars } = p;
       const pagePath = p.pageInfo.path;
       // DomStack pageInfo.path is the directory path (e.g., "2015/01/pubsub-with-postgres-and-node-js")
       const pageUrl = pagePath ? '/' + pagePath + '/' : '/';
@@ -43,5 +43,5 @@ export function filterAndSortPosts (pages) {
         ),
       };
     })
-    .sort((a, b) => parseDateSafe(b.date).getTime() - parseDateSafe(a.date).getTime());
+    .toSorted((a, b) => parseDateSafe(b.date).getTime() - parseDateSafe(a.date).getTime());
 }

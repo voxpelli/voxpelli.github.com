@@ -175,7 +175,7 @@ export default async function globalData ({ pages }) {
 
   const tagCounts = Object.entries(allTags)
     .map(([tag, posts]) => ({ tag, count: posts.length }))
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+    .toSorted((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 
   return {
     allPosts,

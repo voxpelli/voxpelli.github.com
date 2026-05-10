@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Sidebar sticky behavior — desktop', () => {
   test.use({ viewport: { width: 1280, height: 720 } });

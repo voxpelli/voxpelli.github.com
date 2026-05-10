@@ -14,7 +14,7 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
  */
 export default function archivePage ({ vars: pageVars }) {
   const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.postsByYear) || {};
-  const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+  const years = Object.keys(postsByYear).toSorted((a, b) => Number(b) - Number(a));
 
   let result = '<div class="content-header">\n  <p class="content-title">Archive // All Writings</p>\n</div>\n\n';
 

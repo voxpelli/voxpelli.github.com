@@ -55,13 +55,9 @@ function wrapTable (md) {
   const defaultTableClose = md.renderer.rules.table_close ?? ((tokens, idx, options, _env, self) =>
     self.renderToken(tokens, idx, options));
 
-  md.renderer.rules.table_open = (tokens, idx, options, env, self) => {
-    return `<div class="table-wrapper">${defaultTableOpen(tokens, idx, options, env, self)}`;
-  };
+  md.renderer.rules.table_open = (tokens, idx, options, env, self) => `<div class="table-wrapper">${defaultTableOpen(tokens, idx, options, env, self)}`;
 
-  md.renderer.rules.table_close = (tokens, idx, options, env, self) => {
-    return `${defaultTableClose(tokens, idx, options, env, self)}</div>`;
-  };
+  md.renderer.rules.table_close = (tokens, idx, options, env, self) => `${defaultTableClose(tokens, idx, options, env, self)}</div>`;
 }
 
 /**

@@ -1,5 +1,4 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Workaround for a Playwright auto-scroll geometry quirk: at 1280×720 the

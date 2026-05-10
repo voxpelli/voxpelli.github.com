@@ -1,7 +1,12 @@
 import { html } from 'async-htm-to-string';
 
 import { safePostUrl } from '../safe-url.js';
-import { capitalize, extractDomain, extractFullDomain, extractName } from '../utils.js';
+import {
+  capitalize,
+  extractDomain,
+  extractFullDomain,
+  extractName,
+} from '../utils.js';
 
 /**
  * Render a bilingual heading with optional lang attribute.
