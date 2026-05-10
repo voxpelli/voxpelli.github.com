@@ -6,7 +6,6 @@
   },
   "files": ["eslint.config.js"],
   "include": [
-    "e2e/**/*.js",
     "src/**/*.js",
     "tools/**/*.js",
     "test/**/*.js"
