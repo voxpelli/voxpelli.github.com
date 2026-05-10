@@ -26,21 +26,21 @@
     "test:e2e": "playwright test --project=chromium"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.11.3",
     "@domstack/static": "^11",
     "@playwright/test": "^1.59.1",
-    "@types/estree": "^1.0.8",
-    "@types/node": "^22",
+    "@types/estree": "^1.0.9",
+    "@types/node": "^22.19.18",
     "@voxpelli/eslint-config": "^25.1.0",
     "@voxpelli/tsconfig": "^16",
     "axe-core": "^4.11.4",
     "eslint": "^9",
     "husky": "^9",
-    "knip": "^6.4.1",
+    "knip": "^6.12.2",
     "npm-run-all2": "^8",
     "serve": "^14.2.6",
     "type-coverage": "^2.29.7",
-    "typescript": "~5.9.3"
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "async-htm-to-string": "^5.0.2"
