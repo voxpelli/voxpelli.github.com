@@ -53,13 +53,6 @@ test.describe('microformats', () => {
     await expect(webmention).toHaveAttribute('href', /.+/);
   });
 
-  test('article page has micropub endpoint', async ({ page }) => {
-    await page.goto('/2019/10/use-type-script-3-7-to-generate/');
-    const micropub = page.locator('link[rel="micropub"]');
-    await expect(micropub).toHaveCount(1);
-    await expect(micropub).toHaveAttribute('href', /.+/);
-  });
-
   test('homepage has WebSub hub link', async ({ page }) => {
     await page.goto('/');
     const hub = page.locator('link[rel="hub"]');

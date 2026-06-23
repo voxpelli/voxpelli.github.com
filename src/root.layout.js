@@ -39,7 +39,6 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
   const authorName = String(vars.authorName || '');
   const themeColor = String(vars.themeColor || '');
   const pushHub = String(vars.pushHub || '');
-  const micropubEndpoint = String(vars.micropubEndpoint || '');
   const webmentionEndpoint = String(vars.webmentionEndpoint || '');
 
   const title = vars.frontpage
@@ -115,7 +114,6 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
     ${vars.frontpage
       ? html`
         ${pushHub ? html`<link rel="hub" href=${safePostUrl(pushHub)} />` : ''}
-        ${micropubEndpoint ? html`<link rel="micropub" href=${safePostUrl(micropubEndpoint)} />` : ''}
       `
       : ''}
     ${vars.author ? html`<link rel="author" type="text/html" href="/" title=${authorName} />` : ''}

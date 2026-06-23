@@ -5,7 +5,6 @@ export interface SiteVars {
   authorEmail: string;
   pushHub: string;
   themeColor: string;
-  micropubEndpoint: string;
   webmentionEndpoint: string;
 }
 

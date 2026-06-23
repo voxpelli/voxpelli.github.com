@@ -21,11 +21,10 @@ export function getSiteVars (vars) {
   assertKeyWithType(vars, 'authorName', 'string');
   assertKeyWithType(vars, 'authorEmail', 'string');
   assertKeyWithType(vars, 'themeColor', 'string');
-  assertKeyWithType(vars, 'micropubEndpoint', 'string');
   assertKeyWithType(vars, 'webmentionEndpoint', 'string');
   assertOptionalKeyWithType(vars, 'pushHub', 'string');
 
-  const { authorEmail, authorName, blogName, micropubEndpoint, pushHub = '', siteUrl, themeColor, webmentionEndpoint } = vars;
+  const { authorEmail, authorName, blogName, pushHub = '', siteUrl, themeColor, webmentionEndpoint } = vars;
 
-  return { authorEmail, authorName, blogName, micropubEndpoint, pushHub, siteUrl, themeColor, webmentionEndpoint };
+  return { authorEmail, authorName, blogName, pushHub, siteUrl, themeColor, webmentionEndpoint };
 }
