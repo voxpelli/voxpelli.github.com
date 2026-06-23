@@ -10,7 +10,7 @@ test.describe('touch target compliance (44px minimum)', () => {
   });
 
   test('navigation items meet 44x44px minimum', async ({ page }) => {
-    const navLinks = page.locator('.nav-item a');
+    const navLinks = page.locator('a.nav-item');
     const count = await navLinks.count();
 
     expect(count).toBeGreaterThan(0);

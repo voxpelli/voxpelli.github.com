@@ -15,9 +15,10 @@ test.describe('microformats', () => {
     const entry = page.locator('.h-feed .h-entry').first();
     await expect(entry).toBeVisible();
 
-    const published = entry.locator('.dt-published');
+    // .dt-published is itself the <time datetime> element (not a wrapper)
+    const published = entry.locator('time.dt-published[datetime]');
+    await expect(published).toHaveCount(1);
     await expect(published).toBeVisible();
-    await expect(published.locator('time[datetime]')).toHaveCount(1);
 
     const url = entry.locator('a.u-url');
     await expect(url).toBeVisible();
@@ -30,7 +31,7 @@ test.describe('microformats', () => {
     await expect(hcard.first()).toBeVisible();
 
     await expect(page.locator('.h-card .p-name').first()).toBeVisible();
-    await expect(page.locator('.h-card .u-photo')).toHaveAttribute('src', /.+/);
+    await expect(page.locator('.h-card .u-photo').first()).toHaveAttribute('src', /.+/);
     await expect(page.locator('.h-card .p-note').first()).toBeVisible();
   });
 
