@@ -2,6 +2,7 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "src/**/page.{js,md,html}",
+    "src/**/page.draft.{js,html}",
     "src/**/*.layout.js",
     "src/**/*.template.js",
     "src/**/*.data.js",
@@ -19,6 +20,7 @@
     "*.config.js"
   ],
   "ignoreDependencies": [
-    "serve"
+    "serve",
+    "@types/estree"
   ]
 }
