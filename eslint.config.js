@@ -37,7 +37,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['playwright.config.js'],
+    files: ['playwright.config.js', 'e2e/**/*.test.js'],
     rules: {
       'n/no-process-env': 'off',
     },
