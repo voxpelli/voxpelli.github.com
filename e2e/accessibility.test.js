@@ -11,7 +11,7 @@ const pages = [
   { name: 'til-index', path: '/til/' },
   { name: 'til-topic', path: '/til/topics/css/' },
   { name: 'articles', path: '/articles/' },
-  { name: 'feeds', path: '/feeds/' },
+  // { name: 'feeds', path: '/feeds/' }, // gated out for release (page.draft.js)
 ];
 
 /**

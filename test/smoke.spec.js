@@ -607,19 +607,9 @@ test('SWARM-13 /articles/ page renders post-cards, no til-cards, ≤10 entries',
   );
 });
 
-test('SWARM-13 /feeds/ page lists all four primary feed URLs', async () => {
-  // New /feeds/ listing page (SWARM-13 Wave 1 Agent A2). Must surface the
-  // four canonical feeds: stream (everything), articles, TIL, releases.
-  const html = await readFile('public/feeds/index.html', 'utf8').catch(() => '');
-  if (!html) return; // Not built yet (pre-A2) — graceful skip
-  const expected = ['/stream.xml', '/all.xml', '/til/feed.atom', '/releases/feed.atom'];
-  for (const feedUrl of expected) {
-    assert.ok(
-      html.includes(feedUrl),
-      `/feeds/ page must surface ${feedUrl} as a link`
-    );
-  }
-});
+// NOTE: /feeds/ listing page is gated out for release (src/feeds/page.draft.js)
+// pending a human-authored rewrite of its descriptions (notbyai policy). Restore
+// this test alongside src/feeds/page.js when the prose lands.
 
 test('SWARM-13 homepage emits rel=alternate → /stream.xml', async () => {
   // Agent A3 rewires root.layout.js per-category rel=alternate routing. The
