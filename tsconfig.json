@@ -2,7 +2,12 @@
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
     "types": ["node"],
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    // Override inherited skipLibCheck:false (@voxpelli/tsconfig). @domstack/static
+    // (all published v11) and eslint-plugin-package-json@0.91.2 ship .d.ts that
+    // don't type-check (self-aliased re-exports, missing generics, AST clash) —
+    // independent of TS version. Re-enable once those are fixed upstream.
+    "skipLibCheck": true
   },
   "files": ["eslint.config.js"],
   "include": [
