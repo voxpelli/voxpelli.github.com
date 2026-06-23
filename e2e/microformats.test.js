@@ -37,10 +37,8 @@ test.describe('microformats', () => {
 
   test('sidebar h-card has p-name and u-url', async ({ page }) => {
     await page.goto('/');
-    const sidebar = page.locator('.sidebar, aside, [role="complementary"]').first();
-    await expect(sidebar).toBeVisible();
-
-    const hcard = sidebar.locator('.h-card');
+    // The sidebar element itself is the h-card (<aside class="sidebar h-card">)
+    const hcard = page.locator('.sidebar.h-card').first();
     await expect(hcard).toBeVisible();
     await expect(hcard.locator('.p-name')).toBeVisible();
     await expect(hcard.locator('.u-url').first()).toBeVisible();

@@ -133,8 +133,8 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
       <aside class="sidebar h-card p-author">
         <header class="brand-header">
           ${vars.frontpage
-? html`<h1 class="title"><a href="/" class="p-name">${authorName}</a></h1>`
-: html`<p class="title"><a href="/" class="p-name">${authorName}</a></p>`}
+? html`<h1 class="title"><a href="/" class="p-name u-url">${authorName}</a></h1>`
+: html`<p class="title"><a href="/" class="p-name u-url">${authorName}</a></p>`}
           <p class="subtitle p-summary">Things <a rel="me" href="/about/">about me</a> and the world around us</p>
         </header>
 
