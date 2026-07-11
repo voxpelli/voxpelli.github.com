@@ -217,6 +217,13 @@ offsets — never blurred, never translucent — and interactive depth is expres
 element and it travels into its own shadow. Soft, ambient, or glowing shadows are **forbidden**. Audit
 test: if a `box-shadow` contains a blur radius or an `rgba()`, it does not belong in this system.
 
+**The Shadow Is Not Load-Bearing Rule.** In Windows High Contrast (`forced-colors: active`),
+`box-shadow` is forced to `none` — so the entire depth vocabulary above simply *disappears*. That is
+acceptable, but only because nothing depends on it: every control that casts a shadow also carries a
+**2px border**, and the press is also a `transform`. Never let a shadow be the *only* thing that makes
+an element perceivable, bounded, or focused. (This is why focus rings use `outline` — `outline-color`
+is forced and survives; a `box-shadow` focus ring would vanish.) Enforced by `e2e/forced-colors.test.js`.
+
 ## 5. Components
 
 The governing character is **restrained and editorial**: components recede so the writing leads. Chrome
@@ -280,6 +287,11 @@ height guard it sticks; below it, it goes static. Enforced by `e2e/sidebar.test.
 ### Don't:
 - **Don't** add a blurred or translucent `box-shadow`. If it has a blur radius or an `rgba()`, it is
   not this system. *(The Displacement Rule.)*
+- **Don't** let a `box-shadow` be the only thing bounding, elevating, or focusing an element — it is
+  forced to `none` in high-contrast mode. *(The Shadow Is Not Load-Bearing Rule.)*
+- **Don't** paint an icon with a `url()` `background-image`. Those are the one thing forced-colors does
+  NOT override, so the icon keeps a colour nobody can see. Mask the shape and colour it with
+  `background-color: currentColor`, which *is* forced — and which adapts to dark mode for free.
 - **Don't** deepen the background to make the page feel warmer. The beige earns nothing — warmth comes
   from falu red, cloudberry, and the serif. *(The Earned Warmth Rule.)*
 - **Don't** put raw `--color-cloudberry` on small text. It fails WCAG AA and the build will fail with it.

@@ -46,6 +46,7 @@ const REACHABILITY_CASES = [
 
 /**
  * @param {import('@playwright/test').Page} page
+ * @returns {Promise<{ clientHeight: number, overflowY: string, position: string, scrollHeight: number }>}
  */
 async function sidebarMetrics (page) {
   return page.evaluate(() => {
@@ -67,7 +68,7 @@ test.describe('Sidebar — never scrolls itself', () => {
       await page.setViewportSize(viewport);
       await page.goto('/');
 
-      const { overflowY, scrollHeight, clientHeight } = await sidebarMetrics(page);
+      const { clientHeight, overflowY, scrollHeight } = await sidebarMetrics(page);
 
       // The standing rule: the sidebar is a landmark, not a scroll container.
       expect(overflowY).not.toBe('auto');
@@ -123,7 +124,7 @@ test.describe('Sidebar — the content must still fit the guard', () => {
       await page.goto('/');
       await page.evaluate(() => document.fonts.ready);
 
-      const { position, scrollHeight, clientHeight } = await sidebarMetrics(page);
+      const { clientHeight, position, scrollHeight } = await sidebarMetrics(page);
 
       // Sticky must actually be engaged at the guard, or we're testing nothing.
       expect(position, 'sticky should engage at the guard height').toBe('sticky');

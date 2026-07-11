@@ -33,7 +33,7 @@ function parseHex (hex) {
   // Expand shorthand (#d14 -> #dd1144). The stylesheet uses both forms, and a
   // parser that silently skips one of them would quietly stop guarding tokens.
   if (body.length === 3) {
-    body = body.split('').map(char => char + char).join('');
+    body = [...body].map(char => char + char).join('');
   }
   const n = Number.parseInt(body, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
