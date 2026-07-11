@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^24.0.0 || >=26"
   },
   "scripts": {
     "build": "npm run clean-hashed && domstack --copy images --copy media && sed \"s/__BUILD_VERSION__/$(git rev-parse --short HEAD)/\" sw.js > public/sw.js && cp public/404/index.html public/404.html",

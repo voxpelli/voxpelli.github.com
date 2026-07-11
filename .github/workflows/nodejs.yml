@@ -13,7 +13,7 @@ jobs:
   test:
     uses: voxpelli/ghatemplates/.github/workflows/test.yml@main
     with:
-      node-versions: '20,22,24'
+      node-versions: '24'
       lockfile: true
       npm-test-script: 'test'
 
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
