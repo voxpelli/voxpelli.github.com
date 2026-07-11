@@ -292,6 +292,13 @@ height guard it sticks; below it, it goes static. Enforced by `e2e/sidebar.test.
 - **Don't** paint an icon with a `url()` `background-image`. Those are the one thing forced-colors does
   NOT override, so the icon keeps a colour nobody can see. Mask the shape and colour it with
   `background-color: currentColor`, which *is* forced — and which adapts to dark mode for free.
+- **Don't** ship a `:hover` rule that changes state without gating it on `@media (hover: hover)`. On
+  touch, `:hover` sticks after a tap — the button stays pressed, the card stays lit. *(The press is
+  the signature; a press that won't let go is a bug.)* Keyboard users are served by `:focus-visible`,
+  never by `:hover`.
+- **Don't** reach for `@media (pointer: coarse)` sizing. It's a no-op here — the paddings already clear
+  44px at every width — and `e2e/touch-targets.test.js` measures that on a coarse pointer at desktop
+  width. Add it the day that test goes red, not before.
 - **Don't** deepen the background to make the page feel warmer. The beige earns nothing — warmth comes
   from falu red, cloudberry, and the serif. *(The Earned Warmth Rule.)*
 - **Don't** put raw `--color-cloudberry` on small text. It fails WCAG AA and the build will fail with it.
