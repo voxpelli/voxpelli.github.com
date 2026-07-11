@@ -15,14 +15,18 @@
   --color-ink-light: #555250;
   --color-falu-red: #8c2121;
   --color-cloudberry: #d97714;
-  /* Cloudberry is a display accent: at small text sizes it only reaches 2.6:1 on
-     parchment, so it fails WCAG AA. This is the AA-safe text variant (same hue,
-     lower lightness). Note .post-type-badge tints its background with 10% of its
-     own currentColor, so darkening the text darkens the backdrop too — this value
-     is solved against that composite (4.97:1), not against bare canvas. Use it
-     wherever cloudberry is small TEXT; keep --color-cloudberry for borders and
-     large/decorative accents. */
-  --color-cloudberry-text: #9c4400;
+  /* Cloudberry is a display accent: as small text it only reaches 2.8:1 on
+     parchment, failing WCAG AA. This is the AA-safe text variant — darker and
+     ~9deg redder (OKLCH L67 C.155 h57 -> L49 C.134 h48), not merely dimmer.
+
+     Solving it is not a plain fg/bg sum: .post-type-badge tints its own backdrop
+     with color-mix(currentColor 10%, transparent), so the text colour also sets
+     its background; and the pill sits inside .til-card, which swaps to
+     --color-canvas-alt on hover. The value must clear 4.5:1 on BOTH composites
+     (5.16:1 resting, 4.66:1 hover). test/token-contrast.spec.js enforces this —
+     do not retune by eye. Use for cloudberry small TEXT; keep --color-cloudberry
+     for non-text decoration. */
+  --color-cloudberry-text: #984200;
   --color-stone: #d1ccc5;
   --color-stone-light: #e0dcd5;
   --color-grid: #e0dcd5;
@@ -1527,7 +1531,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 .hljs-number { color: var(--hl-number) }
 .hljs-literal { color: var(--hl-number) }
 .hljs-regexp { color: var(--hl-number) }
-.hljs-symbol { color: var(--color-cloudberry) }
+.hljs-symbol { color: var(--color-cloudberry-text) }
 .hljs-type { color: var(--hl-name); font-weight: bold }
 .hljs-meta { color: var(--hl-comment); font-weight: bold }
 .hljs-addition { background-color: var(--hl-add-bg) }
@@ -1720,7 +1724,11 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
      cover-link trick (which stretches the anchor over the whole card). */
   content: '\00A0\2197';
   font-size: 0.8em;
-  color: var(--color-cloudberry);
+  /* The AA-safe variant, not the raw accent: this glyph carries meaning ("the
+     title goes off-site"), and at 2.8:1 the accent failed even the 3:1 large-text
+     bar. It stays in the cloudberry family, so the tie to the left-edge accent
+     (which remains --color-cloudberry) still reads. */
+  color: var(--color-cloudberry-text);
   font-family: var(--font-sans);
   font-weight: 400;
   position: static;
@@ -1790,7 +1798,11 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 .post-type-badge--til     { color: var(--color-ink);        border-color: var(--color-stone); }
-.post-type-badge--link    { color: var(--color-cloudberry-text); border-color: var(--color-cloudberry); }
+/* No border-color override: the base rule drives border + backdrop from
+   currentColor, so the AA-safe text colour carries them both. Pinning the border
+   to the brighter --color-cloudberry left it at 2.8:1 — below the 3:1 that WCAG
+   1.4.11 wants for a real link's boundary. */
+.post-type-badge--link    { color: var(--color-cloudberry-text); }
 .post-type-badge--release { color: var(--color-falu-red);   border-color: var(--color-falu-red); }
 
 /* === TIL topic affordance === */
