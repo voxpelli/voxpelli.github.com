@@ -9,12 +9,6 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
-  snapshotPathTemplate: 'screenshots/{projectName}/{testFilePath}/{arg}{ext}',
-  expect: {
-    toHaveScreenshot: {
-      maxDiffPixelRatio: 0.01,
-    },
-  },
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',

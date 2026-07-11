@@ -40,7 +40,6 @@ PR_COMMENTS*.md
 /test-results/
 /playwright-report/
 /blob-report/
-screenshots/
 
 # Beads / Dolt files — entire .beads/ dir excluded (repo is public;
 # issue tracker data stays local). History still contains prior commits
