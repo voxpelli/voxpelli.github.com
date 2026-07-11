@@ -29,7 +29,13 @@ const BADGE_TINT_ALPHA = 0.1;
  * @returns {[number, number, number]}
  */
 function parseHex (hex) {
-  const n = Number.parseInt(hex.slice(1), 16);
+  let body = hex.slice(1);
+  // Expand shorthand (#d14 -> #dd1144). The stylesheet uses both forms, and a
+  // parser that silently skips one of them would quietly stop guarding tokens.
+  if (body.length === 3) {
+    body = body.split('').map(char => char + char).join('');
+  }
+  const n = Number.parseInt(body, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
@@ -87,7 +93,7 @@ function tokensIn (css, selector) {
 
   /** @type {Record<string, string>} */
   const tokens = {};
-  for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-f]{6})\s*;/gi)) {
+  for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*(#(?:[0-9a-f]{3}|[0-9a-f]{6}))\s*;/gi)) {
     if (name && value) tokens[name] = value;
   }
   return tokens;
@@ -133,17 +139,35 @@ for (const [themeName, tokens] of Object.entries(themes)) {
     }
   });
 
-  test(`--color-cloudberry-text meets WCAG AA as code-syntax text (${themeName})`, () => {
-    // .hljs-symbol renders on the code-block background, not the page canvas.
-    const text = tokens['--color-cloudberry-text'];
+  test(`the syntax-highlight palette meets WCAG AA (${themeName})`, () => {
+    // Code is text, and it is held to the same 4.5:1 as prose. This was NOT
+    // true: in light mode --hl-comment was 2.66:1, --hl-number 3.21:1 and
+    // --hl-name 4.39:1. It surfaced as an intermittent axe failure on the one
+    // tested page with code blocks — intermittent because axe reports
+    // "incomplete" rather than "violation" when it cannot resolve a background,
+    // so a real violation flickered in and out of detection and read as flake.
     const hlBg = tokens['--hl-bg'];
-    assert.ok(text && hlBg, `${themeName} must define --color-cloudberry-text and --hl-bg`);
+    assert.ok(hlBg, `${themeName} must define --hl-bg`);
 
-    const ratio = contrastRatio(parseHex(text), parseHex(hlBg));
-    assert.ok(
-      ratio >= AA_NORMAL_TEXT,
-      `${themeName}: --color-cloudberry-text ${text} on --hl-bg ${hlBg} is ` +
-      `${ratio.toFixed(2)}:1, below WCAG AA ${AA_NORMAL_TEXT}:1.`
-    );
+    const syntaxTokens = [
+      '--hl-comment',
+      '--hl-string',
+      '--hl-number',
+      '--hl-name',
+      // .hljs-symbol renders on the code background, not the page canvas.
+      '--color-cloudberry-text',
+    ];
+
+    for (const name of syntaxTokens) {
+      const value = tokens[name];
+      assert.ok(value, `${themeName} must define ${name}`);
+
+      const ratio = contrastRatio(parseHex(value), parseHex(hlBg));
+      assert.ok(
+        ratio >= AA_NORMAL_TEXT,
+        `${themeName}: ${name} ${value} on --hl-bg ${hlBg} is ${ratio.toFixed(2)}:1, ` +
+        `below WCAG AA ${AA_NORMAL_TEXT}:1. Code is text — darken the token.`
+      );
+    }
   });
 }

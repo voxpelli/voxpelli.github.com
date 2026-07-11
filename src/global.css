@@ -66,10 +66,10 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --hl-bg: #f8f5f0;
-  --hl-comment: #998;
+  --hl-comment: #707063;
   --hl-string: #d14;
-  --hl-number: #099;
-  --hl-name: #008080;
+  --hl-number: #007c7c;
+  --hl-name: #006a6a;
   --hl-error-bg: #e3d2d2;
   --hl-add-bg: #ddffdd;
   --hl-del-bg: #ffdddd;
