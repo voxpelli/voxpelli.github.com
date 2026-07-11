@@ -40,7 +40,7 @@ function parseHex (hex) {
 function relativeLuminance (rgb) {
   const [r, g, b] = rgb.map(channel => {
     const c = channel / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   });
   return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
 }
@@ -93,6 +93,7 @@ function tokensIn (css, selector) {
   return tokens;
 }
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed path to our own stylesheet, resolved from import.meta.url; no user input
 const css = await readFile(new URL('../src/global.css', import.meta.url), 'utf8');
 
 const themes = {
