@@ -1,6 +1,16 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+// Flipping data-theme mid-page starts CSS colour transitions (.btn transitions
+// color/background-color over 0.2s). axe reads *computed* colours, so scanning
+// mid-transition reports blended intermediates belonging to no theme — phantom
+// contrast failures against colours that exist nowhere in global.css. Emulating
+// reduced motion engages the stylesheet's own
+// `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms } }`
+// block, so the theme switch is instant and axe always samples settled colours.
+// Contrast rules describe the resting state, not a frame of a fade.
+test.use({ reducedMotion: 'reduce' });
+
 const pages = [
   { name: 'homepage', path: '/' },
   { name: 'article', path: '/2019/10/use-type-script-3-7-to-generate/' },
