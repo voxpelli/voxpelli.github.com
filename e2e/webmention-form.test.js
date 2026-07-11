@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { WEBMENTION_INJECTED_REGION } from './third-party.js';
+import { WEBMENTION_INJECTED_IMAGES } from './third-party.js';
 
 /**
  * SWARM-11 H1 — Webmention form keyboard focus + dark-mode contrast.
@@ -83,7 +83,7 @@ test.describe('Webmention form — focus & dark-mode accessibility', () => {
     });
 
     const results = await new AxeBuilder({ page })
-      .exclude(WEBMENTION_INJECTED_REGION)
+      .exclude(WEBMENTION_INJECTED_IMAGES)
       .include('.webmention-form')
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();

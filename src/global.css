@@ -1105,15 +1105,29 @@ time a,
      The SVG carries no `fill`, so as a background-image it rendered black —
      invisible on the dark canvas. Worse, a url() background-image is one of the
      few things forced-colors mode does NOT override (MDN), so it would keep its
-     own black while every surface around it flipped to the user's palette:
-     invisible again on a dark high-contrast theme. `background-color` IS forced,
-     and `currentColor` inherits the theme, so masking the shape and colouring it
-     with the text colour fixes dark mode and forced-colors in one move. */
+     own black while every surface around it flipped to the user's palette.
+     Masking the shape and colouring it with `currentColor` fixes dark mode.
+     It does NOT, on its own, fix forced-colors — see the block below. */
   background-color: currentColor;
   -webkit-mask: url('data:image/svg+xml,%3Csvg width="8" height="8" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M.09 0C.03 0 0 .04 0 .09V5.9c0 .05.04.09.09.09H6l2 2V.08c0-.06-.04-.09-.09-.09H.1z"/%3E%3C/svg%3E') no-repeat center center;
   -webkit-mask-size: auto 13px;
   mask: url('data:image/svg+xml,%3Csvg width="8" height="8" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M.09 0C.03 0 0 .04 0 .09V5.9c0 .05.04.09.09.09H6l2 2V.08c0-.06-.04-.09-.09-.09H.1z"/%3E%3C/svg%3E') no-repeat center center;
   mask-size: auto 13px;
+}
+
+/* `background-color: currentColor` is not enough in forced colours. The property
+   IS reverted — but to a BACKGROUND system colour (Canvas), not to the text
+   colour, so the masked glyph paints white-on-white and disappears. Measured:
+   the ::before computed rgb(255,255,255) while its own link computed
+   rgb(0,0,159). Name a TEXT system colour explicitly — the glyph sits inside a
+   link, so LinkText is the one it should match. Opacity is never forced, so a
+   0.7 that merely looked soft in our own palette would quietly eat contrast from
+   a palette chosen for maximum contrast; take it back to 1. */
+@media (forced-colors: active) {
+  .u-responses::before {
+    background-color: LinkText;
+    opacity: 1;
+  }
 }
 
 html.js .u-responses {

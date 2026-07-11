@@ -1,31 +1,22 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { WEBMENTION_INJECTED_REGION } from './third-party.js';
+import { WEBMENTION_INJECTED_IMAGES } from './third-party.js';
 
-// Flipping data-theme mid-page starts CSS colour transitions (cards, nav items and
-// buttons transition `color` over 0.2s, while the page background is not
-// transitioned and snaps immediately). axe reads *computed* colours, so a scan that
-// lands inside that window sees the OLD theme's foreground on the NEW theme's
-// background — e.g. light ink #2c2a28 on dark canvas #1e1d1b, 1.17:1. That pairing
-// exists in no settled state, since each dark block defines every token at once.
-// Emulating reduced motion engages the stylesheet's own
+// Emulate reduced motion, so the colour transitions a theme flip starts settle in
+// 0.01ms instead of 200ms — the stylesheet's own
 // `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms } }`
-// block, which shrinks each transition to nothing. That alone is NOT enough — see
-// setTheme() below, which is what actually makes the scan see settled colours — but
-// it makes the wait there instant instead of 200ms per page.
+// block does the work. It is sound only while that block neuters *motion* and
+// nothing else (today: animation-duration, animation-iteration-count,
+// transition-duration, scroll-behavior). If it ever changes a colour, size or
+// visibility, this stops being a no-op and the suite would validate a rendering
+// most users never see.
+//
+// This is NOT what makes the scans correct — setTheme() is. See there.
 //
 // It MUST go through `contextOptions`: `reducedMotion` is a BrowserContextOption,
 // not a test option, so `test.use({ reducedMotion: 'reduce' })` is accepted and
-// silently discarded. It was written that way, emulated nothing, and the suite
-// passed locally purely because a fast machine settled the transition before axe
-// looked. CI, being slower, caught the mid-fade frame and went red.
-//
-// This is only sound while that block neuters *motion* and nothing else (today:
-// animation-duration, animation-iteration-count, transition-duration,
-// scroll-behavior). If it ever changes a colour, size, or visibility, this
-// emulation stops being a no-op and the suite would validate a rendering most
-// users never see.
+// silently discarded. It was written that way and emulated nothing.
 test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
 test('reduced motion is actually emulated', async ({ page }) => {
@@ -50,17 +41,30 @@ const pages = [
 ];
 
 /**
- * Flip the theme, then wait until the colour transitions it starts have finished.
+ * Flip the theme, then wait until the transitions it starts have drained.
  *
- * Reduced motion is NOT sufficient on its own. It shrinks each transition to
- * 0.01ms but does not stop one being *created*: flipping data-theme spawns ~330
- * CSSTransitions, and getComputedStyle reports each property's START value until
- * a frame advances. Measured immediately after the flip, `body` still computes
- * rgb(44,42,40) — the light ink — while --color-ink already reads #cecbc7. axe
- * scanning in that window sees the old theme's foreground on the new theme's
- * background (1.17:1) and reports contrast failures against colour pairs that
- * exist in no theme. Waiting for the transitions to drain is what makes the scan
- * describe the resting state, which is what the contrast rules are about.
+ * This wait is the load-bearing part of the whole file, and it guards against two
+ * different failures depending on whether motion is reduced. `getComputedStyle`
+ * returns the LIVE interpolated value, which equals each property's start value
+ * until a frame has actually rendered — so scanning straight after a flip reads
+ * pre-flip colours.
+ *
+ * Without reduced motion (what CI was doing): the page background snaps instantly
+ * — nothing transitions it — while ~49 elements are still easing `color`. axe then
+ * composites the OLD theme's foreground onto the NEW theme's background: light ink
+ * #2c2a28 on dark canvas #1e1d1b, 1.17:1. That pairing exists in no settled state,
+ * since each dark block defines every token at once. Hence the phantom failures.
+ *
+ * WITH reduced motion, the failure is quieter and worse: every element gets a
+ * transition from the universal `transition-duration: 0.01ms` rule, so ALL of them
+ * read stale together and the page is self-consistently LIGHT right after a flip to
+ * dark. axe would scan light-mode colours, find them fine, and pass — and the
+ * "dark mode" suite would silently be a second light-mode suite. Green, and worth
+ * nothing.
+ *
+ * Filtered to CSSTransition on purpose: a CSSAnimation driven by a scroll/view
+ * timeline (card-fade-up, reading-progress) need never reach a non-running
+ * playState, and any future `animation: … infinite` would hang the wait outright.
  *
  * @param {import('@playwright/test').Page} page
  * @param {string} theme
@@ -71,7 +75,13 @@ async function setTheme (page, theme) {
   }, theme);
 
   await page.waitForFunction(
-    () => document.getAnimations().every((a) => a.playState !== 'running')
+    // globalThis.CSSTransition, not the bare global: this closure is serialised
+    // into the page, where it exists — but ESLint lints it as Node, where it does not.
+    () => document.getAnimations()
+      .filter((a) => a instanceof globalThis.CSSTransition)
+      .every((a) => a.playState !== 'running'),
+    undefined,
+    { timeout: 5000 }
   );
 }
 
@@ -90,7 +100,7 @@ test.describe('accessibility: light mode', () => {
       await setTheme(page, 'light');
 
       const results = await new AxeBuilder({ page })
-        .exclude(WEBMENTION_INJECTED_REGION)
+        .exclude(WEBMENTION_INJECTED_IMAGES)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 
@@ -106,7 +116,7 @@ test.describe('accessibility: dark mode', () => {
       await setTheme(page, 'dark');
 
       const results = await new AxeBuilder({ page })
-        .exclude(WEBMENTION_INJECTED_REGION)
+        .exclude(WEBMENTION_INJECTED_IMAGES)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 
@@ -135,7 +145,7 @@ test.describe('accessibility: OS dark (prefers-color-scheme, no data-theme)', ()
       expect(attr, 'first visit must not set data-theme — the media query styles it').toBeNull();
 
       const results = await new AxeBuilder({ page })
-        .exclude(WEBMENTION_INJECTED_REGION)
+        .exclude(WEBMENTION_INJECTED_IMAGES)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 

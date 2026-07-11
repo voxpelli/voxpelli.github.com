@@ -103,6 +103,14 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 
 **Mobile overflow testing**: Never trust visual inspection alone. Use `document.body.scrollWidth > document.documentElement.clientWidth` to detect horizontal overflow programmatically. Test at 375px viewport width against articles with code blocks, YouTube iframes, and the archive page.
 
+**Playwright media emulation goes through `contextOptions`.** `reducedMotion`, `forcedColors` and `contrast` are `BrowserContextOptions`, NOT test options (only `colorScheme` is one). `test.use({ forcedColors: 'active' })` is accepted and **silently dropped** — the suite goes green having emulated nothing. Use `test.use({ contextOptions: { forcedColors: 'active' } })`, as Playwright's own docs for that option show. Guard every emulated suite with a `matchMedia(...).matches` test — **and make sure each remaining assertion would actually fail if its fix were removed.** A guard proves you emulated something; it does not prove you checked it. (`e2e/forced-colors.test.js` once had 6 assertions that passed with the emulation off.) Two traps when writing those assertions: compare rgb with rgb (a computed `"rgb(44, 42, 40)"` vs a raw `"#2c2a28"` token is a string mismatch that passes in every mode), and remember forced-colors reverts `background-color` to a *background* system colour — `background-color: currentColor` on a masked glyph becomes Canvas-on-Canvas, i.e. invisible.
+
+**axe-core (4.12) has no forced-colors awareness.** Under `forced-colors: active` it reads an *unforced* foreground against a *forced* background, so its contrast numbers there describe a rendering that does not exist (it invented a 1.12:1 "failure" on colours the browser never painted). `.disableRules(['color-contrast'])` for those scans and assert the computed system colours directly. Chromium's emulation itself is accurate — it forces both properties correctly. Upstream: `dequelabs/axe-core#3978`.
+
+**`e2e/` is NOT type-checked** — `tsconfig.json` covers `src/`, `tools/`, `test/` only, so unknown `test.use()` keys and other type errors in e2e never surface. `npm run check` does not validate e2e code.
+
+**Playwright prints `✘` for `test.fail()` expected-failures but counts them as passed** — read the summary line, not the glyphs. `e2e/drawer-focus.test.js` has three (the drawer has no focus trap yet).
+
 ## Design Context
 
 **Brand personality**: Thoughtful, Technical, Warm.

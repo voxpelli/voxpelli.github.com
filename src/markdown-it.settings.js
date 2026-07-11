@@ -110,6 +110,24 @@ function wrapFiguredImage (md) {
 }
 
 /**
+ * An `<iframe>` needs an accessible name, or a screen-reader user reaching it
+ * is told only "frame" (axe: `frame-title`, serious). Give one to any embed
+ * that lacks it, rather than asking every post to remember the attribute.
+ *
+ * A per-video name written by the author is strictly better than this generic
+ * one — add `title="…"` in the markdown and it is left alone. This is the
+ * floor, not the ceiling.
+ *
+ * @param {string} rawIframe
+ * @returns {string}
+ */
+function withIframeTitle (rawIframe) {
+  if (/\stitle\s*=/i.test(rawIframe)) return rawIframe;
+
+  return rawIframe.replace(/^(\s*<iframe)\b/i, '$1 title="Embedded video"');
+}
+
+/**
  * Wrap bare `<iframe>` HTML blocks in `<div class="video-embed">` so the
  * CSS `aspect-ratio: 16/9` wrapper can constrain the embed's size without
  * every post needing boilerplate markup.
@@ -131,7 +149,7 @@ function wrapBareIframe (md) {
     // Only wrap blocks that start with a bare <iframe> and nothing else.
     // `/is` keeps it tolerant of line breaks inside the iframe attributes.
     if (/^<iframe\b[^>]*>\s*(?:<\/iframe>\s*)?$/i.test(trimmed)) {
-      return `<div class="video-embed">${raw}</div>\n`;
+      return `<div class="video-embed">${withIframeTitle(raw)}</div>\n`;
     }
 
     return defaultHtmlBlock(tokens, idx, options, env, self);
