@@ -875,10 +875,47 @@ img {
   display: block;
 }
 
+/* === Card cover-link stacking ===
+   The title anchor stretches over its whole card, so body text is clickable and
+   no second link enters the accessibility tree. The card goes where its title
+   goes — for a LINK card that means the source it bookmarks; the "Read full
+   note" anchor is the escape hatch to the note itself.
+
+   Two levels, only two:
+
+     1  the cover      — the title anchor's stretched ::before
+     2  escape hatches — anything with its OWN destination, which has to stay
+                         clickable through the cover
+
+   Both levels are load-bearing, and both were previously wrong.
+
+   The cover must OUT-RANK positioned content, not merely be positioned itself.
+   `.post-excerpt` is `position: relative` (it must be — it contains the
+   absolutely-positioned fade), and a positioned sibling later in the DOM paints
+   over a cover left at `z-index: auto`. That is what made every excerpt body
+   dead to clicks.
+
+   And the element HOSTING the cover must NOT be positioned: `inset: 0` resolves
+   against the nearest positioned ancestor, so a positioned host traps the cover
+   inside its own box instead of letting it span the card.
+
+   WHICH PSEUDO hosts the cover is not free — every pseudo on a title anchor is
+   already spoken for by something, and an element has only one ::before:
+
+     - post/TIL titles (`a.u-url`) may carry `lang="sv"`, and `a[lang="sv"]::before`
+       paints the Swedish flag. So their cover goes on ::after.
+     - bookmark titles (`a.u-bookmark-of`) spend ::after on the ↗ glyph. So their
+       cover goes on ::before.
+
+   The two never collide: `lang=` only ever lands on `u-url` title anchors, never
+   on `u-bookmark-of` (checked across the built site). If a bookmark title ever
+   gains a `lang`, its flag and its cover will fight over ::before and the card
+   will go dead — put the flag somewhere else that day, don't move the cover. */
 .post-title a::after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 @media (hover: hover) {
@@ -914,6 +951,10 @@ img {
    Underline it, exactly as .e-content a already is in article bodies. Enforced by
    axe's link-in-text-block rule on /articles/. */
 .post-excerpt a {
+  /* Escape hatch (level 2): a real link inside the prose keeps its own
+     destination rather than being swallowed by the card cover. */
+  position: relative;
+  z-index: 2;
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
@@ -967,8 +1008,11 @@ img {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-ink-light);
+  /* Escape hatch (level 2). On a post card this is the same destination as the
+     cover; on a bookmark card it is the ONLY route to the note, since the cover
+     goes off-site. */
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .post-card:hover .post-read-more {
@@ -1821,8 +1865,9 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
    align-items: baseline) so the mono text sits on the serif title's
    baseline rather than centered-above. */
 .til-card-header .post-type-badge {
+  /* Escape hatch (level 2) — its own destination (/links/, /til/, ...). */
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Footer row: read-more (left) + right-aligned meta rail (date + topic +
@@ -1850,8 +1895,9 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
 
 .til-card-footer a,
 .til-card-footer .linklist {
+  /* Escape hatches (level 2): the permalink, the domain, the tags. */
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Inside the compact footer rail, the "Tags:" label reads as form-field
@@ -1895,11 +1941,22 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   font-size: inherit;
 }
 
+/* The bookmark title anchor covers its whole card, so the card goes where the
+   title goes: off-site, to the source. It uses ::before because ::after below is
+   the ↗ glyph. See "Card cover-link stacking". */
+.til-card--bookmark .p-name a.u-bookmark-of::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .til-card--bookmark .p-name a.u-bookmark-of::after {
-  /* External-link glyph (P2 audit): NBSP + ↗ after bookmark title so readers
-     see the title goes off-site. Cloudberry ties it to the left-edge accent.
-     position:static + inset:auto overrides the base .post-title a::after
-     cover-link trick (which stretches the anchor over the whole card). */
+  /* External-link glyph (P2 audit): NBSP + ↗ after the bookmark title so readers
+     see the title goes off-site — and, since the title anchor now covers the whole
+     card, that the CARD goes off-site. Cloudberry ties it to the left-edge accent.
+     position:static + inset:auto undo the base `.post-title a::after` cover, which
+     this rule replaces: on a bookmark card the cover lives on ::before instead. */
   content: '\00A0\2197';
   font-size: 0.8em;
   /* The AA-safe variant, not the raw accent: this glyph carries meaning ("the
@@ -1913,25 +1970,16 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   inset: auto;
 }
 
-/* Bookmark cards carry two nav targets: the title (external bookmark-of URL)
-   and the permalink (author's commentary). The read-more anchor ("Read full
-   note →") is the permalink entry, but users click body text instinctively.
-   Extend the read-more's hit area to cover the whole card via an invisible
-   ::before; the title's u-bookmark-of anchor and the pill + footer links sit
-   above the cover via z-index:1 so they stay independently clickable. No
-   duplicate anchor is introduced — screen readers still see one "Read full
-   note" link, not an extra "excerpt-body" link. */
-.til-card--bookmark .post-read-more::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
+/* The bookmark title anchor hosts its card's cover, so it must stay UNPOSITIONED:
+   `position: relative` here would make it the containing block for its own
+   ::before and trap the cover inside the title's own box. That is precisely the
+   bug this replaced — the old cover hung off `.post-read-more`, which was
+   `position: relative`, so the "whole-card" hit area only ever covered the
+   read-more link.
 
-.til-card--bookmark .p-name a.u-bookmark-of {
-  position: relative;
-  z-index: 1;
-}
+   "Read full note →" is now the escape hatch to the note itself, at level 2 with
+   the other footer links. No duplicate anchor is introduced — screen readers
+   still see one link per destination, not an extra "excerpt-body" link. */
 
 /* Variant: .til-card--release (release notes posts).
    Falu-red left-edge accent signals a product-release post (npm package
