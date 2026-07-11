@@ -443,6 +443,22 @@ img {
   gap: 4px;
 }
 
+/* On input capability, two deliberate and opposite decisions:
+
+   - HOVER is gated on `@media (hover: hover)` (see the blocks below). On touch,
+     :hover applies on tap and then STICKS until you tap elsewhere — without the
+     gate, the subscribe button stays falu-red and pressed, and cards stay on
+     their hover surface, after a tap.
+
+   - SIZING is NOT gated on `@media (pointer: coarse)`, because it would be a
+     no-op: these paddings already clear the 44px touch floor at every width, so
+     a touchscreen laptop (coarse pointer, desktop layout) is already served
+     correctly by the desktop rules. That is a measured claim rather than a hope
+     — and a fragile one, since this padding has already been trimmed once to
+     make the sidebar fit its viewport. e2e/touch-targets.test.js measures it on
+     a coarse pointer AT DESKTOP WIDTH and fails if it stops holding. If that
+     test ever goes red, THAT is the moment to add pointer:coarse sizing rules —
+     not before. */
 .nav-item {
   font-family: var(--font-mono);
   font-size: var(--fs-sm-plus);
@@ -457,11 +473,17 @@ img {
   color: var(--color-ink);
 }
 
-.nav-item:hover {
-  background-color: var(--color-canvas-alt);
-  border-color: var(--color-stone);
-  transform: translateX(4px);
-  color: var(--color-ink);
+/* Scoped to hover-capable pointers. On touch, :hover is applied on tap and then
+   PERSISTS until you tap elsewhere — so without this the button stays falu-red
+   and pressed, and cards stay in their hover state, after a tap. Keyboard users
+   are unaffected: they are served by :focus-visible, not :hover. */
+@media (hover: hover) {
+  .nav-item:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-stone);
+    transform: translateX(4px);
+    color: var(--color-ink);
+  }
 }
 
 .nav-arrow {
@@ -706,12 +728,14 @@ img {
   text-decoration: none;
 }
 
-.btn:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-btn-shadow);
-  background-color: var(--color-falu-red);
-  border-color: var(--color-falu-red);
-  color: var(--color-canvas);
+@media (hover: hover) {
+  .btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--color-btn-shadow);
+    background-color: var(--color-falu-red);
+    border-color: var(--color-falu-red);
+    color: var(--color-canvas);
+  }
 }
 
 .btn:active {
@@ -774,12 +798,14 @@ img {
   transition: transform 0.2s var(--ease-spring);
 }
 
-.post-card:hover {
-  background-color: var(--color-canvas-alt);
-}
+@media (hover: hover) {
+  .post-card:hover {
+    background-color: var(--color-canvas-alt);
+  }
 
-.post-card:hover::before {
-  transform: scaleY(1);
+  .post-card:hover::before {
+    transform: scaleY(1);
+  }
 }
 
 .post-meta {
@@ -819,8 +845,10 @@ img {
   inset: 0;
 }
 
-.post-card:hover .post-title a {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .post-card:hover .post-title a {
+    color: var(--color-falu-red);
+  }
 }
 
 /* === Post excerpt === */
@@ -1680,8 +1708,10 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   box-shadow: inset 3px 0 0 var(--color-stone);
 }
 
-.til-card:hover {
-  background-color: var(--color-canvas-alt);
+@media (hover: hover) {
+  .til-card:hover {
+    background-color: var(--color-canvas-alt);
+  }
 }
 
 .til-card .post-excerpt {

@@ -50,9 +50,15 @@ const TOGGLE_STYLES = `
     transition: transform 0.12s, box-shadow 0.12s;
   }
 
-  button:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 1px 1px 0 var(--color-ink, #2c2a28);
+  /* Scoped to hover-capable pointers: on touch, :hover sticks after a tap, so the
+     toggle would stay lifted. Shadow DOM is isolated from the outer stylesheet's
+     @media, so this has to be declared in here — same reason the reduced-motion
+     rule below is duplicated inside these styles. */
+  @media (hover: hover) {
+    button:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 1px 1px 0 var(--color-ink, #2c2a28);
+    }
   }
 
   /* Shadow DOM is isolated from outer :focus-visible rules — inner rule required for WCAG 2.4.11 */
