@@ -931,18 +931,34 @@ img {
   margin: 0 0 0.25em;
 }
 
+/* The fade must dissolve into whatever surface its card is *currently* painting,
+   so the card owns that colour and the fade only reads it. Declaring it twice is
+   what broke it: the swap was scoped to `.post-card:hover`, so a hovered
+   `.til-card` darkened to canvas-alt while its fade kept dissolving into the
+   resting canvas — a pale band with a hard edge across the excerpt. The swap was
+   also ungated, so on a touch device the fade changed while the card (correctly
+   gated) did not — the same mismatch, inverted. One declaration per surface means
+   a third card type cannot reintroduce either bug. */
+.post-card,
+.til-card {
+  --card-surface: var(--color-canvas);
+}
+
 .post-excerpt-fade {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 3em;
-  background: linear-gradient(to bottom, transparent, var(--color-canvas));
+  background: linear-gradient(to bottom, transparent, var(--card-surface));
   pointer-events: none;
 }
 
-.post-card:hover .post-excerpt-fade {
-  background: linear-gradient(to bottom, transparent, var(--color-canvas-alt));
+@media (hover: hover) {
+  .post-card:hover,
+  .til-card:hover {
+    --card-surface: var(--color-canvas-alt);
+  }
 }
 
 .post-read-more {

@@ -73,4 +73,128 @@ test.describe('hover affordances on a touch device', () => {
 
     await expect(card, 'the card must not stay on its hover surface').toHaveCSS('background-color', resting);
   });
+
+  // Both card types: the `.post-card` fade swap used to sit OUTSIDE
+  // `@media (hover: hover)` while the card's own background sat inside it, so on a
+  // touch device the fade swapped and the card did not — a band, the same defect as
+  // the `.til-card` bug but arriving from the opposite direction.
+  for (const card of ['.post-card', '.til-card']) {
+    test(`tapping a ${card} does not leave its excerpt fade stuck on the hover surface`, async ({ page }) => {
+      await page.goto('/');
+
+      const target = page.locator(`${card}:has(.post-excerpt-fade)`).first();
+      const resting = await effectiveSurface(target);
+
+      await target.hover();
+      await settle(target);
+
+      expect(
+        await fadeTargetColour(target),
+        `${card}'s fade must not swap to the hover surface on a device that cannot hover`
+      ).toBe(resting);
+    });
+  }
+});
+
+/**
+ * The colour a `.post-excerpt-fade` inside `card` actually dissolves into.
+ *
+ * The computed `background-image` is a resolved gradient, e.g.
+ * `linear-gradient(rgba(0, 0, 0, 0) 0%, rgb(233, 229, 222) 100%)` — so the final
+ * `rgb(...)` stop IS the colour the excerpt fades out to. Comparing it against the
+ * card's own `background-color` is the whole invariant: a fade that dissolves into
+ * a colour its card is not painting draws a visible band with a hard edge.
+ *
+ * @param {import('@playwright/test').Locator} card
+ * @returns {Promise<string>} the gradient's final colour stop, as `rgb(r, g, b)`
+ */
+async function fadeTargetColour (card) {
+  const gradient = await card.locator('.post-excerpt-fade')
+    .evaluate(el => getComputedStyle(el).backgroundImage);
+
+  const stops = gradient.match(/rgba?\([^)]*\)/g);
+  if (!stops?.length) throw new Error(`no colour stops in background-image: ${gradient}`);
+
+  return /** @type {string} */ (stops.at(-1));
+}
+
+/**
+ * The colour actually painted behind `card`.
+ *
+ * NOT the same as the card's own `background-color`: at rest the cards paint
+ * nothing (`rgba(0, 0, 0, 0)`) and the parchment the reader sees comes from
+ * `.layout-wrapper` underneath. Only on hover does a card paint its own surface.
+ * So the comparison the fade has to satisfy is against the *effective* surface —
+ * walk up until something is actually opaque.
+ *
+ * @param {import('@playwright/test').Locator} card
+ * @returns {Promise<string>} the painted colour, as `rgb(r, g, b)`
+ */
+async function effectiveSurface (card) {
+  return card.evaluate((el) => {
+    for (let node = /** @type {Element | null} */ (el); node; node = node.parentElement) {
+      const bg = getComputedStyle(node).backgroundColor;
+      if (bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
+    }
+    throw new Error('nothing in the ancestor chain paints a background');
+  });
+}
+
+/**
+ * Wait for the card's background-color transition to finish, so the comparison
+ * reads a settled colour rather than an interpolated one that exists in no state.
+ *
+ * @param {import('@playwright/test').Locator} card
+ */
+async function settle (card) {
+  await card.evaluate(el => Promise.all(
+    el.getAnimations()
+      .filter(a => a instanceof globalThis.CSSTransition)
+      .map(a => a.finished)
+  ));
+}
+
+/**
+ * The excerpt fade is a gradient painted ON TOP of its card, dissolving the text
+ * into the card's own surface. So its end colour is not free: it must equal
+ * whatever the card is painting right now, in every state and on every card type.
+ *
+ * This used to be asserted twice — once by the card, once by a
+ * `.post-card:hover .post-excerpt-fade` override — and the two drifted the moment
+ * a second card type existed. `.til-card` hovered to canvas-alt while its fade
+ * still dissolved into canvas, banding the excerpt. The card now owns the colour
+ * as `--card-surface` and the fade only reads it; these tests pin that.
+ */
+test.describe('the excerpt fade dissolves into its card', () => {
+  for (const card of ['.post-card', '.til-card']) {
+    test(`${card}: at rest`, async ({ page }) => {
+      await page.goto('/');
+
+      const target = page.locator(`${card}:has(.post-excerpt-fade)`).first();
+      const surface = await effectiveSurface(target);
+
+      expect(await fadeTargetColour(target), `${card}'s resting fade must match its resting surface`)
+        .toBe(surface);
+    });
+
+    test(`${card}: on hover`, async ({ page }) => {
+      await page.goto('/');
+
+      const target = page.locator(`${card}:has(.post-excerpt-fade)`).first();
+      const resting = await effectiveSurface(target);
+
+      await target.hover();
+      await settle(target);
+
+      const hovered = await effectiveSurface(target);
+
+      // Guard: if the card never actually changed surface, the assertion below
+      // would pass for free and prove nothing.
+      expect(hovered, `${card} must actually take a hover surface, or this test is vacuous`)
+        .not.toBe(resting);
+
+      expect(await fadeTargetColour(target), `${card}'s fade must follow its card onto the hover surface`)
+        .toBe(hovered);
+    });
+  }
 });
