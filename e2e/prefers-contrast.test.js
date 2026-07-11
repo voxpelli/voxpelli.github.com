@@ -81,11 +81,12 @@ function readTokens (page) {
 }
 
 test.describe('prefers-contrast: more (macOS/iOS "Increase Contrast")', () => {
-  // NB: `contrast` is a BrowserContext option, NOT a Playwright test option the
-  // way colorScheme/forcedColors/reducedMotion are. `test.use({ contrast })`
-  // is accepted and then SILENTLY IGNORED — the emulation never happens, and a
-  // test written that way passes while asserting nothing. Route it through
-  // contextOptions, which is a real test option.
+  // NB: `contrast` is a BrowserContext option, NOT a Playwright test option — and
+  // neither are `forcedColors` and `reducedMotion` (only `colorScheme` is). Passing
+  // any of them to `test.use()` directly is accepted and then SILENTLY IGNORED: the
+  // emulation never happens and the test passes while asserting nothing. All three
+  // must be routed through `contextOptions`, which IS a real test option. Playwright
+  // documents exactly this, using `reducedMotion` as its worked example.
   test.use({ contextOptions: { contrast: 'more' } });
 
   test('muted text reaches AAA when the user asks for more contrast', async ({ page }) => {

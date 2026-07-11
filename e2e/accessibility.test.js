@@ -1,21 +1,37 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-// Flipping data-theme mid-page starts CSS colour transitions (.btn transitions
-// color/background-color over 0.2s). axe reads *computed* colours, so scanning
-// mid-transition reports blended intermediates belonging to no theme — phantom
-// contrast failures against colours that exist nowhere in global.css. Emulating
-// reduced motion engages the stylesheet's own
+// Flipping data-theme mid-page starts CSS colour transitions (cards, nav items and
+// buttons transition `color` over 0.2s, while the page background is not
+// transitioned and snaps immediately). axe reads *computed* colours, so a scan that
+// lands inside that window sees the OLD theme's foreground on the NEW theme's
+// background — e.g. light ink #2c2a28 on dark canvas #1e1d1b, 1.17:1. That pairing
+// exists in no settled state, since each dark block defines every token at once.
+// Emulating reduced motion engages the stylesheet's own
 // `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms } }`
-// block, so the theme switch is instant and axe always samples settled colours.
-// Contrast rules describe the resting state, not a frame of a fade.
+// block, so the switch is instant and axe always samples settled colours. Contrast
+// rules describe the resting state, not a frame of a fade.
+//
+// It MUST go through `contextOptions`: `reducedMotion` is a BrowserContextOption,
+// not a test option, so `test.use({ reducedMotion: 'reduce' })` is accepted and
+// silently discarded. It was written that way, emulated nothing, and the suite
+// passed locally purely because a fast machine settled the transition before axe
+// looked. CI, being slower, caught the mid-fade frame and went red.
 //
 // This is only sound while that block neuters *motion* and nothing else (today:
 // animation-duration, animation-iteration-count, transition-duration,
 // scroll-behavior). If it ever changes a colour, size, or visibility, this
 // emulation stops being a no-op and the suite would validate a rendering most
 // users never see.
-test.use({ reducedMotion: 'reduce' });
+test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+test('reduced motion is actually emulated', async ({ page }) => {
+  // Guard the premise: without it, the emulation can silently stop applying and
+  // every scan below quietly goes back to racing a 0.2s fade.
+  await page.goto('/');
+  const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+  expect(reduced, 'the axe scans below race a colour fade unless motion is reduced').toBe(true);
+});
 
 const pages = [
   { name: 'homepage', path: '/' },
@@ -31,6 +47,18 @@ const pages = [
 ];
 
 /**
+ * Flip the theme, then wait until the colour transitions it starts have finished.
+ *
+ * Reduced motion is NOT sufficient on its own. It shrinks each transition to
+ * 0.01ms but does not stop one being *created*: flipping data-theme spawns ~330
+ * CSSTransitions, and getComputedStyle reports each property's START value until
+ * a frame advances. Measured immediately after the flip, `body` still computes
+ * rgb(44,42,40) — the light ink — while --color-ink already reads #cecbc7. axe
+ * scanning in that window sees the old theme's foreground on the new theme's
+ * background (1.17:1) and reports contrast failures against colour pairs that
+ * exist in no theme. Waiting for the transitions to drain is what makes the scan
+ * describe the resting state, which is what the contrast rules are about.
+ *
  * @param {import('@playwright/test').Page} page
  * @param {string} theme
  */
@@ -38,6 +66,10 @@ async function setTheme (page, theme) {
   await page.evaluate((t) => {
     document.documentElement.dataset.theme = t;
   }, theme);
+
+  await page.waitForFunction(
+    () => document.getAnimations().every((a) => a.playState !== 'running')
+  );
 }
 
 /**

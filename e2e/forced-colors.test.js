@@ -21,9 +21,23 @@ import { expect, test } from '@playwright/test';
  * These tests pin the non-colour cues that carry meaning when colour is taken away.
  */
 
-test.use({ forcedColors: 'active' });
+// `forcedColors` is a BrowserContextOption, NOT a test option — Playwright never
+// registers a `forcedColors` fixture, so `test.use({ forcedColors: 'active' })` is
+// accepted and silently dropped. It has to travel via `contextOptions`, exactly as
+// Playwright's own docs for that option show. Same for `reducedMotion` and `contrast`.
+test.use({ contextOptions: { forcedColors: 'active' } });
 
 test.describe('forced-colors: meaning survives without colour', () => {
+  test('forced-colors is actually emulated', async ({ page }) => {
+    // Guard the premise. Every other assertion in this file happens to hold in
+    // ordinary rendering too (a mask is a mask, an outline is an outline), so if
+    // the emulation silently stops applying, the suite goes green having tested
+    // nothing. It did exactly that until this guard was added.
+    await page.goto('/');
+    const active = await page.evaluate(() => matchMedia('(forced-colors: active)').matches);
+    expect(active, 'this whole file is vacuous unless forced-colors is emulated').toBe(true);
+  });
+
   test('the webmention glyph is painted with a forced colour, not a baked-in one', async ({ page }) => {
     await page.goto('/2019/10/use-type-script-3-7-to-generate/');
 
