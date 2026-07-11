@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+import { WEBMENTION_INJECTED_REGION } from './third-party.js';
+
 // Flipping data-theme mid-page starts CSS colour transitions (cards, nav items and
 // buttons transition `color` over 0.2s, while the page background is not
 // transitioned and snaps immediately). axe reads *computed* colours, so a scan that
@@ -9,8 +11,9 @@ import { expect, test } from '@playwright/test';
 // exists in no settled state, since each dark block defines every token at once.
 // Emulating reduced motion engages the stylesheet's own
 // `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms } }`
-// block, so the switch is instant and axe always samples settled colours. Contrast
-// rules describe the resting state, not a frame of a fade.
+// block, which shrinks each transition to nothing. That alone is NOT enough — see
+// setTheme() below, which is what actually makes the scan see settled colours — but
+// it makes the wait there instant instead of 200ms per page.
 //
 // It MUST go through `contextOptions`: `reducedMotion` is a BrowserContextOption,
 // not a test option, so `test.use({ reducedMotion: 'reduce' })` is accepted and
@@ -87,6 +90,7 @@ test.describe('accessibility: light mode', () => {
       await setTheme(page, 'light');
 
       const results = await new AxeBuilder({ page })
+        .exclude(WEBMENTION_INJECTED_REGION)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 
@@ -102,6 +106,7 @@ test.describe('accessibility: dark mode', () => {
       await setTheme(page, 'dark');
 
       const results = await new AxeBuilder({ page })
+        .exclude(WEBMENTION_INJECTED_REGION)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 
@@ -130,6 +135,7 @@ test.describe('accessibility: OS dark (prefers-color-scheme, no data-theme)', ()
       expect(attr, 'first visit must not set data-theme — the media query styles it').toBeNull();
 
       const results = await new AxeBuilder({ page })
+        .exclude(WEBMENTION_INJECTED_REGION)
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 

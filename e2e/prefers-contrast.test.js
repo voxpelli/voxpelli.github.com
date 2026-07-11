@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+import { WEBMENTION_INJECTED_REGION } from './third-party.js';
+
 /**
  * macOS/iOS "Increase Contrast" — `@media (prefers-contrast: more)`.
  *
@@ -120,6 +122,7 @@ test.describe('prefers-contrast: more (macOS/iOS "Increase Contrast")', () => {
     await page.goto('/2019/10/use-type-script-3-7-to-generate/');
 
     const results = await new AxeBuilder({ page })
+      .exclude(WEBMENTION_INJECTED_REGION)
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();
 

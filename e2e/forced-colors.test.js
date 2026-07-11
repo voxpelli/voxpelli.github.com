@@ -39,6 +39,11 @@ test.describe('forced-colors: meaning survives without colour', () => {
   });
 
   test('the webmention glyph is painted with a forced colour, not a baked-in one', async ({ page }) => {
+    // The widget REPLACES `<a class="u-responses">` with its own markup once the
+    // mentions arrive, so this test is racing the element it asserts on: it passes
+    // only while the fetch is still in flight. Block the script — the subject here
+    // is OUR ::before glyph on OUR element, not the widget.
+    await page.route('**/js/cutting-edge.js', route => route.abort());
     await page.goto('/2019/10/use-type-script-3-7-to-generate/');
 
     // The glyph is a ::before on the no-JS webmention link. It must be drawn by

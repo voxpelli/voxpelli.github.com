@@ -504,6 +504,23 @@ img {
   color: var(--color-canvas);
 }
 
+/* The active nav item is an inverted chip: ink ground, canvas text. Forced-colors
+   mode reverts BOTH `color` and `background-color` to the user's palette, so the
+   inversion simply evaporates and the active item renders identically to every
+   inactive one — the selected state disappears for a sighted high-contrast user.
+   (aria-current still carries it for assistive tech; this is the visual half.)
+   The system-colour keyword pair for a selected item is Highlight/HighlightText,
+   which the UA guarantees to be a legible combination in whatever theme the user
+   picked. Don't substitute our own tokens here: forced-colors would revert them. */
+@media (forced-colors: active) {
+  .nav-item.active,
+  .nav-item.active:hover {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}
+
 /* === Nav Disclosure (button/drawer hamburger) === */
 
 /* No-JS: hamburger never shown, drawer always visible */
@@ -870,6 +887,16 @@ img {
 
 .post-excerpt p {
   margin: 0 0 0.5em;
+}
+
+/* The excerpt is muted (--color-ink-light) while a link inside it keeps --color-ink.
+   That is a 1.84:1 difference — under the 3:1 WCAG asks for when colour is the ONLY
+   thing separating a link from its surrounding text, so the link needs a second cue.
+   Underline it, exactly as .e-content a already is in article bodies. Enforced by
+   axe's link-in-text-block rule on /articles/. */
+.post-excerpt a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .post-excerpt p:last-of-type {
