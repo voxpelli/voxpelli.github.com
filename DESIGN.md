@@ -161,6 +161,19 @@ reach).
 **The One Accent Rule.** Falu red is the only accent that gets to be loud, and it stays under ~10% of
 any view. Two competing loud accents is how this becomes the corporate dev blog.
 
+**The System Colour Rule.** In `forced-colors: active` the user's palette replaces ours, and it replaces
+it *by role*: `color` becomes a text colour, `background-color` becomes a **background** colour. So a
+property inherits the meaning of the property, not the meaning you intended — `background-color:
+currentColor` on a masked glyph does not become the text colour, it becomes **Canvas**, and the glyph
+paints white-on-white and disappears. Whenever a colour has to survive, **name the role you mean**:
+`CanvasText` for text, `LinkText` inside a link, `Highlight` / `HighlightText` for a selected item.
+Never re-name our own tokens there — they would simply be reverted again. Two properties are *never*
+forced and are therefore the only reliable non-colour cues: **`opacity`** and **`border-width`**.
+(Corollary: a decorative `opacity: 0.7` survives into a palette chosen for maximum contrast and quietly
+eats it — take it back to `1`.) Audit test: if a rule inside `@media (forced-colors: active)` mentions a
+`--color-*` token, it is wrong. Enforced by `e2e/forced-colors.test.js`, where every assertion is
+checked by mutation: delete the rule it guards and the test must go red.
+
 ## 3. Typography
 
 **Display Font:** Newsreader (serif) — also the *body* font, unusually
@@ -265,6 +278,12 @@ Used for post-type badges (LINK / TIL / RELEASE).
 - **States:** Active item carries `aria-current="page"` and a falu-red marker; hover nudges on the
   x-axis. The mobile drawer is a full-viewport overlay driven by `aria-expanded` — never
   `<details>/<summary>`.
+- **Active item, in forced colours:** the active item is an *inverted chip* (ink ground, canvas text),
+  and forced colours revert **both** properties — so the inversion evaporates and the selected item
+  renders identically to every unselected one. It is restored with the system pair for a selected item,
+  `background-color: Highlight; color: HighlightText`. Three redundant signals carry "current page":
+  the colour inversion, the `.nav-arrow` (revealed by `opacity`, which is never forced), and
+  `aria-current`. *(The System Colour Rule.)*
 
 ### Signature Component: the sidebar
 A full-height column carrying the wordmark, an h-card, the nav, subscribe, and the notbyai badge.
@@ -283,6 +302,11 @@ height guard it sticks; below it, it goes static. Enforced by `e2e/sidebar.test.
 - **Do** give links inside prose a **non-colour cue** (an underline). Colour alone is never the carrier.
 - **Do** design dark mode as its own theme. It is not an inversion.
 - **Do** let structure be carried by **borders** — 2px ink, 1px stone.
+- **Do** name the **role** in forced colours — `CanvasText`, `LinkText`, `Highlight` / `HighlightText` —
+  never one of our own tokens, which would just be reverted again. *(The System Colour Rule.)*
+- **Do** treat any state carried by an inversion (light text on a dark chip) as **lost** in forced
+  colours, and give it a second cue that isn't colour — `opacity` and `border-width` are the only two
+  properties the user's palette never touches.
 
 ### Don't:
 - **Don't** add a blurred or translucent `box-shadow`. If it has a blur radius or an `rgba()`, it is
@@ -291,7 +315,13 @@ height guard it sticks; below it, it goes static. Enforced by `e2e/sidebar.test.
   forced to `none` in high-contrast mode. *(The Shadow Is Not Load-Bearing Rule.)*
 - **Don't** paint an icon with a `url()` `background-image`. Those are the one thing forced-colors does
   NOT override, so the icon keeps a colour nobody can see. Mask the shape and colour it with
-  `background-color: currentColor`, which *is* forced — and which adapts to dark mode for free.
+  `background-color: currentColor`, which adapts to dark mode for free.
+- **Don't** then assume that masked icon survives forced colours, because it does not.
+  `background-color` **is** reverted — but *to a background colour* (`Canvas`), not to the text colour —
+  so the glyph paints white-on-white and disappears entirely. Add a `@media (forced-colors: active)`
+  block naming a **text** system colour (`LinkText` inside a link, otherwise `CanvasText`), and reset any
+  decorative `opacity` to `1`. *(The System Colour Rule.)* This exact bug shipped once and was invisible
+  until the forced-colors tests were made honest.
 - **Don't** ship a `:hover` rule that changes state without gating it on `@media (hover: hover)`. On
   touch, `:hover` sticks after a tap — the button stays pressed, the card stays lit. *(The press is
   the signature; a press that won't let go is a bug.)* Keyboard users are served by `:focus-visible`,
