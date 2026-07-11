@@ -1,7 +1,8 @@
 # v11 ships `.d.ts` files that fail `tsc` (breaks `skipLibCheck: false` consumers)
 
-> **Status: DRAFT — not filed.** Written for review before opening upstream on
-> `bcomnes/domstack`.
+`Labels: bug, types, dx`
+
+---
 
 ## Summary
 
