@@ -191,9 +191,6 @@ body {
   }
 
   .sidebar {
-    position: sticky;
-    top: 0;
-    height: 100vh;
     border-bottom: none;
     border-right: var(--border-heavy);
   }
@@ -278,13 +275,43 @@ img {
 /* Desktop: restore generous spacing + sticky sidebar layout */
 @media (min-width: 1024px) {
   .sidebar {
-    padding: var(--space-xl) var(--space-lg);
-    gap: var(--space-xl);
+    /* --space-xl for both padding and gap put ~240px (a quarter of the sidebar)
+       into whitespace, which is what pushed the footer past 100vh. Trimmed to
+       --space-md: costs no content, and lets the sidebar fit — and therefore
+       stick — on ordinary laptop viewports. */
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-md);
+    border-bottom: none;
+    border-right: var(--border-heavy);
+  }
+}
+
+/* Sticky ONLY when the sidebar actually fits the viewport.
+
+   The sidebar must never scroll — it is a navigation landmark, not a scroll
+   region — so `overflow-y: auto` is not on the table. It used to be sticky with
+   `height: 100vh` unconditionally, which meant any content past 100vh painted
+   outside a *pinned* box: page-scrolling could never reach it, and the notbyai
+   badge sat off-screen on every desktop viewport.
+
+   Below this guard the sidebar goes static and scrolls with the page, so
+   everything stays reachable — without the sidebar ever growing a scrollbar.
+
+   860px is not arbitrary: the sidebar's intrinsic content measures 781–833px
+   (it grows with width, because the spacing is fluid `clamp()`), so this clears
+   the worst case with ~27px to spare, while still engaging on ordinary laptop
+   viewports (~866px+).
+
+   That headroom is thin ON PURPOSE, and it is defended: e2e/sidebar.test.js
+   measures the sidebar at a viewport exactly this tall, at the widest layout,
+   and fails if the content no longer fits. Add a sixth nav item and that test
+   goes red — loudly — instead of the badge quietly vanishing again. If it does
+   go red, trim the sidebar or raise this number; do not add an inner scrollbar. */
+@media (min-width: 768px) and (min-height: 860px) {
+  .sidebar {
     position: sticky;
     top: 0;
     height: 100vh;
-    border-bottom: none;
-    border-right: var(--border-heavy);
   }
 }
 
@@ -339,8 +366,8 @@ img {
 }
 
 .profile-widget img {
-  width: 72px;
-  height: 72px;
+  width: 56px;
+  height: 56px;
   border-radius: 6px;
   border: var(--border-structural);
   filter: grayscale(20%);
@@ -451,14 +478,19 @@ img {
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .nav-drawer {
-    gap: var(--space-md);
+    /* The 260px tablet column wraps more, so its content runs taller than the
+       desktop one — it was the last thing keeping the sidebar from fitting. */
+    gap: var(--space-sm);
   }
 
 }
 
 @media (min-width: 1024px) {
   .nav-drawer {
-    gap: var(--space-xl);
+    /* Was --space-xl. Between the nav, the subscribe button and the theme
+       toggle that put ~105px of pure gap into the sidebar's height, which is
+       part of what pushed its footer past 100vh. */
+    gap: var(--space-md);
   }
 }
 
@@ -619,7 +651,10 @@ img {
   .nav-drawer .nav-item {
     /* Mobile nav override — fixed 1rem (no fluid scaling in drawer) */
     font-size: 1rem;
-    padding: 0.875rem 1rem;
+    /* Was 0.875rem. Trimmed to help the sidebar fit its own viewport; still
+       ~50px tall, comfortably over the 44px touch-target floor that
+       e2e/touch-targets.test.js enforces. */
+    padding: 0.6875rem 1rem;
   }
 
   .nav-drawer .nav-arrow {
@@ -2183,8 +2218,25 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   padding-top: var(--space-sm);
 }
 
+/* NB: no `margin-top: auto` here. That belongs only to the sticky case, where
+   the sidebar is a fixed 100vh box and the badge should sit at its foot. When
+   the sidebar is static it stretches to the full grid row (the article's whole
+   height), and an auto margin there resolves to thousands of pixels — flinging
+   the badge to the very bottom of the page, far from the nav it belongs with.
+   See the sticky guard block above. */
 .notbyai-badge--sidebar {
-  margin-top: auto;
+  margin-top: var(--space-sm);
+}
+
+/* Sticky case only: the sidebar is a fixed 100vh box, so drop the badge to its
+   foot. This MUST live after the base rule above — both are single-class
+   selectors, so the later one wins, and putting it up with the sticky guard
+   (~line 290) meant the base rule silently overrode it and the badge floated
+   mid-column. Keep the media query in sync with that guard. */
+@media (min-width: 768px) and (min-height: 860px) {
+  .notbyai-badge--sidebar {
+    margin-top: auto;
+  }
 }
 
 .notbyai-badge--drawer {
