@@ -1362,16 +1362,20 @@ figcaption {
   color: var(--color-falu-red);
 }
 
-/* Content links: underlines for readability (article body + about page) */
+/* Content links: underlines for readability (article body + about page + the
+   sidebar subtitle's in-prose link — passes axe link-in-text-block via a
+   non-color cue, since the subtitle text is intentionally muted) */
 .e-content a,
-.about-page a {
+.about-page a,
+.brand-header .subtitle a {
   text-decoration: underline;
   text-decoration-color: var(--color-stone);
   text-underline-offset: 2px;
 }
 
 .e-content a:hover,
-.about-page a:hover {
+.about-page a:hover,
+.brand-header .subtitle a:hover {
   text-decoration-color: var(--color-falu-red);
   color: var(--color-falu-red);
 }
