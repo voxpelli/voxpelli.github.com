@@ -31,6 +31,13 @@ export default async function markdownItSettingsOverride (md) {
  * Wrap fenced code blocks in `<div class="code-block">` for horizontal-scroll
  * and theming hooks without relying on `.e-content pre` descendant selectors.
  *
+ * The `<pre>` also gets `tabindex="0"`. CSS makes it a horizontal scroll
+ * container (`pre:has(> code.hljs) { overflow: auto }`), and a scrollable region
+ * that cannot be focused is unreachable by keyboard — a keyboard-only reader
+ * could not scroll to see the rest of a long line (WCAG 2.1.1; axe
+ * `scrollable-region-focusable`). Only the `<pre>` gets it: tables scroll only
+ * when wide, so a blanket tabindex there would add empty tab stops.
+ *
  * @param {MarkdownIt} md
  */
 function wrapFence (md) {
@@ -38,7 +45,8 @@ function wrapFence (md) {
     self.renderToken(tokens, idx, options));
 
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-    const inner = defaultFence(tokens, idx, options, env, self);
+    const inner = defaultFence(tokens, idx, options, env, self)
+      .replace(/^<pre(?=[\s>])/, '<pre tabindex="0"');
     return `<div class="code-block">${inner}</div>\n`;
   };
 }
