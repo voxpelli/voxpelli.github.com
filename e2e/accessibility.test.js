@@ -77,3 +77,31 @@ test.describe('accessibility: dark mode', () => {
     });
   }
 });
+
+// The two describes above both drive dark mode through `[data-theme="dark"]`.
+// But that is only one of the stylesheet's two dark branches: a first-time
+// visitor with a dark OS and no stored preference gets NO data-theme attribute
+// at all, and is styled by `@media (prefers-color-scheme: dark) :root:not([data-theme])`.
+// dark-mode-sync.spec.js proves the two blocks declare the same VALUES, but
+// nothing proved the media branch actually applies. Drive it with a dark OS and
+// no setTheme() call, so the branch real users land on is the one axe scans.
+test.describe('accessibility: OS dark (prefers-color-scheme, no data-theme)', () => {
+  test.use({ colorScheme: 'dark' });
+
+  for (const { name, path } of pages) {
+    test(`${name} has no critical/serious WCAG 2.1 AA violations`, async ({ page }) => {
+      await page.goto(path);
+
+      // Guard the premise: if anything ever writes data-theme on first visit,
+      // this suite would silently be re-testing the attribute branch instead.
+      const attr = await page.locator('html').getAttribute('data-theme');
+      expect(attr, 'first visit must not set data-theme — the media query styles it').toBeNull();
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
+
+      expect(criticalOrSerious(results.violations)).toEqual([]);
+    });
+  }
+});
