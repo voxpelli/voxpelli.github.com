@@ -108,7 +108,7 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 **Brand personality**: Thoughtful, Technical, Warm.
 
 **"Sovereign Warmth" theme** (current foundation, open to evolution):
-- Palette: warm parchment canvas (`#f4f1eb`), deep ink (`#2c2a28`), falu red accent (`#8c2121`), cloudberry orange (`#d97714`), stone borders
+- Palette: warm parchment canvas (`#f4f1eb`), deep ink (`#2c2a28`), falu red accent (`#8c2121`), cloudberry orange (`#d97714`), stone borders. **Cloudberry is a display accent only** — small text must use `--color-cloudberry-text` (`#984200`), which is the AA-safe variant; the raw accent is 2.6:1 and fails WCAG AA. Enforced by `test/token-contrast.spec.js`
 - Typography: Newsreader (serif, headings/article body), Public Sans (sans, UI), JetBrains Mono (mono, metadata/nav/code). Fluid `clamp()` sizing
 - Layout: Two-column sidebar (340px sticky) + content area on desktop, stacked mobile
 - Mobile: hamburger menu via `<button aria-expanded>` + `.js/.no-js` class toggle (NOT `<details>/<summary>` — accessibility issues). Nav drawer is a fixed overlay with z-index stacking managed via `:has()` on `.sidebar`
@@ -118,8 +118,10 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 **Design principles**:
 1. **Content sovereignty** — design serves readability, never competes. Article text: serif, 65ch max-width
 2. **Warm technical** — engineering precision (mono metadata, grid background, structured borders) with warmth (parchment tones, serif type, organic colors)
-3. **IndieWeb native** — microformats (h-card, h-entry, h-feed) are structural. Webmentions, feeds, micropub are first-class
+3. **IndieWeb native** — microformats (h-card, h-entry, h-feed) are structural. Webmentions and feeds are first-class. (Micropub was removed — the endpoint is no longer hosted; see `f09ef14`)
 4. **Progressive layers** — works without JS, without custom fonts, in dark mode. Each layer enhances without breaking lower layers
 5. **Restrained motion** — subtle transforms and opacity transitions only. Respect `prefers-reduced-motion`. The universal `* { transition-duration: 0.01ms !important; scroll-behavior: auto !important }` block in `global.css` is load-bearing for ~10 motion sources BUT cannot reach `@view-transition { navigation: auto }` (navigation rule, not CSS property — gate with `@media (prefers-reduced-motion: no-preference)`) or Shadow DOM `<style>` blocks (isolated from outer `@media` — `<theme-toggle>` has its own inner `@media (prefers-reduced-motion: reduce)` rule in `TOGGLE_STYLES`). Any new motion in those contexts needs local gating.
 
-See `.impeccable.md` for full design context with references and detailed guidelines.
+**Full design context** lives in two root files (both read by the `impeccable` skill before any design work):
+- `PRODUCT.md` — strategy: register (`brand`), users, purpose, brand personality, **anti-references**, design principles, accessibility bar (WCAG 2.1 AA enforced; article text aims at AAA).
+- `DESIGN.md` — the visual system: tokens, the "Field Notebook" north star, and the named rules (**The Displacement Rule** — shadows are hard offsets, never blurred; **The Two Cloudberries Rule**; **The Earned Warmth Rule**; **The 65ch Rule**). Machine-readable extensions in `.impeccable/design.json`.
