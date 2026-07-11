@@ -2,11 +2,21 @@
 /public
 /.env
 
-# Top-level PNG screenshot leak guard (site assets under images/** still tracked)
+# Top-level screenshot/scratch leak guard (site assets under images/** still tracked)
 /*.png
+/*.jpg
+/*.jpeg
+/*.webp
 npm-debug.log
 yarn-error.log
 /.playwright-mcp
+
+# OS junk. Also covered by ~/.gitignore_global on this machine, but that is not
+# portable — a fresh clone, a contributor, or CI gets no such protection. Note
+# images/ and media/ are copied wholesale into the build (`domstack --copy`), so
+# stray dotfiles in there are worth keeping out of the tree.
+.DS_Store
+Thumbs.db
 
 # Retrospectives and sprint plans (local session notes)
 RETRO-*.md
@@ -17,6 +27,14 @@ PR_COMMENTS*.md
 # Machine-specific .claude/ state (synergy registry + any *.local.json)
 .claude/*.local.json
 .claude/synergy-*
+
+# impeccable: DESIGN.md's sidecar (.impeccable/design.json) and the live-mode
+# config ARE tracked — they're project design context. Only machine-local and
+# transient runtime state is excluded.
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
+.impeccable/live/annotations/
 
 # Playwright
 /test-results/
