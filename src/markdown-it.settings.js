@@ -45,8 +45,24 @@ function wrapFence (md) {
     self.renderToken(tokens, idx, options));
 
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-    const inner = defaultFence(tokens, idx, options, env, self)
-      .replace(/^<pre(?=[\s>])/, '<pre tabindex="0"');
+    const raw = defaultFence(tokens, idx, options, env, self);
+
+    // Fail the build rather than silently drop the a11y fix. A bare
+    // `.replace()` returns the input untouched when it doesn't match, so if an
+    // upstream change (a different highlighter, a copy-button plugin, another
+    // `fence` rule registered after this one) stops emitting a leading `<pre>`,
+    // the tabindex would just quietly vanish. axe would not reliably catch it
+    // either: `scrollable-region-focusable` only fires when a block actually
+    // overflows, which depends on the post's content.
+    if (!/^<pre(?=[\s>])/.test(raw)) {
+      throw new Error(
+        `markdown-it fence renderer no longer emits a leading <pre> (got: ${raw.slice(0, 60)}...). ` +
+        'The tabindex="0" fix that keeps scrollable code blocks keyboard-reachable ' +
+        '(WCAG 2.1.1) cannot be applied. Update wrapFence() in src/markdown-it.settings.js.'
+      );
+    }
+
+    const inner = raw.replace(/^<pre(?=[\s>])/, '<pre tabindex="0"');
     return `<div class="code-block">${inner}</div>\n`;
   };
 }

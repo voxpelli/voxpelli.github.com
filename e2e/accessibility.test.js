@@ -9,6 +9,12 @@ import { expect, test } from '@playwright/test';
 // `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms } }`
 // block, so the theme switch is instant and axe always samples settled colours.
 // Contrast rules describe the resting state, not a frame of a fade.
+//
+// This is only sound while that block neuters *motion* and nothing else (today:
+// animation-duration, animation-iteration-count, transition-duration,
+// scroll-behavior). If it ever changes a colour, size, or visibility, this
+// emulation stops being a no-op and the suite would validate a rendering most
+// users never see.
 test.use({ reducedMotion: 'reduce' });
 
 const pages = [

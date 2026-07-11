@@ -192,6 +192,39 @@ test('article page has non-empty e-content', async () => {
   assert.doesNotMatch(html, /\[object Object\]/, 'article page must not contain stringified objects');
 });
 
+test('code blocks are keyboard-focusable (a11y)', async () => {
+  // CSS makes `pre:has(> code.hljs)` a horizontal scroll container, and a scroll
+  // region that can't be focused is unreachable by keyboard (WCAG 2.1.1). The
+  // tabindex is injected by wrapFence() in src/markdown-it.settings.js.
+  //
+  // This guard lives in smoke, not e2e, on purpose: `npm run e2e` is NOT part of
+  // `npm test`, so the axe check never runs on pre-push. axe is also
+  // content-dependent here — `scrollable-region-focusable` only fires when a
+  // block actually overflows, so a shorter code sample could hide a regression.
+  const html = await readFile('public/2019/10/use-type-script-3-7-to-generate/index.html', 'utf8');
+  const pres = html.match(/<pre\b[^>]*>/g) ?? [];
+
+  assert.ok(pres.length > 0, 'article should contain code blocks to check');
+  for (const pre of pres) {
+    assert.match(pre, /tabindex="0"/, `every <pre> must be keyboard-focusable, got: ${pre}`);
+  }
+});
+
+test('link pill uses the AA-safe cloudberry text token (a11y)', async () => {
+  // Guards the WCAG AA fix: reverting .post-type-badge--link to the raw
+  // --color-cloudberry accent drops it to ~2.6:1. test/token-contrast.spec.js
+  // proves the token's VALUE is AA-safe; this proves the badge still USES it.
+  const css = await readFile('src/global.css', 'utf8');
+  const rule = css.match(/\.post-type-badge--link\s*\{[^}]*\}/);
+
+  assert.ok(rule, 'expected a .post-type-badge--link rule');
+  assert.match(
+    rule[0],
+    /color:\s*var\(--color-cloudberry-text\)/,
+    '.post-type-badge--link must use --color-cloudberry-text (the raw accent fails WCAG AA as small text)'
+  );
+});
+
 test('redirect pages generated from template', async () => {
   await access('public/2008/12/ny blogg/index.html');
   const html = await readFile('public/2008/12/ny blogg/index.html', 'utf8');
