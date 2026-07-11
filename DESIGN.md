@@ -19,6 +19,7 @@ colors:
   falu-red-dark: "#e56b6b"
   cloudberry-dark: "#e8941f"
   stone-dark: "#857f78"
+  sidebar-accent-dark: "rgba(200, 64, 64, 0.55)"
 typography:
   display:
     fontFamily: "Newsreader, serif"
@@ -51,6 +52,7 @@ rounded:
   chip: "2px"
   control: "4px"
   avatar: "6px"
+  full: "50%"
 spacing:
   xs: "clamp(0.5rem, 0.455rem + 0.227vw, 0.75rem)"
   sm: "clamp(0.75rem, 0.682rem + 0.341vw, 1.125rem)"
@@ -122,8 +124,13 @@ the work.
 
 ### Primary
 - **Falu Red** (`#8c2121`; dark `#e56b6b`): The site's one true accent — the pigment on Swedish barns
-  and cottages. It appears on link hover, on release badges, and as the sidebar's border in dark mode.
-  It is *never* a background fill for large areas. Its rarity is what makes it read as deliberate.
+  and cottages. It appears on link hover and on release badges. It is *never* a background fill for
+  large areas. Its rarity is what makes it read as deliberate.
+- **Sidebar Accent** (`rgba(200, 64, 64, 0.55)`, dark only): The sidebar's border in dark mode, and the
+  one red that is *not* falu. It composites to roughly `#7b302f` on the dark canvas — a banked ember,
+  not a flame. Falu red in dark is `#e56b6b`, and a 2px rule in that colour reads as a warning, not an
+  edge; the alpha is what keeps a full-height border from announcing itself. It has no light-mode value:
+  in light the sidebar takes its colour from the border shorthands.
 
 ### Secondary
 - **Cloudberry** (`#d97714`; dark `#e8941f`): The Nordic berry. A *display* accent — borders, the
@@ -203,7 +210,7 @@ the wrong job is a bug, not a style choice.
 **The 65ch Rule.** Article text never exceeds a 65ch measure, at any viewport. Reading is the product;
 everything else in the layout is negotiable, this is not.
 
-## 4. Elevation
+## 4. Elevation & Shape
 
 **There is no soft elevation in this system, and there never will be.** Structure is carried entirely
 by **borders** — 2px ink for structural edges, 1px stone for decorative ones — and by the grid ground.
@@ -236,6 +243,22 @@ acceptable, but only because nothing depends on it: every control that casts a s
 **2px border**, and the press is also a `transform`. Never let a shadow be the *only* thing that makes
 an element perceivable, bounded, or focused. (This is why focus rings use `outline` — `outline-color`
 is forced and survives; a `box-shadow` focus ring would vanish.) Enforced by `e2e/forced-colors.test.js`.
+
+### Radius Vocabulary
+
+Five steps, and only five. Each is a real CSS custom property — `--rounded-hairline` (1px),
+`--rounded-chip` (2px), `--rounded-control` (4px), `--rounded-avatar` (6px), `--rounded-full` (50%) —
+so a radius is *chosen from the scale*, never typed from memory. `full` is for circles: avatars and the
+webmention interaction glyphs. It is not a pill; nothing here is wide enough to become one.
+
+**The Corner Is Not a Dial Rule.** Radius is a **vocabulary, not a spectrum**. There are five values, they
+are named for what they are *for*, and a corner that lands between them is drift, not a new size. If a
+component seems to need 3px, it wants `chip` and the eye is inventing a difference that a reader will
+never see. If it seems to need a pill, it wants to be something other than a pill — a pill is an explicit
+anti-reference here, the tell of the corporate dev-marketing blog this site is the opposite of. Amending
+the scale means amending DESIGN.md *and* `.impeccable/design.json` together; anything else is a literal
+that will quietly breed more literals. Audit test: `grep 'border-radius' src/global.css` must return
+`var(--rounded-*)` on every line, with no exceptions.
 
 ## 5. Components
 

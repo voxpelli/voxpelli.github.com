@@ -31,6 +31,13 @@
   --color-stone-light: #e0dcd5;
   --color-grid: #e0dcd5;
   --color-btn-shadow: var(--color-stone);
+  /* The sidebar's border in dark mode ONLY — inert in light, where the sidebar
+     takes its colour from the border shorthands. Composites to ~#7b302f on the
+     dark canvas: a subdued red edge. Deliberately NOT --color-falu-red, which is
+     #e56b6b in dark and at 2px reads as a warning line rather than an accent.
+     Declared once here so the two dark blocks reference a value instead of each
+     re-typing the literal. */
+  --color-sidebar-accent-dark: rgba(200, 64, 64, 0.55);
 
   --font-serif: 'Newsreader', serif;
   --font-sans: 'Public Sans', sans-serif;
@@ -61,6 +68,18 @@
 
   --border-structural: 1px solid var(--color-stone);
   --border-heavy: 2px solid var(--color-ink);
+
+  /* Radius scale. DESIGN.md declares the first four steps; `full` names the
+     circular avatars that already existed outside the scale. There is no pill
+     step, and there must not be one — pills are an explicit anti-reference (the
+     "corporate dev-marketing blog"). A radius outside this set is drift, not a
+     new size: reach for the nearest step, or amend DESIGN.md and the sidecar
+     together. `.impeccable/design.json` enforces this. */
+  --rounded-hairline: 1px;
+  --rounded-chip: 2px;
+  --rounded-control: 4px;
+  --rounded-avatar: 6px;
+  --rounded-full: 50%;
 
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -168,12 +187,12 @@
 /* Dark mode: sidebar divider gets warm falu-red accent */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) .sidebar {
-    border-color: rgba(200, 64, 64, 0.55);
+    border-color: var(--color-sidebar-accent-dark);
   }
 }
 
 [data-theme="dark"] .sidebar {
-  border-color: rgba(200, 64, 64, 0.55);
+  border-color: var(--color-sidebar-accent-dark);
 }
 
 /* === Base === */
@@ -394,7 +413,7 @@ img {
 .profile-widget img {
   width: 56px;
   height: 56px;
-  border-radius: 6px;
+  border-radius: var(--rounded-avatar);
   border: var(--border-structural);
   filter: grayscale(20%);
 }
@@ -464,7 +483,7 @@ img {
   font-size: var(--fs-sm-plus);
   text-transform: uppercase;
   padding: 0.75rem 1rem;
-  border-radius: 4px;
+  border-radius: var(--rounded-control);
   border: 1px solid transparent;
   transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out), color 0.2s var(--ease-out);
   display: flex;
@@ -590,7 +609,7 @@ img {
   height: 2px;
   width: 100%;
   background-color: var(--color-ink);
-  border-radius: 1px;
+  border-radius: var(--rounded-hairline);
   transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
 }
 
@@ -650,7 +669,7 @@ img {
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: 4px;
+    border-radius: var(--rounded-control);
     position: absolute;
     top: var(--space-sm);
     right: var(--space-sm);
@@ -838,7 +857,7 @@ img {
 .badge {
   border: 1px solid var(--color-stone);
   padding: 0.15rem 0.5rem;
-  border-radius: 2px;
+  border-radius: var(--rounded-chip);
   background-color: var(--color-canvas);
   color: var(--color-ink);
 }
@@ -1001,7 +1020,7 @@ pre:has(> code.hljs) {
 .h-entry .h-card .u-photo,
 .h-card.summary-card .u-photo {
   width: 20px;
-  border-radius: 50%;
+  border-radius: var(--rounded-full);
   vertical-align: middle;
   position: relative;
   top: -2px;
@@ -1010,7 +1029,7 @@ pre:has(> code.hljs) {
 
 .h-card.full-card .u-photo {
   width: 97px;
-  border-radius: 50%;
+  border-radius: var(--rounded-full);
   float: left;
   margin-right: var(--space-md);
   margin-bottom: var(--space-xs);
@@ -1074,7 +1093,7 @@ time a,
   letter-spacing: 0.08em;
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--color-stone);
-  border-radius: 4px;
+  border-radius: var(--rounded-control);
   text-decoration: none;
   transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
 }
@@ -1211,7 +1230,7 @@ div.blog-article-summary + div.blog-article-summary {
   top: 0;
   left: calc(-1 * var(--space-xs));
   width: 50px;
-  border-radius: 50%;
+  border-radius: var(--rounded-full);
 }
 
 /* === Webmention form === */
@@ -1223,7 +1242,7 @@ input[type=url] {
   font-size: var(--fs-sm);
   background: var(--color-canvas);
   color: var(--color-ink);
-  border-radius: 4px;
+  border-radius: var(--rounded-control);
 }
 
 input[type=submit] {
@@ -1295,7 +1314,7 @@ form:has(#webmention-source) {
   color: var(--color-ink);
   background: var(--color-canvas-alt);
   border: 1px solid var(--color-stone);
-  border-radius: 50px;
+  border-radius: var(--rounded-full);
 }
 
 .webmention-interaction-like .webmention-interaction-presentation::after {
@@ -1312,7 +1331,7 @@ form:has(#webmention-source) {
   overflow: hidden;
   width: 2em;
   height: 2em;
-  border-radius: 50%;
+  border-radius: var(--rounded-full);
   background: var(--color-canvas-alt);
   border: 1px solid var(--color-stone);
 }
@@ -1359,7 +1378,7 @@ relative-time .relative-label {
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   text-decoration: none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 var(--rounded-control) var(--rounded-control);
 }
 
 .skip-link:focus {
@@ -1555,7 +1574,7 @@ figcaption {
   display: inline-block;
   border: 1px solid var(--color-stone);
   padding: 0.15rem 0.5rem;
-  border-radius: 2px;
+  border-radius: var(--rounded-chip);
   background-color: var(--color-canvas);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
@@ -1628,7 +1647,7 @@ figcaption {
   align-items: baseline;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-sm);
-  border-radius: 4px;
+  border-radius: var(--rounded-control);
   border: 1px solid transparent;
   text-decoration: none;
   color: var(--color-ink);
@@ -1659,7 +1678,7 @@ figcaption {
 }
 
 /* === Syntax highlighting (highlight.js theme-aware) === */
-pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--space-xs); display: block; }
+pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control); padding: var(--space-xs); display: block; }
 .hljs-comment { color: var(--hl-comment); font-style: italic }
 .hljs-keyword { font-weight: bold }
 .hljs-string { color: var(--hl-string) }
@@ -1932,7 +1951,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 0.1em 0.4em;
-  border-radius: 2px;
+  border-radius: var(--rounded-chip);
   border: 1px solid currentColor;
   background-color: color-mix(in oklab, currentColor 10%, transparent);
   line-height: 1.4;
@@ -2094,7 +2113,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
   font-size: var(--fs-sm);
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--color-stone);
-  border-radius: 3px;
+  border-radius: var(--rounded-chip);
   text-decoration: none;
   color: var(--color-ink);
   transition: background-color 0.15s var(--ease-out);
