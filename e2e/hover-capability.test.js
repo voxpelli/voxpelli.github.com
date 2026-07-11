@@ -180,6 +180,13 @@ test.describe('the excerpt fade dissolves into its card', () => {
     test(`${card}: on hover`, async ({ page }) => {
       await page.goto('/');
 
+      // The surface only swaps where hovering exists — the swap is inside
+      // `@media (hover: hover)` on purpose, so that a tap does not leave a card
+      // stuck on its hover surface. On a touch device there is nothing to assert;
+      // the touch-device suite above covers what must NOT happen there.
+      const canHover = await page.evaluate(() => matchMedia('(hover: hover)').matches);
+      test.skip(!canHover, 'no hover surface exists on a device that cannot hover');
+
       const target = page.locator(`${card}:has(.post-excerpt-fade)`).first();
       const resting = await effectiveSurface(target);
 
