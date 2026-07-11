@@ -15,6 +15,14 @@
   --color-ink-light: #555250;
   --color-falu-red: #8c2121;
   --color-cloudberry: #d97714;
+  /* Cloudberry is a display accent: at small text sizes it only reaches 2.6:1 on
+     parchment, so it fails WCAG AA. This is the AA-safe text variant (same hue,
+     lower lightness). Note .post-type-badge tints its background with 10% of its
+     own currentColor, so darkening the text darkens the backdrop too — this value
+     is solved against that composite (4.97:1), not against bare canvas. Use it
+     wherever cloudberry is small TEXT; keep --color-cloudberry for borders and
+     large/decorative accents. */
+  --color-cloudberry-text: #9c4400;
   --color-stone: #d1ccc5;
   --color-stone-light: #e0dcd5;
   --color-grid: #e0dcd5;
@@ -80,6 +88,10 @@
     --color-ink-light: #bab5ae;
     --color-falu-red: #e56b6b;
     --color-cloudberry: #e8941f;
+    /* Literal, NOT var(--color-cloudberry): the dark accent already clears AA on
+       dark surfaces, but aliasing would let a future palette edit silently drop
+       small text below 4.5:1. Keep >=4.5:1 against --color-canvas. */
+    --color-cloudberry-text: #e8941f;
     --color-stone: #857f78;
     --color-stone-light: #6e6862;
     --color-grid: #2a2826;
@@ -104,6 +116,10 @@
   --color-ink-light: #bab5ae;
   --color-falu-red: #e56b6b;
   --color-cloudberry: #e8941f;
+  /* Literal, NOT var(--color-cloudberry): the dark accent already clears AA on
+     dark surfaces, but aliasing would let a future palette edit silently drop
+     small text below 4.5:1. Keep >=4.5:1 against --color-canvas. */
+  --color-cloudberry-text: #e8941f;
   --color-stone: #857f78;
   --color-stone-light: #6e6862;
   --color-grid: #2a2826;
@@ -1774,7 +1790,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
 }
 
 .post-type-badge--til     { color: var(--color-ink);        border-color: var(--color-stone); }
-.post-type-badge--link    { color: var(--color-cloudberry); border-color: var(--color-cloudberry); }
+.post-type-badge--link    { color: var(--color-cloudberry-text); border-color: var(--color-cloudberry); }
 .post-type-badge--release { color: var(--color-falu-red);   border-color: var(--color-falu-red); }
 
 /* === TIL topic affordance === */
@@ -2073,6 +2089,7 @@ pre code.hljs { background: var(--hl-bg); border-radius: 4px; padding: var(--spa
     --color-stone-light: #eee;
     --color-falu-red: #000;
     --color-cloudberry: #000;
+    --color-cloudberry-text: #000;
   }
 
   body {

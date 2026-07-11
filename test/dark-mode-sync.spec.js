@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
-const EXPECTED_DECLARATION_COUNT = 20;
+const EXPECTED_DECLARATION_COUNT = 21;
 
 /**
  * Normalize a CSS block body: strip comments, trim each line, drop blanks.
