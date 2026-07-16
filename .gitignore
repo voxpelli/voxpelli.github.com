@@ -29,8 +29,11 @@ BRANCH-REVIEW-*
 .claude/*.local.json
 .claude/synergy-*
 # Workflow scripts run in the Claude Code sandbox (top-level return/await —
-# not valid standalone modules, so they must stay out of lint/tsc scope too)
-.claude/workflows/
+# not valid standalone modules; eslint.config.js ignores .claude/ so lint
+# never parses them). branch-lifecycle-review is tracked deliberately — the
+# canonical copy lives at ~/.claude/workflows/, this is the project mirror.
+.claude/workflows/*
+!.claude/workflows/branch-lifecycle-review.js
 
 # liggare ledger (local SQLite register of expiring TODOs)
 .liggare/
