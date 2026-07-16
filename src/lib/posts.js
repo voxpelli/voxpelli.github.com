@@ -3,13 +3,25 @@ import { parseDateSafe } from './utils.js';
 /**
  * Shared post-filtering and sorting logic for indexes, feeds, and archives.
  *
+ * This projection is an ALLOWLIST: a frontmatter field a renderer consumes
+ * must be carried through here (or added in global.data.js enrichment) or it
+ * silently reads as undefined everywhere downstream — which is how the
+ * via-badge and feed <updated> support both shipped as dead code.
+ *
+ * String-typed fields are narrowed at this boundary with typeof guards, so
+ * untrusted frontmatter exits as real types instead of `unknown`
+ * (required-but-maybe-undefined properties, which play nicer with
+ * exactOptionalPropertyTypes than optional ones).
+ *
  * @typedef {object} BasePost
  * @property {string} title
  * @property {unknown} date
  * @property {unknown} lang
- * @property {unknown} category
+ * @property {string | undefined} category
  * @property {string} path
  * @property {string} pageUrl
+ * @property {string | undefined} via
+ * @property {string | undefined} updated
  * @property {unknown} [topic]
  */
 
@@ -33,9 +45,16 @@ export function filterAndSortPosts (pages) {
         title: /** @type {string} */ (vars.title) || '',
         date: vars.date,
         lang: vars.lang,
-        category: vars.category,
+        category: typeof vars.category === 'string' ? vars.category : undefined,
         path: pagePath,
         pageUrl,
+        // `via` (jvns-style soft-citation badge on listing cards,
+        // render-til.js) and `updated` (feed <updated> distinct from
+        // <published>, render-rss-entry.js) are consumed downstream —
+        // omitting them from the projection made both features dead code
+        // and let a hostile `via:` URL bypass the URL_FIELDS build canary.
+        via: typeof vars.via === 'string' ? vars.via : undefined,
+        updated: typeof vars.updated === 'string' ? vars.updated : undefined,
         topic: vars.topic,
         // Preserve all mf-* fields
         ...Object.fromEntries(

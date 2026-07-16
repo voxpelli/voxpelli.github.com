@@ -1,13 +1,20 @@
 import { html, rawHtml, renderToStringSync } from 'async-htm-to-string';
 
+import { tilSupersetIndexUrls } from './lib/categories.js';
 import { escapeXml } from './lib/escape.js';
 import { safePostUrl } from './lib/safe-url.js';
+
+// The /til/ nav item claims the whole til superset's URL space, derived from
+// the category registry so a category joining/leaving the superset can't
+// leave nav highlighting behind (this was the third hand-copied copy of the
+// membership rule).
+const TIL_NAV_PREFIXES = tilSupersetIndexUrls();
 
 /**
  * Path-based active-nav predicate.
  * - Home matches only exactly `/`.
  * - Articles matches `/articles/` + standalone blog posts `/YYYY/...` + `/archive/`.
- * - TIL matches `/til/`, `/links/`, and `/releases/` (the TIL superset).
+ * - TIL matches the til-superset index URLs (til + links + releases today).
  * - Others: exact or prefix match.
  *
  * @param {string} itemHref
@@ -22,9 +29,7 @@ function navActive (itemHref, currentPath) {
       currentPath.startsWith('/archive/');
   }
   if (itemHref === '/til/') {
-    return currentPath.startsWith('/til/') ||
-      currentPath.startsWith('/links/') ||
-      currentPath.startsWith('/releases/');
+    return TIL_NAV_PREFIXES.some(prefix => prefix && currentPath.startsWith(prefix));
   }
   return currentPath === itemHref || currentPath.startsWith(itemHref);
 }

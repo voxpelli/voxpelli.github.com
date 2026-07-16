@@ -1,4 +1,4 @@
-import { CATEGORIES } from './lib/categories.js';
+import { CATEGORIES, isLifestreamCategory, isTilSupersetCategory } from './lib/categories.js';
 import { filterAndSortPosts } from './lib/posts.js';
 import { safePostUrl } from './lib/safe-url.js';
 
@@ -64,10 +64,11 @@ export default async function globalData ({ pages }) {
   // category. Prevents silent "new category added, registry not updated"
   // regressions where prev/next navigation and feed emission would drop
   // the category through. See src/lib/categories.js for the registry.
+  /** @type {ReadonlySet<string | undefined>} */
   const knownCategories = new Set(CATEGORIES.keys());
   for (const post of allPosts) {
     const cat = post.category;
-    if (cat !== undefined && !knownCategories.has(/** @type {string} */ (cat))) {
+    if (cat !== undefined && !knownCategories.has(cat)) {
       throw new Error(
         `Unknown post category "${String(cat)}" at ${String(post.path)} — ` +
         'register it in src/lib/categories.js'
@@ -87,9 +88,7 @@ export default async function globalData ({ pages }) {
   const socialPosts = allPosts.filter(p => p.category === 'social');
   const linkPosts = allPosts.filter(p => p.category === 'links');
   const releasePosts = allPosts.filter(p => p.category === 'release');
-  const tilPosts = allPosts.filter(p =>
-    p.category === 'til' || p.category === 'links' || p.category === 'release'
-  );
+  const tilPosts = allPosts.filter(p => isTilSupersetCategory(p.category));
 
   // Recent posts for feeds
   const recentPosts = blogPosts.slice(0, 10);
@@ -98,12 +97,16 @@ export default async function globalData ({ pages }) {
   const recentTils = tilPosts.slice(0, 10);
   const recentReleases = releasePosts.slice(0, 10);
 
-  // Lifestream — the "everything except social" firehose (homepage + /stream.xml).
-  // Weighted slot selection: blog posts count as 2 slots (they carry more visual
-  // presence per entry), short-form posts (TIL/links/releases) count as 1. Fill
-  // up to 20 slots total. Result is a mixed chronological stream that feels
-  // visually balanced rather than dominated by whichever type posts fastest.
-  const lifestreamCandidates = allPosts.filter(p => p.category !== 'social');
+  // Lifestream — the "everything except social" candidates back two DIFFERENT
+  // selections, deliberately: the HOMEPAGE uses lifestreamPosts, a weighted
+  // slot selection (blog posts count as 2 slots — they carry more visual
+  // presence per entry; short-form TIL/links/releases count as 1; fill up to
+  // 20 slots), so the mixed stream feels visually balanced rather than
+  // dominated by whichever type posts fastest. The /stream.xml FEED uses
+  // recentStream, the plain unweighted latest-20 — feed readers do their own
+  // presentation, so visual weighting would only hide entries from them.
+  const lifestreamCandidates = allPosts.filter(p => isLifestreamCategory(p.category));
+  const recentStream = lifestreamCandidates.slice(0, 20);
   /** @type {typeof allPosts} */
   const lifestreamPosts = [];
   let lifestreamWeight = 0;
@@ -183,6 +186,7 @@ export default async function globalData ({ pages }) {
     recentLinks,
     recentTils,
     recentReleases,
+    recentStream,
     postsByYear,
     allTags,
     tagCounts,

@@ -1,6 +1,5 @@
 import { escapeXml } from './lib/escape.js';
 import { getSiteVars } from './lib/get-site-vars.js';
-import { filterAndSortPosts } from './lib/posts.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
 /** @import { PageData } from './global-types.d.ts' */
@@ -9,8 +8,16 @@ import { renderRssEntry } from './lib/render-rss-entry.js';
 /**
  * Generate multiple Atom feeds using async generator pattern.
  *
- * Templates receive { vars, pages } where vars is global.vars only (not global.data).
- * Pages are full PageData objects with renderInnerPage() available for getting rendered HTML.
+ * Templates receive { vars, pages } where vars is global.vars only — but the
+ * PageData.vars getter merges globalDataVars, so global.data.js collections
+ * are reachable via pages[0].vars (the documented workaround; `@domstack/static`
+ * PR #240, merged upstream but unreleased, passes them in template vars
+ * directly). Consuming the shared collections keeps ONE executable definition
+ * of every feed's membership (global.data.js + lib/categories.js): the
+ * selectors were previously re-derived here "kept in sync by convention",
+ * which is exactly how the til-superset rule grew three drifting copies. It
+ * also reuses the content global.data.js already rendered instead of
+ * re-rendering every feed post.
  *
  * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
  * @returns {AsyncIterable<TemplateOutputOverride>}
@@ -19,39 +26,21 @@ export default async function * feedsTemplate ({ pages, vars }) {
   const { authorEmail, authorName, blogName, feedUidBase, pushHub, siteUrl } = getSiteVars(vars);
   const now = new Date().toISOString();
 
-  // Filter and sort posts using shared helper
-  const allPosts = filterAndSortPosts(pages);
+  const globalDataVars = pages[0]?.vars ?? {};
 
-  const blogPosts = allPosts.filter(p => !p.category);
-  const recentPosts = blogPosts.slice(0, 10);
-  const recentEnglishPosts = blogPosts.filter(p => p.lang === 'en').slice(0, 10);
-  // /links/all.xml stays as the strict bookmark-only subset.
-  // /releases/feed.atom stays as the strict release-only subset.
-  // /til/feed.atom is the short-form superset — TIL absorbs link + release posts
-  // in the user-facing feed. /stream.xml is the firehose — everything except
-  // social. Same selectors as global.data.js; kept in sync by convention.
-  const recentLinks = allPosts.filter(p => p.category === 'links').slice(0, 10);
-  const recentReleases = allPosts.filter(p => p.category === 'release').slice(0, 10);
-  const recentTils = allPosts
-    .filter(p => p.category === 'til' || p.category === 'links' || p.category === 'release')
-    .slice(0, 10);
-  const recentStream = allPosts.filter(p => p.category !== 'social').slice(0, 20);
-
-  // Build page index for O(1) lookup instead of O(n) pages.find() per post
-  /** @type {Map<string, PageData>} */
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
-  // Pre-render all unique feed posts in parallel, with cache to avoid duplicates
-  const allFeedPosts = [...new Map([...recentPosts, ...recentEnglishPosts, ...recentLinks, ...recentTils, ...recentReleases, ...recentStream].map(p => [p.path, p])).values()];
-  /** @type {Map<string, string>} */
-  const renderCache = new Map();
-  await Promise.all(allFeedPosts.map(async (post) => {
-    const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page?.renderInnerPage
-      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
-      : '';
-    renderCache.set(/** @type {string} */ (post.path), html);
-  }));
+  /**
+   * @param {string} key
+   * @returns {Array<Record<string, unknown>>}
+   */
+  function collection (key) {
+    const value = globalDataVars[key];
+    if (!Array.isArray(value)) {
+      // Loud, not lenient: a missing collection would otherwise ship a valid
+      // but EMPTY feed — which readers treat as "everything was deleted".
+      throw new TypeError(`feeds.template.js: global.data collection "${key}" not reachable via pages[0].vars`);
+    }
+    return value;
+  }
 
   /**
    * @param {object} options
@@ -68,7 +57,9 @@ export default async function * feedsTemplate ({ pages, vars }) {
    */
   function buildFeed ({ feedId, htmlUrl, posts, selfUrl, subtitle }) {
     const entries = posts.map(post => {
-      const html = renderCache.get(/** @type {string} */ (post.path)) || '';
+      // global.data.js pre-renders content onto every blog + til-superset
+      // post — the members of every feed below.
+      const html = typeof post.content === 'string' ? post.content : '';
       return renderRssEntry({ content: html, post, siteUrl, uidBase: feedUidBase });
     });
 
@@ -99,7 +90,7 @@ ${entries.join('\n')}
       // Historical exception: all.xml has identified as the site root since
       // the Jekyll era — keep it for subscriber continuity.
       feedId: '/',
-      posts: recentPosts,
+      posts: collection('recentPosts'),
     }),
   };
 
@@ -109,7 +100,7 @@ ${entries.join('\n')}
       selfUrl: '/english.xml',
       htmlUrl: '/',
       subtitle: 'English posts',
-      posts: recentEnglishPosts,
+      posts: collection('recentEnglishPosts'),
     }),
   };
 
@@ -119,7 +110,7 @@ ${entries.join('\n')}
       selfUrl: '/links/all.xml',
       htmlUrl: '/links/',
       subtitle: 'Links',
-      posts: recentLinks,
+      posts: collection('recentLinks'),
     }),
   };
 
@@ -129,7 +120,7 @@ ${entries.join('\n')}
       selfUrl: '/til/feed.atom',
       htmlUrl: '/til/',
       subtitle: 'TIL',
-      posts: recentTils,
+      posts: collection('recentTils'),
     }),
   };
 
@@ -139,7 +130,7 @@ ${entries.join('\n')}
       selfUrl: '/releases/feed.atom',
       htmlUrl: '/releases/',
       subtitle: 'Releases',
-      posts: recentReleases,
+      posts: collection('recentReleases'),
     }),
   };
 
@@ -150,7 +141,7 @@ ${entries.join('\n')}
       selfUrl: '/stream.xml',
       htmlUrl: '/',
       subtitle: 'Stream',
-      posts: recentStream,
+      posts: collection('recentStream'),
     }),
   };
 }
