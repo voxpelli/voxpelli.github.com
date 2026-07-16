@@ -11,7 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:lint` — ESLint only
 - `npm run check:tsc` — TypeScript type checking only
 - `npm run test:build` — smoke tests only (requires prior build): `node --test 'test/**/*.spec.js'`
-- `npm run e2e` — Playwright e2e tests (requires prior build): chromium + mobile viewports
+- `npm run test:e2e` — the CI-gated Playwright run: desktop chromium ONLY (requires prior build)
+- `npm run e2e` — both Playwright projects: chromium + Pixel 5 mobile. The mobile project carries a known red baseline (~12 failures — sidebar-resident controls live in the closed drawer at mobile width; tracked in beads) and is NOT run in CI, so local red under `[mobile]` is expected until the baseline is burned down
 - `npm run build-drafts` / `npm run dev-drafts` — production build / watch mode including `.draft.*` pages
 - `npm run check:knip` — dead-code + unused-dep detection (runs in `check`)
 
@@ -28,7 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ESM only (`"type": "module"`), JSDoc types, neostandard style via `@voxpelli/eslint-config`
 - TypeScript checks JS via `tsc --noEmit` (never compiles) — extends `@voxpelli/tsconfig/node20.json`
 - Type coverage enforced at 95%+ with `--strict`
-- Node.js `^20.19.0 || ^22.13.0 || >=24`
+- Node.js `^24.0.0 || >=26` (latest-LTS-only floor — this is an app, not a library; Node 20's test runner had no glob support and silently ran zero tests)
 - `n/no-sync` rule disabled (sync file reads acceptable in this SSG context)
 - `src/global.client.js` checked by separate `tsconfig.browser.json` (DOM lib, no Node types)
 
@@ -99,7 +100,7 @@ Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from
 
 Smoke tests require a clean production build, NOT a dev build. The regex `/global-[A-Z0-9]+\.css/i` expects hashed asset names which `npm run dev` does not produce. If smoke tests fail with "did not match regex", run `rm -f public/global-*.css public/global.client-*.js && npm run build` first. `public/` accumulates dozens of stale hashed files over a dev session — periodic cleanup is fine.
 
-E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` via `npm run e2e`.
+E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` — CI gates on `npm run test:e2e` (chromium only); `npm run e2e` adds the mobile project, which has a known red baseline (see Build Commands above). A real mobile regression must be judged against that baseline SET, not against "is anything red".
 
 **Mobile overflow testing**: Never trust visual inspection alone. Use `document.body.scrollWidth > document.documentElement.clientWidth` to detect horizontal overflow programmatically. Test at 375px viewport width against articles with code blocks, YouTube iframes, and the archive page.
 
@@ -110,6 +111,12 @@ E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run a
 **`e2e/` is NOT type-checked** — `tsconfig.json` covers `src/`, `tools/`, `test/` only, so unknown `test.use()` keys and other type errors in e2e never surface. `npm run check` does not validate e2e code.
 
 **Playwright prints `✘` for `test.fail()` expected-failures but counts them as passed** — read the summary line, not the glyphs. `e2e/drawer-focus.test.js` has three (the drawer has no focus trap yet).
+
+## Deployment (GitHub Pages cutover)
+
+- Deploys run via `actions/deploy-pages` from `gh-pages.yml` on push to `master`. **The repo's Pages source must be "GitHub Actions"** (Settings → Pages) — while it is "Deploy from a branch", merging this migration would make GitHub legacy-Jekyll-build the repo root and break the live site.
+- The custom domain (`voxpelli.com`) lives in **Settings → Pages**, not in a `CNAME` file (the migration deleted it — artifact-based deploys don't read one). The deploy job's post-deploy step fails loudly if `page_url` is not the custom domain, so a lost domain config cannot ship silently.
+- A push to `master` IS a production deploy. Never push without an explicit go-ahead.
 
 ## Design Context
 

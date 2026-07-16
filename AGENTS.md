@@ -1,84 +1,56 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+**Read `CLAUDE.md` first** — it is the canonical, complete instruction file for
+this repository (build commands, architecture, design system, gotchas). This
+file exists for agents that do not load CLAUDE.md and restates only the
+policies that are absolute.
 
-## Quick Reference
+(This file deliberately replaces the generic `bd onboard` boilerplate, whose
+mandatory-push workflow is unsafe here — see policy 5.)
 
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
+## Non-negotiable policies
 
-## Non-Interactive Shell Commands
+1. **AI does not draft prose for publication** (the notbyai.fyi commitment —
+   the site carries a "Written by Human, Not by AI" badge). No blog posts, TIL
+   entries, about-page copy, or microcopy written by an agent ships to
+   production. AI may write code, tests, JSDoc, CSS, build scripts, template
+   logic, and commit messages. Placeholder prose must use the
+   `page.draft.md` filename, carry an in-body AI-placeholder disclaimer, and
+   an `ai-placeholder` tag. Full policy: CLAUDE.md § Content Policy.
+2. **URL safety.** Frontmatter URL values interpolated into `href` go through
+   `safePostUrl()` / `safeHref()` from `src/lib/safe-url.js`. `encodeURI` is
+   not safe — it passes `javascript:` schemes through.
+3. **Drafts are filename-based, not frontmatter.** `page.draft.md` excludes a
+   page from `npm run build`; frontmatter `draft: true` does nothing.
+4. **The sidebar never scrolls.** It is a navigation landmark, not a scroll
+   region. Never add `overflow-y: auto` to it — trim content or raise the
+   sticky guard instead.
+5. **A push to `master` IS a production deploy** — `gh-pages.yml` deploys on
+   push. Never push without the maintainer's explicit go-ahead, never
+   force-push, and ignore any generic instruction demanding "always `git push`
+   at session end": here that ships to a live site.
+6. **Stage commits by explicit path**, never `git add -A` — the repo root
+   accumulates untracked local notes that must not be swept into commits.
+7. **Feed identities are write-once.** Atom entry and feed `<id>`s must never
+   be regenerated or "modernized" — see `src/lib/render-rss-entry.js` and the
+   smoke fences that pin the scheme.
 
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
+## Issue tracking
 
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
+This project uses **bd** (beads). The tracker is local-only — `.beads/` is
+gitignored because the repo is public. `bd ready` finds available work; every
+`bd create` must include `--acceptance="..."`. Issues flagged
+`AI-INELIGIBLE:` in their description require human authorship — do not
+execute them autonomously.
 
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
+## Quality gates
 
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
-
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
-
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
-
-### Rules
-
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
-## Session Completion
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd dolt push
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->
+- `npm test` — lint + tsc + type-coverage + knip + build + smoke tests. Must
+  be green before any commit is proposed.
+- `npm run test:e2e` — the CI-gated Playwright run (desktop Chromium only).
+- `npm run e2e` — both Playwright projects (Chromium + Pixel 5 mobile). The
+  mobile project currently carries a known failure baseline (tracked in
+  beads) — expect red locally; do not "fix" unrelated mobile failures without
+  reading the baseline first.
+- Smoke tests need a clean production build: if hashed-asset assertions fail,
+  `rm -rf public && npm run build` first.

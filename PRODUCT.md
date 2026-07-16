@@ -78,9 +78,12 @@ What this must never become:
 
 ## Accessibility & Inclusion
 
-**WCAG 2.1 AA is the enforced floor**, gated in CI: axe runs across the site in both light and dark
-themes and the build fails on any critical or serious violation. Reduced motion is honoured, dark mode
-is fully supported, and interactive targets meet the 44px minimum.
+**WCAG 2.1 AA is the enforced floor.** The CI gate runs axe across the site in light, dark, and
+OS-dark themes **on desktop Chromium** and fails on any critical or serious violation. The Pixel 5
+mobile project runs locally (`npm run e2e`) and currently carries a known failure baseline (tracked
+in beads) — it is not yet CI-gated, so the enforced floor is desktop-scoped until that baseline is
+burned down. Reduced motion is honoured, dark mode is fully supported, and interactive targets meet
+the 44px minimum.
 
 **Article text aims beyond AA, at AAA (7:1)** — reading is the entire job, so the text ramp goes
 further than the floor requires.
