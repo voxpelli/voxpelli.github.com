@@ -148,9 +148,9 @@ export function renderPost ({ authorName, container, content, excerpt, post, sit
  *
  * Shape mirrors renderTil's til-card but the primary title link targets the
  * external bookmark URL (u-bookmark-of microformat) and a .domain-badge
- * shows the source domain. The permalink is inferable from the outer
- * h-entry context; no explicit "permalink" link is emitted to match the
- * editorial convention of linkblog entries (title IS the destination).
+ * shows the source domain. When the excerpt truncates, renderExcerpt emits an
+ * explicit "Read full note →" permalink link — the ONLY route to the note,
+ * since the title (and the card-body cover it hosts) go off-site.
  *
  * @param {object} options
  * @param {PostVars} options.post
@@ -176,9 +176,10 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
 
   const excerptResult = content ? extractExcerpt(content) : undefined;
   // "Read full note →" signals the permalink carries the author's commentary
-  // (more than fits in the card excerpt). Title (above) already targets the
-  // external bookmark-of URL; the read-more and its card-body cover (::before
-  // in global.css) both go to the permalink.
+  // (more than fits in the card excerpt). The card-body cover lives on the
+  // TITLE anchor's ::before (see "Card cover-link stacking" in global.css)
+  // and goes to the EXTERNAL bookmark URL — the read-more is the escape
+  // hatch back to the permalink, and the only route there.
   const excerpt = excerptResult
     ? renderExcerpt(excerptResult, postUrl, { readMoreLabel: 'Read full note' })
     : { excerptHtml: '', readMoreHtml: '' };

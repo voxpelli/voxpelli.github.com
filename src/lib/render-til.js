@@ -111,8 +111,10 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
   // Density pass: header row (pill + title), body (excerpt), footer rail
   // containing read-more + right-aligned meta (date + topic + via-domain +
   // tags) on the same row at desktop widths. Flex-wrap lets meta drop below
-  // read-more at narrow widths. Footer links need position:relative +
-  // z-index:1 so they escape the .post-title a::after card-cover-link overlay.
+  // read-more at narrow widths. Footer links are positioned escape hatches
+  // that out-rank the card cover — see "Card cover-link stacking" in
+  // global.css for the z-levels rather than trusting a copy here (the copy
+  // drifted once already).
   return renderToStringSync(html`
     <article class=${isRelease ? 'h-entry til-card til-card--release' : 'h-entry til-card'} lang=${lang}>
         <div class="til-card-header">
