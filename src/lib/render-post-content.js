@@ -56,7 +56,7 @@ export function renderPostContent ({ authorName, compact, content, nonenglish, p
         ${PostSyndication({ headingLang, standalone: standalone || false, swedish: swedish || false, syndication })}
         ${PostPersonTags({ headingLang, persontags, swedish: swedish || false })}
         ${PostSubmitTo({ headingLang, submitto, swedish: swedish || false })}
-        ${PostTags({ category: /** @type {string|undefined} */ (post.category), headingLang, swedish: swedish || false, tags })}
+        ${PostTags({ category: post.category, headingLang, swedish: swedish || false, tags })}
         ${PostFooter({ authorName, compact, nonenglish, post })}
         ${!compact ? html`<a class="u-responses" href=${mentionsUrl}>See mentions of this post</a>` : ''}
       </article>
