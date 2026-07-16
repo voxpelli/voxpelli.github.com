@@ -123,18 +123,26 @@ export function PostSubmitTo ({ headingLang, submitto, swedish }) {
  * Render tags list.
  *
  * @param {object} options
+ * @param {string|undefined} [options.category] - the post's category. The tag
+ *   index (global.data.js allTags) is deliberately built from uncategorized
+ *   blog posts only — social/link posts have different tag semantics — so a
+ *   linked tag on a categorized post 404s. Categorized posts therefore render
+ *   their tags as plain text, the pre-migration semantics.
  * @param {string|false} options.headingLang
  * @param {boolean} options.swedish
  * @param {string[]|undefined} [options.tags]
  * @returns {HtmlTemplateValue | undefined}
  */
-export function PostTags ({ headingLang, swedish, tags }) {
+export function PostTags ({ category, headingLang, swedish, tags }) {
   if (!tags || tags.length === 0) return;
   return html`
     <div class="tags linklist">
         ${LocalizedHeading({ enText: 'Tags:', headingLang, svText: 'Taggar:', swedish })}
         <ul>
-          ${tags.map(tag => html`<li class="p-category"><a href=${`/tags/${encodeURIComponent(String(tag).toLowerCase())}/`}>${String(tag)}</a></li>`)}
+          ${tags.map(tag => html`<li class="p-category">${category
+            ? String(tag)
+            : html`<a href=${`/tags/${encodeURIComponent(String(tag).toLowerCase())}/`}>${String(tag)}</a>`
+          }</li>`)}
         </ul>
       </div>
   `;

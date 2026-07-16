@@ -203,7 +203,7 @@ function renderBookmarkCard ({ content, nonenglish, post, swedish }) {
           <div class="til-card-meta">
             <relative-time><time class="dt-published" datetime=${isoDate}>${isoDateShort}</time></relative-time>
             ${domain ? html`<span class="domain-badge" aria-hidden="true">${domain}</span>` : ''}
-            ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+            ${PostTags({ category: /** @type {string|undefined} */ (post.category), headingLang: false, swedish: swedish || false, tags })}
           </div>
         </div>
       </article>

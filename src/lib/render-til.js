@@ -131,7 +131,7 @@ export function renderTil ({ authorName, compact, content, nonenglish, post: raw
             ${via && viaSafe
               ? html`<a class="domain-badge u-bookmark-of" href=${viaSafe}>${extractFullDomain(via)}</a>`
               : ''}
-            ${PostTags({ headingLang: false, swedish: swedish || false, tags })}
+            ${PostTags({ category: /** @type {string|undefined} */ (post.category), headingLang: false, swedish: swedish || false, tags })}
           </div>
         </div>
       </article>
