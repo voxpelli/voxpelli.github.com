@@ -270,6 +270,7 @@ test('TIL feed is the SWARM-12 superset — includes /links/ entries', async () 
   // strict. This test documents the merge shape — if a future revert removes
   // the superset aggregation, this test catches it.
   const tilFeed = await readFile('public/til/feed.atom', 'utf8');
+  // TODO(test) [review:2027-01-16]: data-dependent fence — the TIL feed is a top-10 slice, so once 10+ newer til/release posts outrank every /links/ post this >0 assertion fails on legitimate content growth, not a regression. Reassert against a wider slice or fixture data before that happens.
   const linkEntries = (tilFeed.match(/<entry>[\s\S]*?\/links\/[\s\S]*?<\/entry>/g) || []).length;
   assert.ok(linkEntries > 0, 'TIL feed must include at least one /links/ entry after SWARM-12 merge');
 

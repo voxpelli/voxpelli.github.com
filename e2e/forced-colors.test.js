@@ -195,6 +195,7 @@ test.describe('forced-colors: meaning survives without colour', () => {
     // rendering that does not exist. It invented a 1.12:1 "failure" here on
     // colours the browser never painted.
     // Upstream: dequelabs/axe-core#3978, dequelabs/axe-core-npm#1067.
+    // TODO(a11y) [axe-core@>=4.13]: re-evaluate dropping the disableRules below — #3978 is milestoned for axe-core 4.13 but unmerged as of 2026-07; keep the disable unless a real forced-colors-aware contrast check actually shipped in the release.
     const results = await new AxeBuilder({ page })
       .exclude(WEBMENTION_INJECTED_IMAGES)
       .disableRules(['color-contrast'])

@@ -52,6 +52,7 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
   const lang = String(vars.lang || 'en');
 
+  // TODO [@domstack/static@>=11.0.4]: PR #250 (merged 2026-05-24, unreleased) adds a `url` field to PageInfo — use it here and in article.layout.js instead of reconstructing the canonical URL from page.path.
   const pageUrl = (page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '')) || '/';
   const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 

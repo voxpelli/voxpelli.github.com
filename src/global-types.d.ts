@@ -23,6 +23,7 @@ export type ValidatedSiteVars = SiteVars;
 /**
  * Temporary shared stopgap until `@domstack/static` exports `PageData`.
  * Keep this aligned with the subset this repo actually consumes.
+ * TODO [@domstack/static@>=11.0.4]: PR #241 (merged 2026-05-24, unreleased) exports PageData/PageInfo from the package entry — delete this stopgap interface and import the real types.
  */
 export interface PageData {
   pageInfo: {

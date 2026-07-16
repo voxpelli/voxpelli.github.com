@@ -7,6 +7,7 @@
     // (all published v11) and eslint-plugin-package-json@0.91.2 ship .d.ts that
     // don't type-check (self-aliased re-exports, missing generics, AST clash) —
     // independent of TS version. Re-enable once those are fixed upstream.
+    // TODO [@domstack/static@>=11.0.4]: retry skipLibCheck:false — the broken .d.ts reproduces on every published v11 (see domstack-issues/15-broken-dts-under-skiplibcheck.md); verify the fix actually landed in the release, and recheck eslint-plugin-package-json@0.91.2's types too before flipping.
     "skipLibCheck": true
   },
   "files": ["eslint.config.js"],

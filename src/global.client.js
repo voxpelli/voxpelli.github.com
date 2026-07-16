@@ -219,6 +219,7 @@ if (subtomeBtn) {
 }
 
 // --- Mobile Nav: button/drawer toggle ---
+// TODO(a11y) [review:2026-10-16]: the open drawer has no focus trap (Tab/Shift+Tab leak to the page behind the overlay) — e2e/drawer-focus.test.js carries three test.fail() fences that flip green, and must have their wrappers removed, once trapping lands here. #a11y
 const hamburgerBtn = /** @type {HTMLButtonElement | null} */ (document.querySelector('.hamburger-btn'));
 const navDrawer = document.querySelector('#nav-drawer');
 

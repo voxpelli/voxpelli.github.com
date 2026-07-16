@@ -30,6 +30,7 @@ export default function topicsTemplate ({ pages, vars }) {
   const styles = pages[0]?.styles ?? [];
   const scripts = pages[0]?.scripts ?? [];
 
+  // TODO [@domstack/static@>=11.0.4]: PR #240 (merged 2026-04-20, unreleased) passes global.data.js output in template `vars` — drop this pages[0].vars pull here, in tags.template.js and in feeds.template.js once the release ships.
   const pageVars = pages[0]?.vars ?? {};
   const tilPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.tilPosts) || [];
 

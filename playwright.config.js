@@ -19,6 +19,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     {
+      // TODO(e2e) [review:2026-09-16]: this project ships with a known red baseline (~12 unannotated failures) and runs nowhere in CI — either fix the baseline or mark the known failures test.fail(), then gate mobile in CI alongside chromium. !p1 #testing
       name: 'mobile',
       use: { ...devices['Pixel 5'] },
     },
