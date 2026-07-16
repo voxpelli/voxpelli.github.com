@@ -1,0 +1,16 @@
+name: Linting
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: voxpelli/ghatemplates/.github/workflows/lint.yml@main
+    with:
+      lockfile: true

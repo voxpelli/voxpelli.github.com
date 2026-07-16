@@ -1,0 +1,157 @@
+/**
+ * @import MarkdownIt from 'markdown-it'
+ */
+
+/**
+ * Structural wrappers for rich markdown content.
+ *
+ * Four render-rule overrides apply newsdoc-style semantic containers without
+ * touching source markdown or adding dependencies:
+ *
+ *   - fence        -> `<div class="code-block">` around `<pre><code>` fences
+ *   - table_open   -> `<div class="table-wrapper">` around tables
+ *   - image        -> `<figure><figcaption>` for images with a title attribute
+ *   - html_block   -> `<div class="video-embed">` around bare `<iframe>` blocks
+ *
+ * Wrappers are purely additive: every unstyled element still renders exactly
+ * as the default would, so older published posts don't need any edits.
+ *
+ * @param {MarkdownIt} md
+ * @returns {Promise<MarkdownIt>}
+ */
+export default async function markdownItSettingsOverride (md) {
+  wrapFence(md);
+  wrapTable(md);
+  wrapFiguredImage(md);
+  wrapBareIframe(md);
+  return md;
+}
+
+/**
+ * Wrap fenced code blocks in `<div class="code-block">` for horizontal-scroll
+ * and theming hooks without relying on `.e-content pre` descendant selectors.
+ *
+ * The `<pre>` also gets `tabindex="0"`. CSS makes it a horizontal scroll
+ * container (`pre:has(> code.hljs) { overflow: auto }`), and a scrollable region
+ * that cannot be focused is unreachable by keyboard — a keyboard-only reader
+ * could not scroll to see the rest of a long line (WCAG 2.1.1; axe
+ * `scrollable-region-focusable`). Only the `<pre>` gets it: tables scroll only
+ * when wide, so a blanket tabindex there would add empty tab stops.
+ *
+ * @param {MarkdownIt} md
+ */
+function wrapFence (md) {
+  const defaultFence = md.renderer.rules.fence ?? ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+
+  md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const raw = defaultFence(tokens, idx, options, env, self);
+
+    // Fail the build rather than silently drop the a11y fix. A bare
+    // `.replace()` returns the input untouched when it doesn't match, so if an
+    // upstream change (a different highlighter, a copy-button plugin, another
+    // `fence` rule registered after this one) stops emitting a leading `<pre>`,
+    // the tabindex would just quietly vanish. axe would not reliably catch it
+    // either: `scrollable-region-focusable` only fires when a block actually
+    // overflows, which depends on the post's content.
+    if (!/^<pre(?=[\s>])/.test(raw)) {
+      throw new Error(
+        `markdown-it fence renderer no longer emits a leading <pre> (got: ${raw.slice(0, 60)}...). ` +
+        'The tabindex="0" fix that keeps scrollable code blocks keyboard-reachable ' +
+        '(WCAG 2.1.1) cannot be applied. Update wrapFence() in src/markdown-it.settings.js.'
+      );
+    }
+
+    const inner = raw.replace(/^<pre(?=[\s>])/, '<pre tabindex="0"');
+    return `<div class="code-block">${inner}</div>\n`;
+  };
+}
+
+/**
+ * Wrap tables in `<div class="table-wrapper">` so wide tables get an
+ * independent horizontal scroll region instead of overflowing the article.
+ *
+ * @param {MarkdownIt} md
+ */
+function wrapTable (md) {
+  const defaultTableOpen = md.renderer.rules.table_open ?? ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+  const defaultTableClose = md.renderer.rules.table_close ?? ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+
+  md.renderer.rules.table_open = (tokens, idx, options, env, self) => `<div class="table-wrapper">${defaultTableOpen(tokens, idx, options, env, self)}`;
+
+  md.renderer.rules.table_close = (tokens, idx, options, env, self) => `${defaultTableClose(tokens, idx, options, env, self)}</div>`;
+}
+
+/**
+ * Promote titled images (`![alt](url "title")`) to `<figure>/<figcaption>`.
+ * Untitled images stay as bare `<img>` — authors opt into a caption by
+ * adding a title, matching how markdown's built-in `title` attribute reads.
+ *
+ * @param {MarkdownIt} md
+ */
+function wrapFiguredImage (md) {
+  const defaultImage = md.renderer.rules.image ?? ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+
+  md.renderer.rules.image = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    if (!token) return defaultImage(tokens, idx, options, env, self);
+
+    const titleAttr = token.attrGet('title');
+    const imgHtml = defaultImage(tokens, idx, options, env, self);
+
+    if (!titleAttr) return imgHtml;
+
+    const caption = md.utils.escapeHtml(titleAttr);
+    return `<figure>${imgHtml}<figcaption>${caption}</figcaption></figure>`;
+  };
+}
+
+/**
+ * An `<iframe>` needs an accessible name, or a screen-reader user reaching it
+ * is told only "frame" (axe: `frame-title`, serious). Give one to any embed
+ * that lacks it, rather than asking every post to remember the attribute.
+ *
+ * A per-video name written by the author is strictly better than this generic
+ * one — add `title="…"` in the markdown and it is left alone. This is the
+ * floor, not the ceiling.
+ *
+ * @param {string} rawIframe
+ * @returns {string}
+ */
+function withIframeTitle (rawIframe) {
+  if (/\stitle\s*=/i.test(rawIframe)) return rawIframe;
+
+  return rawIframe.replace(/^(\s*<iframe)\b/i, '$1 title="Embedded video"');
+}
+
+/**
+ * Wrap bare `<iframe>` HTML blocks in `<div class="video-embed">` so the
+ * CSS `aspect-ratio: 16/9` wrapper can constrain the embed's size without
+ * every post needing boilerplate markup.
+ *
+ * Other html_block tokens (including any existing author-written wrappers)
+ * pass through unchanged.
+ *
+ * @param {MarkdownIt} md
+ */
+function wrapBareIframe (md) {
+  const defaultHtmlBlock = md.renderer.rules.html_block ?? ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+
+  md.renderer.rules.html_block = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const raw = token?.content ?? '';
+    const trimmed = raw.trim();
+
+    // Only wrap blocks that start with a bare <iframe> and nothing else.
+    // `/is` keeps it tolerant of line breaks inside the iframe attributes.
+    if (/^<iframe\b[^>]*>\s*(?:<\/iframe>\s*)?$/i.test(trimmed)) {
+      return `<div class="video-embed">${withIframeTitle(raw)}</div>\n`;
+    }
+
+    return defaultHtmlBlock(tokens, idx, options, env, self);
+  };
+}

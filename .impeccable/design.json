@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-11T21:15:00Z",
+  "title": "Design System: voxpelli.com",
+  "extensions": {
+    "colorMeta": {
+      "falu-red": {
+        "role": "primary",
+        "displayName": "Falu Red",
+        "canonical": "oklch(42.5% 0.143 25.7)",
+        "tonalRamp": [
+          "#330000",
+          "#570000",
+          "#7d0e14",
+          "#a33734",
+          "#ca5b54",
+          "#f17e75",
+          "#ffa398",
+          "#ffc8bc"
+        ]
+      },
+      "cloudberry": {
+        "role": "secondary",
+        "displayName": "Cloudberry",
+        "canonical": "oklch(66.6% 0.155 57.3)",
+        "tonalRamp": [
+          "#310000",
+          "#550000",
+          "#7a1d00",
+          "#9f4200",
+          "#c56500",
+          "#ec8830",
+          "#ffad5a",
+          "#ffd280"
+        ]
+      },
+      "cloudberry-text": {
+        "role": "secondary",
+        "displayName": "Cloudberry Text",
+        "canonical": "oklch(48.5% 0.132 48.1)",
+        "tonalRamp": [
+          "#2e0000",
+          "#520000",
+          "#762200",
+          "#9a4404",
+          "#c06633",
+          "#e78a57",
+          "#ffae7b",
+          "#ffd39f"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "canonical": "oklch(95.9% 0.009 84.6)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#272520",
+          "#44423d",
+          "#63615c",
+          "#85827d",
+          "#a7a59f",
+          "#ccc9c3",
+          "#f1eee8"
+        ]
+      },
+      "canvas-alt": {
+        "role": "neutral",
+        "displayName": "Canvas Alt",
+        "canonical": "oklch(92.3% 0.010 81.8)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#28251f",
+          "#45423c",
+          "#64615b",
+          "#85827b",
+          "#a8a49e",
+          "#ccc9c2",
+          "#f2eee7"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(28.6% 0.005 67.6)",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272523",
+          "#44423f",
+          "#63615e",
+          "#84827f",
+          "#a7a4a2",
+          "#cbc9c6",
+          "#f1eeeb"
+        ]
+      },
+      "ink-light": {
+        "role": "neutral",
+        "displayName": "Ink Light",
+        "canonical": "oklch(44.1% 0.005 56.3)",
+        "tonalRamp": [
+          "#0d0b09",
+          "#272423",
+          "#44413f",
+          "#64605e",
+          "#85827f",
+          "#a8a4a2",
+          "#ccc8c6",
+          "#f1eeeb"
+        ]
+      },
+      "stone": {
+        "role": "neutral",
+        "displayName": "Stone",
+        "canonical": "oklch(84.7% 0.011 76.6)",
+        "tonalRamp": [
+          "#0e0b06",
+          "#28241f",
+          "#45413c",
+          "#65605a",
+          "#86827b",
+          "#a9a49d",
+          "#cdc8c1",
+          "#f3eee6"
+        ]
+      },
+      "grid": {
+        "role": "neutral",
+        "displayName": "Grid",
+        "canonical": "oklch(89.6% 0.010 81.8)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#28251f",
+          "#45423c",
+          "#64615b",
+          "#85827b",
+          "#a8a49e",
+          "#ccc9c2",
+          "#f2eee7"
+        ]
+      },
+      "sidebar-accent-dark": {
+        "role": "accent",
+        "displayName": "Sidebar Accent (dark only)",
+        "canonical": "rgba(200, 64, 64, 0.55)",
+        "note": "Composites to ~#7b302f on the dark canvas. NOT falu-red, which is #e56b6b in dark and reads as a warning line at 2px. No light-mode value."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The sidebar wordmark and global h1. A masthead — tight leading, negative tracking. Never a section heading."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Article h1 and about-page title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Post titles in index listings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Article prose. Serif, capped at a 65ch measure — non-negotiable."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "The margin layer: mono metadata, dates, tags, badges. Uppercase, 0.08em tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "press-rest",
+        "value": "4px 4px 0 var(--color-btn-shadow)",
+        "purpose": "Hard offset, no blur, no alpha. The element sits above the paper like a physical key."
+      },
+      {
+        "name": "press-hover",
+        "value": "2px 2px 0 var(--color-btn-shadow)",
+        "purpose": "Paired with translate(2px, 2px): the element travels INTO its own shadow."
+      },
+      {
+        "name": "press-active",
+        "value": "0 0 0 var(--color-btn-shadow)",
+        "purpose": "Paired with translate(4px, 4px): fully pressed, flat on the paper."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-spring",
+        "value": "cubic-bezier(0.175, 0.885, 0.32, 1.1)",
+        "purpose": "The press. A little mechanical overshoot on buttons."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Default easing for opacity/transform state changes."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "<768px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "desktop",
+        "value": "1024px"
+      }
+    ],
+    "rounded": {
+      "hairline": "1px",
+      "chip": "2px",
+      "control": "4px",
+      "avatar": "6px",
+      "full": "50%"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A key to be pressed, not a CTA to be sold. Press it and it travels into its own shadow.",
+      "html": "<button class=\"ds-btn\">Subscribe to RSS</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.875rem 1.5rem; background: var(--color-canvas, #f4f1eb); color: var(--color-ink, #2c2a28); border: 2px solid var(--color-ink, #2c2a28); border-radius: var(--rounded-hairline); font-family: \"Public Sans\", sans-serif; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 4px 4px 0 var(--color-stone, #d1ccc5); transition: background-color .2s cubic-bezier(.175,.885,.32,1.1), color .2s cubic-bezier(.175,.885,.32,1.1), transform .2s cubic-bezier(.175,.885,.32,1.1), box-shadow .2s cubic-bezier(.175,.885,.32,1.1); } .ds-btn:hover { background: var(--color-falu-red, #8c2121); border-color: var(--color-falu-red, #8c2121); color: var(--color-canvas, #f4f1eb); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--color-stone, #d1ccc5); } .ds-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--color-stone, #d1ccc5); } .ds-btn:focus-visible { outline: 2px solid var(--color-falu-red, #8c2121); outline-offset: 2px; }"
+    },
+    {
+      "name": "Post-type Chip",
+      "kind": "chip",
+      "refersTo": "badge-link",
+      "description": "Tints its own backdrop from currentColor — so the text colour also sets the fill. Uses the AA-safe cloudberry, never the display one.",
+      "html": "<a class=\"ds-chip\" href=\"#\">LINK</a>",
+      "css": ".ds-chip { display: inline-block; font-family: \"JetBrains Mono\", monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; padding: 0.1em 0.4em; border-radius: var(--rounded-chip); text-decoration: none; white-space: nowrap; color: var(--color-cloudberry-text, #984200); border: 1px solid currentColor; background-color: color-mix(in oklab, currentColor 10%, transparent); } .ds-chip:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "The softest geometry in the system (4px), because it is the thing you aim at. 44px minimum target, enforced by test. The active item is an inverted chip — which forced colours would flatten, so it names Highlight/HighlightText explicitly.",
+      "html": "<a class=\"ds-nav\" href=\"#\" aria-current=\"page\">Articles</a>",
+      "css": ".ds-nav { display: flex; align-items: center; min-height: 44px; padding: 0.75rem 1rem; border-radius: var(--rounded-control); border: 1px solid transparent; font-family: \"JetBrains Mono\", monospace; font-size: 0.9rem; color: var(--color-ink, #2c2a28); text-decoration: none; transition: transform .2s cubic-bezier(.16,1,.3,1), background-color .2s cubic-bezier(.16,1,.3,1); } @media (hover: hover) { .ds-nav:hover { background: var(--color-canvas-alt, #e9e5de); transform: translateX(2px); } } .ds-nav[aria-current=\"page\"] { background-color: var(--color-ink, #2c2a28); border-color: var(--color-ink, #2c2a28); color: var(--color-canvas, #f4f1eb); } .ds-nav:focus-visible { outline: 2px solid var(--color-falu-red, #8c2121); outline-offset: 2px; } @media (forced-colors: active) { .ds-nav[aria-current=\"page\"] { background-color: Highlight; color: HighlightText; border-color: Highlight; } }"
+    },
+    {
+      "name": "URL Input",
+      "kind": "input",
+      "refersTo": "input-url",
+      "description": "Mono, because it is data being entered — not prose. Hairline stone stroke; focus ring never suppressed.",
+      "html": "<input class=\"ds-input\" type=\"url\" placeholder=\"https://example.com/your-post\" />",
+      "css": ".ds-input { width: min(100%, 30rem); padding: 0.5rem; border: 1px solid var(--color-stone, #d1ccc5); border-radius: var(--rounded-hairline); background: var(--color-canvas, #f4f1eb); color: var(--color-ink, #2c2a28); font-family: \"JetBrains Mono\", monospace; font-size: 0.85rem; } .ds-input:focus-visible { outline: 2px solid var(--color-falu-red, #8c2121); outline-offset: 1px; }"
+    },
+    {
+      "name": "Post Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Delimited by rules, not radii. Never floats — the hover state changes the surface, it does not lift.",
+      "html": "<article class=\"ds-card\"><a class=\"ds-card-title\" href=\"#\">Use TypeScript 3.7 to generate declarations</a><p class=\"ds-card-meta\">2019.10.07 &middot; 6 MIN READ</p></article>",
+      "css": ".ds-card { padding: 1.5rem; border-bottom: 1px solid var(--color-stone, #d1ccc5); background: var(--color-canvas, #f4f1eb); transition: background-color .2s cubic-bezier(.16,1,.3,1); } .ds-card:hover { background: var(--color-canvas-alt, #e9e5de); } .ds-card-title { display: block; font-family: \"Newsreader\", serif; font-weight: 600; font-size: 1.6rem; line-height: 1.25; color: var(--color-ink, #2c2a28); text-decoration: none; } .ds-card-title:hover { color: var(--color-falu-red, #8c2121); } .ds-card-meta { margin: 0.5rem 0 0; font-family: \"JetBrains Mono\", monospace; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-light, #555250); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Notebook",
+    "overview": "A technical record, kept by hand, and warmed by the paper it's kept on. The page is ruled like engineering grid paper. The margins are annotated in monospace — dates, tags, reply-verbs, syndication links — while the prose itself is set in a serif and left alone to be read. The mono is the annotation layer; the serif is the record. Keeping those two voices distinct is the whole system.\n\nThis is not a terminal and not a document viewer. Every technical signal is held against warmth that comes from material and culture, not from a beige background: falu red is the pigment on Swedish barns, cloudberry is a Nordic berry. That specificity is what keeps the system out of the cream-and-serif lane it would otherwise fall into.",
+    "keyCharacteristics": [
+      "Grid-paper ground; monospace margins; serif prose. Three voices, never blurred.",
+      "Near-square geometry (1-6px radii). Structure is carried by borders, never by soft shadows.",
+      "Depth is physical: hard, unblurred offsets that you press an element into.",
+      "Fluid everything — type and spacing scale with the viewport via clamp().",
+      "Two full themes. Dark is designed, not inverted."
+    ],
+    "rules": [
+      {
+        "name": "The Earned Warmth Rule",
+        "body": "The canvas tint carries no warmth on its own — it is a ground. Warmth is earned by falu red, cloudberry, and the serif. Audit test: strip the accents and the serif; if it still reads warm and editorial, the warmth was coming from the beige, and the beige is generic.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Cloudberries Rule",
+        "body": "--color-cloudberry is for borders and display; --color-cloudberry-text is for small text. The display colour fails WCAG AA below ~18px. Enforced by test/token-contrast.spec.js, including against the hover surface axe cannot reach.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Accent Rule",
+        "body": "Falu red is the only accent that gets to be loud, and it stays under ~10% of any view.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Voices Rule",
+        "body": "Serif = the record. Sans = the chrome. Mono = the margin. A voice used for the wrong job is a bug, not a style choice.",
+        "section": "typography"
+      },
+      {
+        "name": "The 65ch Rule",
+        "body": "Article text never exceeds a 65ch measure, at any viewport. Reading is the product.",
+        "section": "typography"
+      },
+      {
+        "name": "The Displacement Rule",
+        "body": "Depth is communicated by displacement, never diffusion. Shadows are hard offsets — never blurred, never translucent — and interactive depth is movement: press an element and it travels into its own shadow. Audit test: if a box-shadow contains a blur radius or an rgba(), it does not belong in this system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Shadow Is Not Load-Bearing Rule",
+        "body": "In forced-colors: active, box-shadow is forced to none — so the entire depth vocabulary simply disappears. That is acceptable only because nothing depends on it: every control that casts a shadow also carries a 2px border, and the press is also a transform. Never let a shadow be the only thing that makes an element perceivable, bounded, or focused. This is why focus rings use outline — outline-color is forced and survives, whereas a box-shadow focus ring would vanish.",
+        "section": "elevation"
+      },
+      {
+        "name": "The System Colour Rule",
+        "body": "In forced-colors: active the user's palette replaces ours BY ROLE: color becomes a text colour, background-color becomes a background colour. A property inherits the meaning of the property, not the meaning you intended — background-color: currentColor on a masked glyph does not become the text colour, it becomes Canvas, and the glyph paints white-on-white and disappears. Whenever a colour has to survive, name the role you mean: CanvasText for text, LinkText inside a link, Highlight/HighlightText for a selected item. Never re-name our own tokens there; they would just be reverted again. Only opacity and border-width are never forced, so they are the only reliable non-colour cues — and a decorative opacity: 0.7 quietly eats contrast from a palette chosen for maximum contrast, so take it back to 1. Audit test: if a rule inside @media (forced-colors: active) mentions a --color-* token, it is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Corner Is Not a Dial Rule",
+        "body": "Radius is a vocabulary, not a spectrum. Five values exist — --rounded-hairline (1px), --rounded-chip (2px), --rounded-control (4px), --rounded-avatar (6px), --rounded-full (50%, for circles) — they are named for what they are for, and a corner that lands between them is drift, not a new size. If a component seems to need 3px it wants chip, and the eye is inventing a difference no reader will see. If it seems to need a pill, it wants to be something other than a pill: pills are an explicit anti-reference, the tell of the corporate dev-marketing blog this site is the opposite of. Amending the scale means amending DESIGN.md and this sidecar together; anything else is a literal that quietly breeds more literals. Audit test: every border-radius in src/global.css must read var(--rounded-*), with no exceptions.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the three voices separate: serif for prose, sans for chrome, mono for the margin.",
+      "Do cap article measure at 65ch. Reading is the product.",
+      "Do express depth as displacement — hard 4px 4px 0 offsets and a real press.",
+      "Do use --color-cloudberry-text (#984200) for any cloudberry text, and plain --color-cloudberry only for borders and display.",
+      "Do give links inside prose a non-colour cue (an underline). Colour alone is never the carrier.",
+      "Do design dark mode as its own theme. It is not an inversion.",
+      "Do let structure be carried by borders — 2px ink, 1px stone.",
+      "Do name the role in forced colours — CanvasText, LinkText, Highlight/HighlightText — never one of our own tokens, which would just be reverted again. (The System Colour Rule.)",
+      "Do treat any state carried by an inversion (light text on a dark chip) as lost in forced colours, and give it a second cue that isn't colour — opacity and border-width are the only two properties the user's palette never touches.",
+      "Reach for the nearest --rounded-* step when a corner feels off-scale. The scale is five values wide on purpose."
+    ],
+    "donts": [
+      "Don't add a blurred or translucent box-shadow. If it has a blur radius or an rgba(), it is not this system.",
+      "Don't let a box-shadow be the only thing bounding, elevating, or focusing an element — it is forced to none in high-contrast mode. (The Shadow Is Not Load-Bearing Rule.)",
+      "Don't paint an icon with a url() background-image. Those are the one thing forced-colors does NOT override, so the icon keeps a colour nobody can see. Mask the shape and colour it with background-color: currentColor, which adapts to dark mode for free.",
+      "Don't then assume that masked icon survives forced colours, because it does not. background-color IS reverted — but to a background colour (Canvas), not to the text colour — so the glyph paints white-on-white and disappears. Add a @media (forced-colors: active) block naming a TEXT system colour (LinkText inside a link, otherwise CanvasText), and reset any decorative opacity to 1. (The System Colour Rule.) This exact bug shipped once and was invisible until the forced-colors tests were made honest.",
+      "Don't ship a :hover rule that changes state without gating it on @media (hover: hover). On touch, :hover sticks after a tap — the button stays pressed, the card stays lit. Keyboard users are served by :focus-visible, never by :hover.",
+      "Don't reach for @media (pointer: coarse) sizing. It's a no-op here — the paddings already clear 44px at every width — and e2e/touch-targets.test.js measures that on a coarse pointer at desktop width. Add it the day that test goes red, not before.",
+      "Don't deepen the background to make the page feel warmer. The beige earns nothing.",
+      "Don't put raw --color-cloudberry on small text. It fails WCAG AA and the build will fail with it.",
+      "Don't give the sidebar an inner scrollbar. Ever.",
+      "Don't reach for pills, rounded-lg, gradient CTAs, stock hero illustration, or \"Book a demo\" — that is the corporate dev-marketing blog.",
+      "Don't add signup modals, interstitials, or \"clap\"-style affordances over the content — that is the siloed blog platform this site exists to be the opposite of.",
+      "Don't go monospace-everything and black-on-white. That is the brutalist/terminal dev blog — the near miss.",
+      "Don't ship generated prose, SEO filler, or stock imagery. That is the AI-slop content farm, and the notbyai badge is a standing promise against it.",
+      "Type a raw border-radius. Every corner comes from the --rounded-* scale; a literal px value is drift, and a pill is an anti-reference."
+    ]
+  }
+}

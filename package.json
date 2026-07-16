@@ -1,18 +1,49 @@
 {
+  "description": "My personal blog",
   "private": true,
-  "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "husky": "^3.0.0"
+  "type": "module",
+  "engines": {
+    "node": "^24.0.0 || >=26"
   },
   "scripts": {
-    "test": "eslint ."
+    "build": "npm run clean-hashed && domstack --copy images --copy media && sed \"s/__BUILD_VERSION__/$(git rev-parse --short HEAD)/\" sw.js > public/sw.js && cp public/404/index.html public/404.html",
+    "build-drafts": "npm run clean-hashed && domstack --drafts --copy images --copy media",
+    "check": "run-p check:* --continue-on-error",
+    "check:knip": "knip",
+    "check:lint": "eslint --report-unused-disable-directives .",
+    "check:tsc": "tsc",
+    "check:tsc-browser": "tsc -p tsconfig.browser.json",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 95 --ignore-files 'sw.js'",
+    "clean-hashed": "rm -f public/global-*.css public/global.client-*.js",
+    "dev": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --copy images --copy media",
+    "dev-drafts": "mkdir -p public && cp sw.js public/sw.js && domstack --watch --drafts --copy images --copy media",
+    "e2e": "playwright test",
+    "husky-disable": "git config --unset core.hooksPath",
+    "husky-enable": "husky",
+    "prepare": "husky",
+    "test": "run-s check build test:build",
+    "test:build": "node --test 'test/**/*.spec.js'",
+    "test:e2e": "playwright test --project=chromium"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm test"
-    }
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@domstack/static": "^11",
+    "@playwright/test": "^1.59.1",
+    "@types/estree": "^1.0.9",
+    "@types/node": "^24.13.3",
+    "@voxpelli/eslint-config": "^25.1.0",
+    "@voxpelli/tsconfig": "^16",
+    "axe-core": "^4.11.4",
+    "eslint": "^9",
+    "husky": "^9",
+    "knip": "^6.12.2",
+    "npm-run-all2": "^8",
+    "serve": "^14.2.6",
+    "type-coverage": "^2.29.7",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@voxpelli/typed-utils": "^5.0.0",
+    "async-htm-to-string": "^5.0.2"
   }
 }

@@ -1,0 +1,67 @@
+import { expect, test } from '@playwright/test';
+
+test.describe('microformats', () => {
+  test('h-feed on homepage contains h-entry children', async ({ page }) => {
+    await page.goto('/');
+    const hfeed = page.locator('.h-feed');
+    await expect(hfeed).toBeVisible();
+    const entries = hfeed.locator('.h-entry');
+    await expect(entries.first()).toBeVisible();
+    expect(await entries.count()).toBeGreaterThan(0);
+  });
+
+  test('h-entry on homepage has dt-published and u-url', async ({ page }) => {
+    await page.goto('/');
+    const entry = page.locator('.h-feed .h-entry').first();
+    await expect(entry).toBeVisible();
+
+    // .dt-published is itself the <time datetime> element (not a wrapper)
+    const published = entry.locator('time.dt-published[datetime]');
+    await expect(published).toHaveCount(1);
+    await expect(published).toBeVisible();
+
+    const url = entry.locator('a.u-url');
+    await expect(url).toBeVisible();
+    await expect(url).toHaveAttribute('href', /^\//);
+  });
+
+  test('h-card on about page has p-name, u-photo, and p-note', async ({ page }) => {
+    await page.goto('/about/');
+    const hcard = page.locator('.h-card');
+    await expect(hcard.first()).toBeVisible();
+
+    await expect(page.locator('.h-card .p-name').first()).toBeVisible();
+    await expect(page.locator('.h-card .u-photo').first()).toHaveAttribute('src', /.+/);
+    await expect(page.locator('.h-card .p-note').first()).toBeVisible();
+  });
+
+  test('sidebar h-card has p-name and u-url', async ({ page }) => {
+    await page.goto('/');
+    // The sidebar element itself is the h-card (<aside class="sidebar h-card">)
+    const hcard = page.locator('.sidebar.h-card').first();
+    await expect(hcard).toBeVisible();
+    await expect(hcard.locator('.p-name')).toBeVisible();
+    await expect(hcard.locator('.u-url').first()).toBeVisible();
+  });
+
+  test('article page has webmention endpoint', async ({ page }) => {
+    await page.goto('/2019/10/use-type-script-3-7-to-generate/');
+    const webmention = page.locator('link[rel="webmention"]');
+    await expect(webmention).toHaveCount(1);
+    await expect(webmention).toHaveAttribute('href', /.+/);
+  });
+
+  test('homepage has WebSub hub link', async ({ page }) => {
+    await page.goto('/');
+    const hub = page.locator('link[rel="hub"]');
+    await expect(hub).toHaveCount(1);
+    await expect(hub).toHaveAttribute('href', /.+/);
+  });
+
+  test('about page has rel=me links', async ({ page }) => {
+    await page.goto('/about/');
+    const relMe = page.locator('a[rel~="me"]');
+    await expect(relMe.first()).toBeVisible();
+    expect(await relMe.count()).toBeGreaterThan(0);
+  });
+});
