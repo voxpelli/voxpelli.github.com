@@ -43,39 +43,74 @@ async function freezeCards (page) {
 }
 
 /**
- * The href a click at a given point on the card would follow, or undefined if the
- * point is dead.
+ * The href a click at a probe point on the card would follow, or undefined if
+ * the point is dead. ONE in-page probe serves both addressing modes — by
+ * relative position on the card, or by the centre of a child element — so the
+ * viewport guard cannot be dropped from one of them (it was: an early
+ * `throughCover` re-implemented the hit-test without the guard).
  *
- * Throws rather than returning null when the point lies outside the viewport:
- * `elementFromPoint` finds nothing there either, so an unscrolled card would be
- * indistinguishable from an unclickable one and the test would report a defect
- * that isn't there (it did, while this file was being written).
+ * Throws rather than returning undefined when the point lies outside the
+ * viewport: `elementFromPoint` finds nothing there either, so an unscrolled
+ * card would be indistinguishable from an unclickable one and the test would
+ * report a defect that isn't there (it did, while this file was being written).
  *
+ * @param {import('@playwright/test').Locator} card
+ * @param {{ rx: number, ry: number } | { selector: string }} target
+ * @returns {Promise<string | undefined>}
+ */
+function probeHref (card, target) {
+  return card.evaluate((el, target) => {
+    let x, y;
+    if ('selector' in target) {
+      const child = el.querySelector(target.selector);
+      if (!child) throw new Error(`no ${target.selector} on this card`);
+      const r = child.getBoundingClientRect();
+      x = r.left + r.width / 2;
+      y = r.top + r.height / 2;
+    } else {
+      const r = el.getBoundingClientRect();
+      x = r.left + r.width * target.rx;
+      y = r.top + r.height * target.ry;
+    }
+
+    if (y < 0 || y > globalThis.innerHeight || x < 0 || x > globalThis.innerWidth) {
+      throw new Error(`probe ${JSON.stringify(target)} is outside the viewport — scroll the card into view first`);
+    }
+
+    const hit = document.elementFromPoint(x, y);
+    return hit?.closest('a')?.getAttribute('href') ?? undefined;
+  }, target);
+}
+
+/**
  * @param {import('@playwright/test').Locator} card
  * @param {number} rx horizontal position within the card, 0–1
  * @param {number} ry vertical position within the card, 0–1
  * @returns {Promise<string | undefined>}
  */
 function hrefAt (card, rx, ry) {
-  return card.evaluate((el, [rx, ry]) => {
-    const r = el.getBoundingClientRect();
-    const x = r.left + r.width * rx;
-    const y = r.top + r.height * ry;
-
-    if (y < 0 || y > globalThis.innerHeight || x < 0 || x > globalThis.innerWidth) {
-      throw new Error(`probe (${rx}, ${ry}) is outside the viewport — scroll the card into view first`);
-    }
-
-    const hit = document.elementFromPoint(x, y);
-    return hit?.closest('a')?.getAttribute('href') ?? undefined;
-  }, [rx, ry]);
+  return probeHref(card, { rx, ry });
 }
+
+/**
+ * @param {import('@playwright/test').Locator} card
+ * @param {string} selector child element whose centre to probe
+ * @returns {Promise<string | undefined>}
+ */
+function hrefAtElement (card, selector) {
+  return probeHref(card, { selector });
+}
+
+// Every test in this file probes the homepage with the entrance animation
+// frozen — and a future test that forgot freezeCards would silently
+// reintroduce the hit-testing race its JSDoc documents.
+test.beforeEach(async ({ page }) => {
+  await page.goto('/');
+  await freezeCards(page);
+});
 
 test.describe('cards are clickable across their whole surface', () => {
   test('no card on the homepage has a dead zone', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     const cards = page.locator('.post-card, .til-card');
     const count = await cards.count();
     expect(count, 'the homepage must actually have cards, or this test is vacuous').toBeGreaterThan(5);
@@ -100,9 +135,6 @@ test.describe('cards are clickable across their whole surface', () => {
 
 test.describe('a card goes where its title goes', () => {
   test('a post card leads to the post', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     const card = page.locator('.post-card').first();
     const title = await card.locator('.post-title a').getAttribute('href');
 
@@ -110,9 +142,6 @@ test.describe('a card goes where its title goes', () => {
   });
 
   test('a link card leads off-site, to the source it bookmarks', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     const card = page.locator('.til-card--bookmark').first();
     await card.scrollIntoViewIfNeeded();
     const source = await card.locator('.post-title a.u-bookmark-of').getAttribute('href');
@@ -122,39 +151,21 @@ test.describe('a card goes where its title goes', () => {
   });
 
   test('the escape hatches keep their own destinations', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     // A bookmark card that still offers a route back to the note itself.
     const card = page.locator('.til-card--bookmark:has(.post-read-more)').first();
     await card.scrollIntoViewIfNeeded();
 
-    /**
-     * @param {string} selector
-     * @returns {Promise<string | undefined>} the href a click at that element's centre follows
-     */
-    const throughCover = (selector) => card.evaluate((el, sel) => {
-      const t = el.querySelector(sel);
-      if (!t) throw new Error(`no ${sel} on this card`);
-      const r = t.getBoundingClientRect();
-      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return hit?.closest('a')?.getAttribute('href') ?? undefined;
-    }, selector);
-
     const permalink = await card.locator('.post-read-more').getAttribute('href');
 
-    expect(await throughCover('.post-read-more'), '"Read full note" must still reach the note, not the source')
+    expect(await hrefAtElement(card, '.post-read-more'), '"Read full note" must still reach the note, not the source')
       .toBe(permalink);
-    expect(await throughCover('.post-type-badge'), 'the LINK pill must still reach /links/')
+    expect(await hrefAtElement(card, '.post-type-badge'), 'the LINK pill must still reach /links/')
       .toBe('/links/');
   });
 });
 
 test.describe('the cover does not eat the decorations it shares a pseudo-element with', () => {
   test('flag survives: a Swedish post title still renders its inline flag', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     const anchor = page.locator('.post-card .post-title a[lang="sv"]').first();
     await expect(anchor, 'the homepage must have a Swedish post, or this test is vacuous').toBeVisible();
 
@@ -177,9 +188,6 @@ test.describe('the cover does not eat the decorations it shares a pseudo-element
   });
 
   test('glyph survives: a bookmark title still renders its trailing ↗', async ({ page }) => {
-    await page.goto('/');
-    await freezeCards(page);
-
     const anchor = page.locator('.til-card--bookmark .post-title a.u-bookmark-of').first();
     await anchor.scrollIntoViewIfNeeded();
 

@@ -171,3 +171,56 @@ for (const [themeName, tokens] of Object.entries(themes)) {
     }
   });
 }
+
+test('every border-radius reads a --rounded-* token — the scale is closed', async () => {
+  // DESIGN.md: "Five steps, and only five." A literal radius is drift, not a
+  // new size. The comment above the scale in global.css says this file
+  // enforces that — this test is what makes the claim true.
+  const css = await readFile('src/global.css', 'utf8');
+
+  const literals = [];
+  for (const match of css.matchAll(/border-radius:\s*([^\s;][^;]*);/g)) {
+    const value = (match[1] || '').trim();
+    // Per-corner shorthands are fine as long as every component is either a
+    // scale token or 0 (no radius is not a sixth step — squaring a corner is
+    // the absence of rounding, e.g. `0 0 var(--rounded-control) var(--rounded-control)`).
+    const components = value.split(/\s+/);
+    const ok = components.length >= 1 && components.length <= 4 &&
+      components.every(part => part === '0' || /^var\(--rounded-[a-z]+\)$/.test(part));
+    if (!ok) literals.push(value);
+  }
+
+  assert.ok(css.includes('--rounded-full'), 'the radius scale itself must exist, or this test is vacuous');
+  assert.deepEqual(
+    literals,
+    [],
+    `border-radius values outside the --rounded-* scale (reach for the nearest step, or amend DESIGN.md + .impeccable/design.json together): ${literals.join(', ')}`
+  );
+});
+
+test('every box-shadow is a hard displacement — no blur, per The Displacement Rule', async () => {
+  // DESIGN.md's Displacement Rule: shadows are hard offsets, never blurred.
+  // A box-shadow's third length is the blur radius; any nonzero value there
+  // is a soft shadow. (inset border-substitutes like `inset 3px 0 0` carry
+  // an explicit 0 blur and pass.)
+  const css = await readFile('src/global.css', 'utf8');
+
+  const blurred = [];
+  for (const match of css.matchAll(/box-shadow:\s*([^\s;][^;]*);/g)) {
+    const value = (match[1] || '').trim();
+    if (value === 'none') continue;
+    for (const shadow of value.split(/,(?![^(]*\))/)) {
+      // Strip color functions so their internal numbers don't read as lengths.
+      const lengths = shadow.replaceAll(/(?:rgba?|oklch|color-mix|var)\([^)]*\)/g, '')
+        .trim().replaceAll(/^inset\s+/g, '')
+        .split(/\s+/).filter(part => /^-?\d/.test(part));
+      const blur = lengths[2];
+      if (blur !== undefined && Number.parseFloat(blur) !== 0) {
+        blurred.push(shadow.trim());
+      }
+    }
+  }
+
+  assert.ok(css.includes('box-shadow'), 'the stylesheet must use box-shadow somewhere, or this test is vacuous');
+  assert.deepEqual(blurred, [], `blurred shadows violate The Displacement Rule (hard offsets only): ${blurred.join(' | ')}`);
+});

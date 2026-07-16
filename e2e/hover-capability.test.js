@@ -102,8 +102,9 @@ test.describe('hover affordances on a touch device', () => {
  * The computed `background-image` is a resolved gradient, e.g.
  * `linear-gradient(rgba(0, 0, 0, 0) 0%, rgb(233, 229, 222) 100%)` — so the final
  * `rgb(...)` stop IS the colour the excerpt fades out to. Comparing it against the
- * card's own `background-color` is the whole invariant: a fade that dissolves into
- * a colour its card is not painting draws a visible band with a hard edge.
+ * surface the card is actually painting (see effectiveSurface — NOT the card's own
+ * `background-color`, which is transparent at rest) is the whole invariant: a fade
+ * that dissolves into a colour its card is not showing draws a visible band.
  *
  * @param {import('@playwright/test').Locator} card
  * @returns {Promise<string>} the gradient's final colour stop, as `rgb(r, g, b)`
