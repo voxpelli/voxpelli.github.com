@@ -17,6 +17,7 @@ import { assertKeyWithType, assertOptionalKeyWithType } from '@voxpelli/typed-ut
  */
 export function getSiteVars (vars) {
   assertKeyWithType(vars, 'siteUrl', 'string');
+  assertKeyWithType(vars, 'feedUidBase', 'string');
   assertKeyWithType(vars, 'blogName', 'string');
   assertKeyWithType(vars, 'authorName', 'string');
   assertKeyWithType(vars, 'authorEmail', 'string');
@@ -24,7 +25,7 @@ export function getSiteVars (vars) {
   assertKeyWithType(vars, 'webmentionEndpoint', 'string');
   assertOptionalKeyWithType(vars, 'pushHub', 'string');
 
-  const { authorEmail, authorName, blogName, pushHub = '', siteUrl, themeColor, webmentionEndpoint } = vars;
+  const { authorEmail, authorName, blogName, feedUidBase, pushHub = '', siteUrl, themeColor, webmentionEndpoint } = vars;
 
-  return { authorEmail, authorName, blogName, pushHub, siteUrl, themeColor, webmentionEndpoint };
+  return { authorEmail, authorName, blogName, feedUidBase, pushHub, siteUrl, themeColor, webmentionEndpoint };
 }

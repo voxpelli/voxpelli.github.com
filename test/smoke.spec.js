@@ -104,6 +104,44 @@ test('feed entry <id>s are unique across the feed', async () => {
   }
 });
 
+test('feed entry <id>s keep the legacy uid scheme — a write-once contract', async () => {
+  // Atom entry ids are permanent identifiers, not links. The live feeds have
+  // served `http://voxpelli.com` + slash-less path since the Jekyll era
+  // (site.uid_base + post.id). Regenerating them — https scheme, trailing
+  // slash, anything — re-floods every subscriber with duplicates,
+  // irreversibly. This pins the derivation for every feed.
+  for (const feedPath of ['public/all.xml', 'public/english.xml', 'public/links/all.xml', 'public/til/feed.atom', 'public/releases/feed.atom', 'public/stream.xml']) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- literal list above
+    const xml = await readFile(feedPath, 'utf8');
+    const entryIdPattern = /<entry>[\s\S]*?<id>([^<]*)<\/id>/g;
+    const ids = [...xml.matchAll(entryIdPattern)].map(m => m[1] || '');
+    for (const id of ids) {
+      assert.match(id, /^http:\/\/voxpelli\.com\//, `${feedPath}: entry id "${id}" must use the legacy uid base (http://, not the canonical https:// link)`);
+      assert.doesNotMatch(id, /\/$/, `${feedPath}: entry id "${id}" must not carry a trailing slash (Jekyll post.id never did)`);
+    }
+  }
+});
+
+test('feed-level <id>s are unique across all feeds', async () => {
+  // Regression: deriving the feed id from htmlUrl collided all.xml,
+  // english.xml and stream.xml on `https://voxpelli.com/` — readers that
+  // key or dedupe subscriptions by feed id conflate them (RFC 4287 requires
+  // universally unique ids). all.xml keeps its historical `/` id; every
+  // other feed must identify as itself.
+  /** @type {Map<string, string>} */
+  const seen = new Map();
+  for (const feedPath of ['public/all.xml', 'public/english.xml', 'public/links/all.xml', 'public/til/feed.atom', 'public/releases/feed.atom', 'public/stream.xml']) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- literal list above
+    const xml = await readFile(feedPath, 'utf8');
+    const feedIdMatch = xml.match(/<feed[^>]*>[\s\S]*?<id>([^<]*)<\/id>/);
+    const feedId = feedIdMatch && feedIdMatch[1] ? feedIdMatch[1] : '';
+    assert.ok(feedId, `${feedPath} must have a feed-level <id>`);
+    const holder = seen.get(feedId);
+    assert.equal(holder, undefined, `${feedPath} shares feed <id> "${feedId}" with ${holder}`);
+    seen.set(feedId, feedPath);
+  }
+});
+
 test('feed entries emit both <published> and <updated>', async () => {
   // Regression: entries used to omit <published>, leaving readers unable to
   // distinguish first-publish from last-edit timestamps.

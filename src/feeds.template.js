@@ -16,7 +16,7 @@ import { renderRssEntry } from './lib/render-rss-entry.js';
  * @returns {AsyncIterable<TemplateOutputOverride>}
  */
 export default async function * feedsTemplate ({ pages, vars }) {
-  const { authorEmail, authorName, blogName, pushHub, siteUrl } = getSiteVars(vars);
+  const { authorEmail, authorName, blogName, feedUidBase, pushHub, siteUrl } = getSiteVars(vars);
   const now = new Date().toISOString();
 
   // Filter and sort posts using shared helper
@@ -57,14 +57,19 @@ export default async function * feedsTemplate ({ pages, vars }) {
    * @param {object} options
    * @param {string} options.selfUrl
    * @param {string} [options.htmlUrl]
+   * @param {string} [options.feedId] - path for the feed-level <id>; defaults to
+   *   selfUrl. RFC 4287 requires feed ids to be universally unique — deriving
+   *   them from htmlUrl collided all.xml/english.xml/stream.xml on the same id.
+   *   Like entry ids, a feed id is permanent once served: all.xml keeps its
+   *   historical `/` explicitly; every other feed identifies as its self URL.
    * @param {string} [options.subtitle]
    * @param {Array<Record<string, unknown>>} options.posts
    * @returns {string}
    */
-  function buildFeed ({ htmlUrl, posts, selfUrl, subtitle }) {
+  function buildFeed ({ feedId, htmlUrl, posts, selfUrl, subtitle }) {
     const entries = posts.map(post => {
       const html = renderCache.get(/** @type {string} */ (post.path)) || '';
-      return renderRssEntry({ content: html, post, siteUrl });
+      return renderRssEntry({ content: html, post, siteUrl, uidBase: feedUidBase });
     });
 
     return `<?xml version="1.0" encoding="utf-8"?>
@@ -75,7 +80,7 @@ export default async function * feedsTemplate ({ pages, vars }) {
  ${pushHub ? `<link href="${escapeXml(pushHub)}" rel="hub" />` : ''}
  ${htmlUrl ? `<link href="${escapeXml(siteUrl + htmlUrl)}" type="text/html" />` : ''}
  <updated>${now}</updated>
- <id>${escapeXml(siteUrl + (htmlUrl || selfUrl))}</id>
+ <id>${escapeXml(siteUrl + (feedId || selfUrl))}</id>
  <author>
    <name>${escapeXml(authorName)}</name>
    <email>${escapeXml(authorEmail)}</email>
@@ -91,6 +96,9 @@ ${entries.join('\n')}
     content: buildFeed({
       selfUrl: '/all.xml',
       htmlUrl: '/',
+      // Historical exception: all.xml has identified as the site root since
+      // the Jekyll era — keep it for subscriber continuity.
+      feedId: '/',
       posts: recentPosts,
     }),
   };
