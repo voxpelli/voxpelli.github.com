@@ -6,8 +6,10 @@
  */
 
 import assert from 'node:assert/strict';
-import { access, readdir, readFile } from 'node:fs/promises';
 import { test } from 'node:test';
+import {
+  access, glob, readdir, readFile,
+} from 'node:fs/promises';
 
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';
@@ -111,7 +113,6 @@ test('feed entry <id>s keep the legacy uid scheme — a write-once contract', as
   // slash, anything — re-floods every subscriber with duplicates,
   // irreversibly. This pins the derivation for every feed.
   for (const feedPath of ['public/all.xml', 'public/english.xml', 'public/links/all.xml', 'public/til/feed.atom', 'public/releases/feed.atom', 'public/stream.xml']) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- literal list above
     const xml = await readFile(feedPath, 'utf8');
     const entryIdPattern = /<entry>[\s\S]*?<id>([^<]*)<\/id>/g;
     const ids = [...xml.matchAll(entryIdPattern)].map(m => m[1] || '');
@@ -131,7 +132,6 @@ test('feed-level <id>s are unique across all feeds', async () => {
   /** @type {Map<string, string>} */
   const seen = new Map();
   for (const feedPath of ['public/all.xml', 'public/english.xml', 'public/links/all.xml', 'public/til/feed.atom', 'public/releases/feed.atom', 'public/stream.xml']) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- literal list above
     const xml = await readFile(feedPath, 'utf8');
     const feedIdMatch = xml.match(/<feed[^>]*>[\s\S]*?<id>([^<]*)<\/id>/);
     const feedId = feedIdMatch && feedIdMatch[1] ? feedIdMatch[1] : '';
@@ -140,6 +140,72 @@ test('feed-level <id>s are unique across all feeds', async () => {
     assert.equal(holder, undefined, `${feedPath} shares feed <id> "${feedId}" with ${holder}`);
     seen.set(feedId, feedPath);
   }
+});
+
+test('every /images/ and /media/ URL in built pages resolves to a built file', async () => {
+  // `--copy <dir>` FLATTENS the top-level directory (images/foo.png lands at
+  // public/foo.png), so anything that must be served from /images/… has to
+  // sit double-nested at images/images/… in the source tree — the same shape
+  // badges/ already uses (images/badges/ → public/badges/). Legacy Jekyll-era
+  // assets have their /images/ and /media/ URLs baked into migrated content;
+  // this walks every built page so the next asset cannot silently 404.
+  //
+  // Pre-existing 404s, broken on the live Jekyll site too (the 2015
+  // Instagram import referenced media that never entered the repo) —
+  // excluded so real regressions stay loud; tracked in beads:
+  const knownBroken = new Set([
+    '/media/2015-07-47843/ig-hij5vv.jpg',
+    '/media/2015-07-47843/igy-z0s-ka.mp4',
+    '/media/2015-07-63251/ig-qqlipo.jpg',
+  ]);
+
+  const refPattern = /(?:src|href|poster)="(?:https?:\/\/voxpelli\.com)?(\/(?:images|media)\/[^"]+)"/g;
+  /** @type {string[]} */
+  const missing = [];
+  let checked = 0;
+
+  for await (const page of glob('public/**/*.html')) {
+    const html = await readFile(page, 'utf8');
+    for (const [, assetPath] of html.matchAll(refPattern)) {
+      if (!assetPath || knownBroken.has(assetPath)) continue;
+      checked += 1;
+      try {
+        await access(`public${assetPath}`);
+      } catch {
+        missing.push(`${assetPath} (referenced by ${page})`);
+      }
+    }
+  }
+
+  assert.ok(checked > 0, 'expected at least one /images/ or /media/ reference — if the pattern rots, this test is vacuous');
+  assert.deepEqual(missing, [], `referenced assets missing from public/:\n${missing.join('\n')}`);
+});
+
+test('every /tags/ link in built pages resolves to a built tag page', async () => {
+  // The tag index is deliberately built from uncategorized blog posts only
+  // (global.data.js allTags — social/link posts have different tag
+  // semantics), so PostTags must only LINK tags in that same universe:
+  // categorized posts render tags as plain text. This walks every built page
+  // so the renderer and the generator cannot silently disagree again —
+  // the disagreement shipped /tags/github/ 404s on social posts.
+  /** @type {string[]} */
+  const dead = [];
+  let checked = 0;
+
+  for await (const page of glob('public/**/*.html')) {
+    const html = await readFile(page, 'utf8');
+    for (const [, tag] of html.matchAll(/href="\/tags\/([^"/]+)\/"/g)) {
+      checked += 1;
+      try {
+        await access(`public/tags/${tag}/index.html`);
+      } catch {
+        dead.push(`/tags/${tag}/ (linked from ${page})`);
+      }
+    }
+  }
+
+  assert.ok(checked > 0, 'expected at least one /tags/ link — if the pattern rots, this test is vacuous');
+  assert.deepEqual(dead, [], `tag links pointing at pages that were never generated:\n${dead.join('\n')}`);
 });
 
 test('feed entries emit both <published> and <updated>', async () => {
@@ -725,26 +791,38 @@ test('SWARM-13 active-nav regression fence — correct nav item marked per path'
   }
 });
 
-test('SWARM-13 /releases/ renders til-card--release + My full release notes label', async () => {
-  const html = await readFile('public/releases/index.html', 'utf8').catch(() => '');
-  if (!html) return; // Not built or only drafts exist — graceful skip
-  // Only a real release (non-draft) would trigger the modifier class — if the
-  // page was built but contains no visible release cards, skip too.
-  if (!html.includes('til-card--release')) return;
-  assert.match(html, /til-card--release/, '/releases/ must render .til-card--release when a release is present');
-  assert.match(html, /My full release notes/, '/releases/ card must use release-specific read-more label');
+test('SWARM-13 /releases/ renders til-card--release + My full release notes label', async (t) => {
+  // The expectation is derived from the SOURCE tree, never from the built
+  // output: the old guard (`if (!html.includes(X)) return;` followed by
+  // `assert.match(html, X)`) returned early in exactly the case the assertion
+  // existed to catch, so the test stayed green while til-card--release had
+  // zero instances in the whole built site. Non-draft release posts are what
+  // obligate the page to render release cards — count those instead.
+  const releaseSources = await Array.fromAsync(glob('src/releases/*/**/page.md'));
+  if (releaseSources.length === 0) {
+    t.skip('no non-draft release posts exist yet — til-card--release has no live consumer until one ships');
+    return;
+  }
+  const html = await readFile('public/releases/index.html', 'utf8');
+  assert.match(html, /til-card--release/, `/releases/ must render .til-card--release (${releaseSources.length} non-draft release post(s) exist)`);
+  assert.match(html, /My full release notes/, '/releases/ card must use the release-specific read-more label');
 });
 
-test('SWARM-13 TIL card pill badge links back to /til/', async () => {
+test('SWARM-13 TIL card pill badge links back to /til/', async (t) => {
   // Agent C1: TIL cards carry a .post-type-badge.post-type-badge--til anchor
   // that links to the TIL index. Attribute order in the built output is not
   // guaranteed, so accept either class-first or href-first ordering.
-  const html = await readFile('public/til/index.html', 'utf8').catch(() => '');
-  if (!html) return; // TIL index not built — graceful skip
-  // Cascade-skip when /til/ currently has no real TIL-category posts (only
-  // drafts) — the superset page may be rendering only /links/ or /releases/
-  // entries, which carry --link / --release badges, not --til.
-  if (!html.includes('post-type-badge--til')) return;
+  //
+  // Expectation derived from the SOURCE tree (same rationale as the release
+  // test above): guarding on the built page's own content is a tautology.
+  // The --til badge only appears for real til-category posts; the superset
+  // page may otherwise render only /links/ or /releases/ entries.
+  const tilSources = await Array.fromAsync(glob('src/til/*/**/page.md'));
+  if (tilSources.length === 0) {
+    t.skip('no non-draft til posts exist yet — the --til badge has no live consumer until one ships');
+    return;
+  }
+  const html = await readFile('public/til/index.html', 'utf8');
   const classFirst = /<a[^>]*class="[^"]*post-type-badge post-type-badge--til[^"]*"[^>]*href="\/til\/"[^>]*>TIL<\/a>/;
   const hrefFirst = /<a[^>]*href="\/til\/"[^>]*class="[^"]*post-type-badge post-type-badge--til[^"]*"[^>]*>TIL<\/a>/;
   assert.ok(

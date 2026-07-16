@@ -35,10 +35,29 @@ const pages = [
   { name: 'archive', path: '/archive/' },
   { name: 'about', path: '/about/' },
   { name: 'til-index', path: '/til/' },
-  { name: 'til-topic', path: '/til/topics/css/' },
+  // { name: 'til-topic', path: '/til/topics/css/' }, // gated out: topic pages only materialize once non-draft topical TILs ship — against the current build this was a 404 that all three suites scanned and passed vacuously
   { name: 'articles', path: '/articles/' },
   // { name: 'feeds', path: '/feeds/' }, // gated out for release (page.draft.js)
 ];
+
+/**
+ * Navigate to a fixture and assert it actually loaded.
+ *
+ * A 404 has no violations either — serve's fallback page trivially passes an
+ * axe scan, so a moved/renamed/drafts-gated fixture silently turns its WCAG
+ * gate into a no-op (it did: /til/topics/css/ was scanned as a 404 by three
+ * suites, all green). Same premise-guard as mobile-overflow.test.js.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} path
+ */
+async function gotoFixture (page, path) {
+  const response = await page.goto(path);
+  expect(
+    response?.status(),
+    `${path} returned HTTP ${String(response?.status())} — fixture path may have moved or is drafts-gated; a 404 passes axe vacuously`
+  ).toBe(200);
+}
 
 /**
  * Flip the theme, then wait until the transitions it starts have drained.
@@ -96,7 +115,7 @@ function criticalOrSerious (violations) {
 test.describe('accessibility: light mode', () => {
   for (const { name, path } of pages) {
     test(`${name} has no critical/serious WCAG 2.1 AA violations`, async ({ page }) => {
-      await page.goto(path);
+      await gotoFixture(page, path);
       await setTheme(page, 'light');
 
       const results = await new AxeBuilder({ page })
@@ -112,7 +131,7 @@ test.describe('accessibility: light mode', () => {
 test.describe('accessibility: dark mode', () => {
   for (const { name, path } of pages) {
     test(`${name} has no critical/serious WCAG 2.1 AA violations`, async ({ page }) => {
-      await page.goto(path);
+      await gotoFixture(page, path);
       await setTheme(page, 'dark');
 
       const results = await new AxeBuilder({ page })
@@ -137,7 +156,7 @@ test.describe('accessibility: OS dark (prefers-color-scheme, no data-theme)', ()
 
   for (const { name, path } of pages) {
     test(`${name} has no critical/serious WCAG 2.1 AA violations`, async ({ page }) => {
-      await page.goto(path);
+      await gotoFixture(page, path);
 
       // Guard the premise: if anything ever writes data-theme on first visit,
       // this suite would silently be re-testing the attribute branch instead.
