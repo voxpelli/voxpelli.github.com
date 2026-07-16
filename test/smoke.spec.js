@@ -798,7 +798,11 @@ test('SWARM-13 /releases/ renders til-card--release + My full release notes labe
   // existed to catch, so the test stayed green while til-card--release had
   // zero instances in the whole built site. Non-draft release posts are what
   // obligate the page to render release cards — count those instead.
-  const releaseSources = await Array.fromAsync(glob('src/releases/*/**/page.md'));
+  // (collected via for-await: Array.fromAsync needs an ES2024 lib and the
+  // tsconfig still targets node20 — tracked as its own lead)
+  /** @type {string[]} */
+  const releaseSources = [];
+  for await (const file of glob('src/releases/*/**/page.md')) releaseSources.push(file);
   if (releaseSources.length === 0) {
     t.skip('no non-draft release posts exist yet — til-card--release has no live consumer until one ships');
     return;
@@ -817,7 +821,9 @@ test('SWARM-13 TIL card pill badge links back to /til/', async (t) => {
   // test above): guarding on the built page's own content is a tautology.
   // The --til badge only appears for real til-category posts; the superset
   // page may otherwise render only /links/ or /releases/ entries.
-  const tilSources = await Array.fromAsync(glob('src/til/*/**/page.md'));
+  /** @type {string[]} */
+  const tilSources = [];
+  for await (const file of glob('src/til/*/**/page.md')) tilSources.push(file);
   if (tilSources.length === 0) {
     t.skip('no non-draft til posts exist yet — the --til badge has no live consumer until one ships');
     return;
