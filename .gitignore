@@ -23,10 +23,17 @@ RETRO-*.md
 SWARM-*.md
 SYNERGY-*
 PR_COMMENTS*.md
+BRANCH-REVIEW-*
 
 # Machine-specific .claude/ state (synergy registry + any *.local.json)
 .claude/*.local.json
 .claude/synergy-*
+# Workflow scripts run in the Claude Code sandbox (top-level return/await —
+# not valid standalone modules, so they must stay out of lint/tsc scope too)
+.claude/workflows/
+
+# liggare ledger (local SQLite register of expiring TODOs)
+.liggare/
 
 # impeccable: DESIGN.md's sidecar (.impeccable/design.json) and the live-mode
 # config ARE tracked — they're project design context. Only machine-local and

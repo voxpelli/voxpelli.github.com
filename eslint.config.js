@@ -5,7 +5,9 @@ import { noUnsafeUrlInterpolation } from './tools/eslint-no-unsafe-url-interpola
 
 export default defineConfig([
   ...voxpelli({
-    ignores: ['sw.js'],
+    // .claude/workflows/*.js run in the Claude Code workflow sandbox (top-level
+    // return/await, injected globals) — they are not standalone modules.
+    ignores: ['sw.js', '.claude/'],
     noMocha: true,
   }),
   {
