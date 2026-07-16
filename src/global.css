@@ -69,12 +69,14 @@
   --border-structural: 1px solid var(--color-stone);
   --border-heavy: 2px solid var(--color-ink);
 
-  /* Radius scale. DESIGN.md declares the first four steps; `full` names the
-     circular avatars that already existed outside the scale. There is no pill
-     step, and there must not be one — pills are an explicit anti-reference (the
-     "corporate dev-marketing blog"). A radius outside this set is drift, not a
-     new size: reach for the nearest step, or amend DESIGN.md and the sidecar
-     together. `.impeccable/design.json` enforces this. */
+  /* Radius scale. DESIGN.md declares all five steps ("Five steps, and only
+     five" — `full` covers the circles: avatars, webmention glyphs). There is
+     no pill step, and there must not be one — pills are an explicit
+     anti-reference (the "corporate dev-marketing blog"). A radius outside
+     this set is drift, not a new size: reach for the nearest step, or amend
+     DESIGN.md and the sidecar together. test/token-contrast.spec.js enforces
+     this — a literal border-radius fails the build; `.impeccable/design.json`
+     documents the rule for design tooling. */
   --rounded-hairline: 1px;
   --rounded-chip: 2px;
   --rounded-control: 4px;
@@ -259,8 +261,10 @@ a {
   transition: color 0.2s var(--ease-out);
 }
 
-a:hover {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  a:hover {
+    color: var(--color-falu-red);
+  }
 }
 
 /* Swedish prose hyphenation — long compound words (e.g. "delningsekonomi")
@@ -377,8 +381,10 @@ img {
   text-decoration: none;
 }
 
-.brand-header .title a:hover {
-  color: var(--color-ink);
+@media (hover: hover) {
+  .brand-header .title a:hover {
+    color: var(--color-ink);
+  }
 }
 
 .brand-header .subtitle {
@@ -519,8 +525,10 @@ img {
   border-color: var(--color-ink);
 }
 
-.nav-item.active:hover {
-  color: var(--color-canvas);
+@media (hover: hover) {
+  .nav-item.active:hover {
+    color: var(--color-canvas);
+  }
 }
 
 /* The active nav item is an inverted chip: ink ground, canvas text. Forced-colors
@@ -677,8 +685,12 @@ img {
     transition: background-color 0.15s var(--ease-out);
   }
 
-  .js .hamburger-btn:hover {
-    background-color: var(--color-canvas-alt);
+  /* Nested hover gate: the hamburger is a touch-primary control — without
+     this, a tap leaves it stuck on the hover surface until the next tap. */
+  @media (hover: hover) {
+    .js .hamburger-btn:hover {
+      background-color: var(--color-canvas-alt);
+    }
   }
 
   .nav-disclosure {
@@ -835,10 +847,9 @@ img {
 }
 
 @media (hover: hover) {
-  .post-card:hover {
-    background-color: var(--color-canvas-alt);
-  }
-
+  /* The hover SURFACE itself is painted by the shared --card-surface block
+     below (one declaration for card + fade, both card types) — only the
+     accent-bar reveal lives here. */
   .post-card:hover::before {
     transform: scaleY(1);
   }
@@ -883,7 +894,9 @@ img {
 
    Two levels, only two:
 
-     1  the cover      — the title anchor's stretched ::before
+     1  the cover      — the title anchor's stretched pseudo (::after on
+                         post/TIL titles, ::before on bookmark titles — WHICH
+                         pseudo is not free, see below)
      2  escape hatches — anything with its OWN destination, which has to stay
                          clickable through the cover
 
@@ -979,7 +992,10 @@ img {
    resting canvas — a pale band with a hard edge across the excerpt. The swap was
    also ungated, so on a touch device the fade changed while the card (correctly
    gated) did not — the same mismatch, inverted. One declaration per surface means
-   a third card type cannot reintroduce either bug. */
+   a third card type cannot reintroduce either bug — which is also why the
+   hover block below paints the card's own background-color from the same
+   variable: the card background and the fade target are ONE value, swapped in
+   ONE place. (It was three synced places once, and they drifted.) */
 .post-card,
 .til-card {
   --card-surface: var(--color-canvas);
@@ -993,12 +1009,19 @@ img {
   height: 3em;
   background: linear-gradient(to bottom, transparent, var(--card-surface));
   pointer-events: none;
+  /* Above the escape hatches (level 2): `.post-excerpt a` is lifted to z-2 to
+     stay clickable through the card cover, which put prose links ABOVE the
+     fade — full-contrast text sitting un-dissolved inside the fade band. The
+     fade must out-paint everything in the excerpt; pointer-events: none keeps
+     the links clickable underneath it. */
+  z-index: 3;
 }
 
 @media (hover: hover) {
   .post-card:hover,
   .til-card:hover {
     --card-surface: var(--color-canvas-alt);
+    background-color: var(--card-surface);
   }
 }
 
@@ -1015,8 +1038,10 @@ img {
   z-index: 2;
 }
 
-.post-card:hover .post-read-more {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .post-card:hover .post-read-more {
+    color: var(--color-falu-red);
+  }
 }
 
 /* === Headings === */
@@ -1158,10 +1183,12 @@ time a,
   transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
 }
 
-.posts-extras a:hover {
-  background-color: var(--color-canvas-alt);
-  border-color: var(--color-falu-red);
-  transform: translateX(4px);
+@media (hover: hover) {
+  .posts-extras a:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-falu-red);
+    transform: translateX(4px);
+  }
 }
 
 /* === Webmention responses link === */
@@ -1317,12 +1344,14 @@ input[type=submit] {
   transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
 }
 
-input[type=submit]:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-stone);
-  background-color: var(--color-falu-red);
-  color: var(--color-canvas);
-  border-color: var(--color-falu-red);
+@media (hover: hover) {
+  input[type=submit]:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--color-stone);
+    background-color: var(--color-falu-red);
+    color: var(--color-canvas);
+    border-color: var(--color-falu-red);
+  }
 }
 
 input[type=submit]:active {
@@ -1598,8 +1627,10 @@ figcaption {
   transition: color 0.2s var(--ease-out);
 }
 
-.content-area > .h-entry > footer a:hover {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .content-area > .h-entry > footer a:hover {
+    color: var(--color-falu-red);
+  }
 }
 
 /* Content links: underlines for readability (article body + about page + the
@@ -1613,11 +1644,13 @@ figcaption {
   text-underline-offset: 2px;
 }
 
-.e-content a:hover,
-.about-page a:hover,
-.brand-header .subtitle a:hover {
-  text-decoration-color: var(--color-falu-red);
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .e-content a:hover,
+  .about-page a:hover,
+  .brand-header .subtitle a:hover {
+    text-decoration-color: var(--color-falu-red);
+    color: var(--color-falu-red);
+  }
 }
 
 /* Metadata section labels: mono uppercase */
@@ -1641,8 +1674,13 @@ figcaption {
   transition: border-color 0.2s var(--ease-out);
 }
 
-.tags .p-category:hover {
-  border-color: var(--color-falu-red);
+@media (hover: hover) {
+  /* :has(a) — categorized posts render their tags as PLAIN TEXT (the tag
+     index only covers blog posts), and a hover signal on non-interactive
+     text is a false affordance. Only chips that actually link may glow. */
+  .tags .p-category:has(a):hover {
+    border-color: var(--color-falu-red);
+  }
 }
 
 /* === About page === */
@@ -1714,11 +1752,13 @@ figcaption {
   transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
 }
 
-.elsewhere-links a:hover {
-  background-color: var(--color-canvas-alt);
-  border-color: var(--color-stone);
-  transform: translateX(4px);
-  color: var(--color-ink);
+@media (hover: hover) {
+  .elsewhere-links a:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-stone);
+    transform: translateX(4px);
+    color: var(--color-ink);
+  }
 }
 
 .elsewhere-links strong {
@@ -1728,8 +1768,10 @@ figcaption {
   white-space: nowrap;
 }
 
-.elsewhere-links a:hover strong {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .elsewhere-links a:hover strong {
+    color: var(--color-falu-red);
+  }
 }
 
 .elsewhere-desc {
@@ -1828,11 +1870,8 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   box-shadow: inset 3px 0 0 var(--color-stone);
 }
 
-@media (hover: hover) {
-  .til-card:hover {
-    background-color: var(--color-canvas-alt);
-  }
-}
+/* .til-card's hover surface is painted by the shared --card-surface block
+   (see the fade ownership comment) — no per-component hover background. */
 
 .til-card .post-excerpt {
   max-height: 8em;
@@ -2039,9 +2078,11 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   text-underline-offset: 2px;
 }
 
-.til-topic:hover {
-  text-decoration-style: solid;
-  text-decoration-color: currentColor;
+@media (hover: hover) {
+  .til-topic:hover {
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
+  }
 }
 
 /* Like grouping: override content-area section padding for compact likes */
@@ -2106,8 +2147,10 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   color: var(--color-ink);
 }
 
-.post-nav-link:hover .post-nav-title {
-  color: var(--color-falu-red);
+@media (hover: hover) {
+  .post-nav-link:hover .post-nav-title {
+    color: var(--color-falu-red);
+  }
 }
 
 /* === Year-jump nav (archive) === */
@@ -2183,8 +2226,10 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   transition: background-color 0.15s var(--ease-out);
 }
 
-.tag-cloud a:hover {
-  background: var(--color-canvas-alt);
+@media (hover: hover) {
+  .tag-cloud a:hover {
+    background: var(--color-canvas-alt);
+  }
 }
 
 /* === Motion === */
@@ -2280,14 +2325,18 @@ pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control);
   transition: transform 0.2s var(--ease-spring);
 }
 
-.e-content a:hover::after {
-  transform: scaleX(1);
+@media (hover: hover) {
+  .e-content a:hover::after {
+    transform: scaleX(1);
+  }
 }
 
 /* Let the expanding underline carry the hover signal, not text color */
-.e-content a:hover {
-  text-decoration-color: var(--color-stone);
-  color: inherit;
+@media (hover: hover) {
+  .e-content a:hover {
+    text-decoration-color: var(--color-stone);
+    color: inherit;
+  }
 }
 
 /* --- 4. Reading progress bar (article pages only) --- */
