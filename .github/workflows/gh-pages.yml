@@ -7,10 +7,11 @@ on:
     branches: ["master"]
   workflow_dispatch:
 
+# Deploy-capable permissions (pages/id-token) are scoped to the deploy job
+# only — the build and e2e jobs run branch code on pull_request triggers and
+# must not hold them.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -46,6 +47,9 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -55,3 +59,18 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      # The custom domain lives in Settings → Pages (no CNAME file with
+      # artifact deploys) — out-of-repo state nothing else verifies. If a
+      # settings change ever drops it, page_url regresses to *.github.io and
+      # every canonical URL, feed id and webmention breaks. Fail loudly.
+      - name: Verify the custom domain survived the deploy
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          case "$PAGE_URL" in
+            https://voxpelli.com|https://voxpelli.com/*)
+              echo "custom domain intact: $PAGE_URL" ;;
+            *)
+              echo "::error::Pages deployed to $PAGE_URL — the custom domain is gone (Settings → Pages → Custom domain)"
+              exit 1 ;;
+          esac

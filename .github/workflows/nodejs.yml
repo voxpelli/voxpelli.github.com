@@ -9,6 +9,12 @@ on:
 permissions:
   contents: read
 
+# NOTE: the e2e job that used to live here was a byte-identical copy of
+# gh-pages.yml's e2e job (same triggers, same steps) — a change-one-forget-
+# the-other hazard that had already demanded dual edits once. gh-pages.yml
+# owns e2e now. This workflow's remaining test job still duplicates the
+# npm test run in gh-pages.yml's build job; dropping this file entirely is
+# tracked as a candidate, pending an explicit decision.
 jobs:
   test:
     uses: voxpelli/ghatemplates/.github/workflows/test.yml@main
@@ -16,16 +22,3 @@ jobs:
       node-versions: '24'
       lockfile: true
       npm-test-script: 'test'
-
-  e2e:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run build
-      - run: npm run test:e2e
