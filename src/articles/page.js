@@ -6,14 +6,15 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Articles',
   hfeed: true,
+  dataDeps: ['blogPosts'],
 }));
 
 /**
- * @param {{ vars: Record<string, unknown> & import('../global-types.d.ts').SiteVars }} options
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> & import('../global-types.d.ts').SiteVars }} options
  * @returns {string}
  */
-export default function articlesPage ({ vars: pageVars }) {
-  const blogPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.blogPosts) || [];
+export default function articlesPage ({ data, vars: pageVars }) {
+  const blogPosts = /** @type {Array<Record<string, unknown>>} */ (data.blogPosts) || [];
   const recentArticles = blogPosts.slice(0, 10);
 
   const postListItems = recentArticles.map(post =>

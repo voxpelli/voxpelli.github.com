@@ -8,6 +8,7 @@ import { renderPost } from './lib/render-post.js';
  *   frontpage?: boolean,
  *   hfeed?: boolean,
  *   webmentionable?: boolean,
+ *   dataDeps?: string[],
  * }} PageVars
  */
 
@@ -17,17 +18,18 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   frontpage: true,
   webmentionable: true,
   hfeed: true,
+  dataDeps: ['lifestreamPosts'],
 }));
 
 /**
- * @param {{ vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars }} options
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars }} options
  * @returns {string}
  */
-export default function homePage ({ vars: pageVars }) {
+export default function homePage ({ data, vars: pageVars }) {
   // Homepage renders the lifestream — blog posts + TIL + links + releases
   // in one chronological stream. Weight-capped at 20 slots in global.data.js
   // (blog = 2 slots, others = 1). Social posts excluded.
-  const lifestreamPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.lifestreamPosts) || [];
+  const lifestreamPosts = /** @type {Array<Record<string, unknown>>} */ (data.lifestreamPosts) || [];
 
   const postListItems = lifestreamPosts.map(post =>
     renderPost({

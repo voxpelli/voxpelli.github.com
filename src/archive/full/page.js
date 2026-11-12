@@ -3,25 +3,11 @@ import { renderPost } from '../../lib/render-post.js';
 /**
  * Full archive — all post types (blog, social, links) in chronological order.
  *
- * @param {{ pages: import('../../global-types.d.ts').PageData[], vars: Record<string, unknown> }} options
- * @returns {Promise<string>}
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> }} options
+ * @returns {string}
  */
-export default async function fullArchivePage ({ pages, vars: pageVars }) {
-  const allPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.allPosts) || [];
-
-  // Build page index for content rendering
-  /** @type {Map<string, import('../../global-types.d.ts').PageData>} */
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
-  // Pre-render all posts in parallel
-  /** @type {Map<string, string>} */
-  const renderCache = new Map();
-  await Promise.all(allPosts.map(async (post) => {
-    const page = pagesByPath.get(/** @type {string} */ (post.path));
-    if (page?.renderInnerPage) {
-      renderCache.set(/** @type {string} */ (post.path), await page.renderInnerPage({ pages }));
-    }
-  }));
+export default function fullArchivePage ({ data, vars: pageVars }) {
+  const allPosts = /** @type {Array<Record<string, unknown>>} */ (data.allPosts) || [];
 
   // Group by year
   /** @type {Record<string, typeof allPosts>} */
@@ -41,10 +27,9 @@ export default async function fullArchivePage ({ pages, vars: pageVars }) {
     result += `<div class="content-header"><h3>${year}</h3></div>\n`;
 
     for (const post of posts) {
-      const content = renderCache.get(/** @type {string} */ (post.path)) || '';
       result += renderPost({
         authorName: String(pageVars.authorName || ''),
-        content,
+        content: String(post.content || ''),
         post,
         siteUrl: String(pageVars.siteUrl || ''),
       }) + '\n';

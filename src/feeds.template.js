@@ -2,42 +2,44 @@ import { escapeXml } from './lib/escape.js';
 import { getSiteVars } from './lib/get-site-vars.js';
 import { renderRssEntry } from './lib/render-rss-entry.js';
 
-/** @import { PageData } from './global-types.d.ts' */
-/** @import { TemplateOutputOverride } from '@domstack/static' */
+/** @import { TemplateOutputOverride } from './global-types.d.ts' */
+
+export const dataDeps = [
+  'recentPosts',
+  'recentEnglishPosts',
+  'recentLinks',
+  'recentTils',
+  'recentReleases',
+  'recentStream',
+];
 
 /**
  * Generate multiple Atom feeds using async generator pattern.
  *
- * Templates receive { vars, pages } where vars is global.vars only — but the
- * PageData.vars getter merges globalDataVars, so global.data.js collections
- * are reachable via pages[0].vars (the documented workaround; `@domstack/static`
- * PR #240, merged upstream but unreleased, passes them in template vars
- * directly). Consuming the shared collections keeps ONE executable definition
- * of every feed's membership (global.data.js + lib/categories.js): the
+ * Consuming the shared collections keeps ONE executable definition of every
+ * feed's membership (global.data.js + lib/categories.js): the
  * selectors were previously re-derived here "kept in sync by convention",
  * which is exactly how the til-superset rule grew three drifting copies. It
  * also reuses the content global.data.js already rendered instead of
  * re-rendering every feed post.
  *
- * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @param {{ vars: Record<string, unknown>, data: Record<string, unknown> }} options
  * @returns {AsyncIterable<TemplateOutputOverride>}
  */
-export default async function * feedsTemplate ({ pages, vars }) {
+export default async function * feedsTemplate ({ data, vars }) {
   const { authorEmail, authorName, blogName, feedUidBase, pushHub, siteUrl } = getSiteVars(vars);
   const now = new Date().toISOString();
-
-  const globalDataVars = pages[0]?.vars ?? {};
 
   /**
    * @param {string} key
    * @returns {Array<Record<string, unknown>>}
    */
   function collection (key) {
-    const value = globalDataVars[key];
+    const value = data[key];
     if (!Array.isArray(value)) {
       // Loud, not lenient: a missing collection would otherwise ship a valid
       // but EMPTY feed — which readers treat as "everything was deleted".
-      throw new TypeError(`feeds.template.js: global.data collection "${key}" not reachable via pages[0].vars`);
+      throw new TypeError(`feeds.template.js: global.data collection "${key}" not available via template data`);
     }
     return value;
   }

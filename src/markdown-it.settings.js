@@ -1,5 +1,5 @@
 /**
- * @import MarkdownIt from 'markdown-it'
+ * @import { MarkdownIt } from 'markdown-it'
  */
 
 /**
@@ -104,7 +104,7 @@ function wrapFiguredImage (md) {
 
     if (!titleAttr) return imgHtml;
 
-    const caption = md.utils.escapeHtml(titleAttr);
+    const caption = md.utils.escapeHtml(String(titleAttr));
     return `<figure>${imgHtml}<figcaption>${caption}</figcaption></figure>`;
   };
 }

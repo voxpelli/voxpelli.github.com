@@ -2,6 +2,8 @@ import { escapeXml } from './lib/escape.js';
 import { getSiteVars } from './lib/get-site-vars.js';
 import { redirects } from './redirects.template.js';
 
+export const dataDeps = ['sourcePagePaths'];
+
 // Redirect stubs (meta-refresh), feed files, and the 404 page are not
 // canonical content — excluding them keeps crawlers focused on real pages.
 const redirectFromPaths = new Set(redirects.map(r => r.from));
@@ -20,16 +22,15 @@ function isIndexable (pagePath) {
 }
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: import('./global-types.d.ts').PageData[] }} options
- * @returns {import('@domstack/static').TemplateOutputOverride}
+ * @param {{ vars: Record<string, unknown>, data: Record<string, unknown> }} options
+ * @returns {import('./global-types.d.ts').TemplateOutputOverride}
  */
-export default function sitemapTemplate ({ pages, vars }) {
+export default function sitemapTemplate ({ data, vars }) {
   const { siteUrl } = getSiteVars(vars);
 
-  const urls = pages
-    .filter(p => isIndexable(p.pageInfo?.path || ''))
-    .map(p => {
-      const pagePath = p.pageInfo?.path || '';
+  const urls = /** @type {string[]} */ (data.sourcePagePaths)
+    .filter(pagePath => isIndexable(pagePath))
+    .map(pagePath => {
       const url = pagePath ? '/' + pagePath + '/' : '/';
       return `  <url>
     <loc>${escapeXml(siteUrl + url)}</loc>

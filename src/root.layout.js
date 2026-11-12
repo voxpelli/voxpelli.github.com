@@ -35,7 +35,7 @@ function navActive (itemHref, currentPath) {
 }
 
 /**
- * @param {{ children: string, page?: { path: string } | undefined, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars & { noFeedAlternates?: boolean }, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, page?: { path: string, url?: string } | undefined, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars & { noFeedAlternates?: boolean }, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
 export default function rootLayout ({ children, page, scripts = [], styles = [], vars }) {
@@ -52,8 +52,7 @@ export default function rootLayout ({ children, page, scripts = [], styles = [],
 
   const lang = String(vars.lang || 'en');
 
-  // TODO [@domstack/static@>=11.0.4]: PR #250 (merged 2026-05-24, unreleased) adds a `url` field to PageInfo — use it here and in article.layout.js instead of reconstructing the canonical URL from page.path.
-  const pageUrl = (page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '')) || '/';
+  const pageUrl = page?.url || (page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '')) || '/';
   const canonicalUrl = `${siteUrl}${vars.frontpage ? '/' : pageUrl}`;
 
   // Determine active nav item

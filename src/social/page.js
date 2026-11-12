@@ -8,31 +8,16 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   title: 'Social',
   category: 'social',
   hfeed: true,
+  dataDeps: ['socialPosts'],
 }));
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
- * @returns {Promise<string>}
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> }} options
+ * @returns {string}
  */
-export default async function socialPage ({ pages, vars: pageVars }) {
-  const socialPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.socialPosts) || [];
+export default function socialPage ({ data, vars: pageVars }) {
+  const socialPosts = /** @type {Array<Record<string, unknown>>} */ (data.socialPosts) || [];
   const recentSocial = socialPosts.slice(0, 10);
-
-  // Build page index for O(1) lookup
-  /** @type {Map<string, import('../global-types.d.ts').PageData>} */
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
-  // Pre-render non-like posts in parallel (likes work from frontmatter alone)
-  /** @type {Map<string, string>} */
-  const renderCache = new Map();
-  const nonLikePosts = recentSocial.filter(post => !post['mf-like-of']);
-  await Promise.all(nonLikePosts.map(async (post) => {
-    const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page?.renderInnerPage
-      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
-      : '';
-    renderCache.set(/** @type {string} */ (post.path), html);
-  }));
 
   const authorName = String(pageVars.authorName || '');
   let result = '<div class="content-header">\n  <h2>Social // Interactions</h2>\n</div>\n\n';
@@ -53,7 +38,7 @@ export default async function socialPage ({ pages, vars: pageVars }) {
       }
       result += renderPost({
         authorName,
-        content: renderCache.get(/** @type {string} */ (post.path)) || String(post.content || ''),
+        content: String(post.content || ''),
         post,
         siteUrl: String(pageVars.siteUrl || ''),
       }) + '\n';

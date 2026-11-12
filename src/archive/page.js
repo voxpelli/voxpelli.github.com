@@ -6,14 +6,15 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   layout: 'root',
   title: 'Blog Post Archive',
   hfeed: true,
+  dataDeps: ['postsByYear'],
 }));
 
 /**
- * @param {{ vars: Record<string, unknown> & import('../global-types.d.ts').SiteVars }} options
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> & import('../global-types.d.ts').SiteVars }} options
  * @returns {string}
  */
-export default function archivePage ({ vars: pageVars }) {
-  const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.postsByYear) || {};
+export default function archivePage ({ data, vars: pageVars }) {
+  const postsByYear = /** @type {Record<string, Array<Record<string, unknown>>>} */ (data.postsByYear) || {};
   const years = Object.keys(postsByYear).toSorted((a, b) => Number(b) - Number(a));
 
   let result = '<div class="content-header">\n  <p class="content-title">Archive // All Writings</p>\n</div>\n\n';

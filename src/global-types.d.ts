@@ -21,17 +21,23 @@ export interface SiteVars {
 export type ValidatedSiteVars = SiteVars;
 
 /**
- * Temporary shared stopgap until `@domstack/static` exports `PageData`.
- * Keep this aligned with the subset this repo actually consumes.
- * TODO [@domstack/static@>=11.0.4]: PR #241 (merged 2026-05-24, unreleased) exports PageData/PageInfo from the package entry — delete this stopgap interface and import the real types.
+ * Keep these narrow local shapes until DOMStack's published v12 declarations
+ * can be parsed by TypeScript 6.
  */
+// TODO [@domstack/static@>=12.0.1]: use the public types from `@domstack/static/types.js` once its declarations parse under TypeScript 6.
 export interface PageData {
   pageInfo: {
     path: string;
+    url: string;
     outputRelname: string;
   };
   vars: Record<string, unknown>;
-  renderInnerPage?: (opts: { pages: PageData[] }) => Promise<string>;
+  renderInnerPage?: () => Promise<string>;
   styles?: string[];
   scripts?: string[];
+}
+
+export interface TemplateOutputOverride {
+  outputName: string;
+  content: string;
 }

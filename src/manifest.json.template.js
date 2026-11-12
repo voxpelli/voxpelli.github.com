@@ -1,6 +1,6 @@
 /**
  * @param {{ vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars }} _options
- * @returns {import('@domstack/static').TemplateOutputOverride}
+ * @returns {import('./global-types.d.ts').TemplateOutputOverride}
  */
 export default function manifestTemplate ({ vars }) {
   return {

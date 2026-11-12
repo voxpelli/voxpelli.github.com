@@ -7,35 +7,21 @@ export const vars = /** @satisfies {PageVars} */ (/** @type {const} */ ({
   title: 'Links',
   category: 'links',
   hfeed: true,
+  dataDeps: ['linkPosts'],
 }));
 
 /**
- * @param {{ vars: Record<string, unknown>, pages: import('../global-types.d.ts').PageData[] }} options
- * @returns {Promise<string>}
+ * @param {{ data: Record<string, unknown>, vars: Record<string, unknown> }} options
+ * @returns {string}
  */
-export default async function linksPage ({ pages, vars: pageVars }) {
-  const linkPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.linkPosts) || [];
+export default function linksPage ({ data, vars: pageVars }) {
+  const linkPosts = /** @type {Array<Record<string, unknown>>} */ (data.linkPosts) || [];
   const recentLinks = linkPosts.slice(0, 5);
-
-  // Build page index for O(1) lookup
-  /** @type {Map<string, import('../global-types.d.ts').PageData>} */
-  const pagesByPath = new Map(pages.map(p => [p.pageInfo.path, p]));
-
-  // Pre-render all link posts in parallel
-  /** @type {Map<string, string>} */
-  const renderCache = new Map();
-  await Promise.all(recentLinks.map(async (post) => {
-    const page = pagesByPath.get(/** @type {string} */ (post.path));
-    const html = page?.renderInnerPage
-      ? /** @type {string} */ (await page.renderInnerPage({ pages }))
-      : '';
-    renderCache.set(/** @type {string} */ (post.path), html);
-  }));
 
   const postsHtml = recentLinks.map(post =>
     renderPost({
       post,
-      content: renderCache.get(/** @type {string} */ (post.path)) || /** @type {string} */ (post.content) || '',
+      content: /** @type {string} */ (post.content) || '',
       authorName: /** @type {string} */ (pageVars.authorName),
       siteUrl: /** @type {string} */ (pageVars.siteUrl),
     })

@@ -53,7 +53,7 @@ This site carries the [notbyai.fyi](https://notbyai.fyi/) "Written by Human, Not
 
 ## Architecture
 
-DomStack (`@domstack/static` v11) static site generator with convention-based file routing.
+DomStack (`@domstack/static` v12) static site generator with convention-based file routing.
 
 ### DomStack File Conventions
 
@@ -66,8 +66,8 @@ DomStack (`@domstack/static` v11) static site generator with convention-based fi
 
 ### DomStack Gotchas
 
-- **Template data access**: Templates receive `{ vars, pages }` where `vars` is `global.vars.js` only. Access `global.data.js` output via `pages[0].vars` (the `PageData.vars` getter includes `globalDataVars`)
-- **`PageData.vars` is a getter**: Creates a fresh merged object each call — setting `page.vars.x = y` writes to a temporary object. Mutate `post.content` on array items from `global.data.js` instead
+- **Global data subscriptions**: `global.data.js` is the only hook that receives source `pages`. Pages, layouts, and templates declare `dataDeps` and receive those values in a separate `data` argument; they are not merged into `vars`
+- **`PageData.vars` is read-only**: It is a cached, shallow-frozen cascade of global, layout, page, and builder vars. Do not mutate it; use global-data return values for shared post enrichment
 - **Code blocks render as bare `<pre><code class="hljs">`**: `markdown-it-highlightjs` does NOT wrap in `.highlight` — CSS targeting `.highlight` won't match built output
 - **Drafts are filename-based, not frontmatter**: `page.draft.md` / `page.draft.html` / `page.draft.js` excludes from default build; `npm run build-drafts` includes them. Frontmatter `draft: true` has zero effect. Source: `@domstack/static/lib/identify-pages.js:29-30`
 - **`--copy images` flattens the top-level directory**: `images/foo.png` → `public/foo.png` (not `public/images/foo.png`). Anything you want at `public/<subdir>/` should be named `<subdir>/` at the top of your copied tree, e.g. `images/badges/x.svg` → `public/badges/x.svg`

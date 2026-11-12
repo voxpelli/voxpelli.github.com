@@ -3,32 +3,27 @@ import { getSiteVars } from './lib/get-site-vars.js';
 import { renderPost } from './lib/render-post.js';
 import rootLayout from './root.layout.js';
 
-/** @import { PageData } from './global-types.d.ts' */
 /** @import { PostVars } from './lib/render-post.js' */
-/** @import { TemplateOutputOverride } from '@domstack/static' */
+/** @import { TemplateOutputOverride } from './global-types.d.ts' */
+
+export const dataDeps = ['allTags', 'tagCounts', 'globalAssets'];
 
 /**
  * Generate tag index page and individual tag pages.
  *
- * Templates receive { vars, pages } where vars is global.vars only (not global.data).
- * However, pages[].vars (the PageData getter) includes global.data output, so we
- * access pre-computed allTags/tagCounts from there — posts already have rendered content.
+ * The global data subscriptions provide tag indexes and the assets used by
+ * normal pages.
  *
- * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @param {{ vars: Record<string, unknown>, data: Record<string, unknown> }} options
  * @returns {TemplateOutputOverride[]}
  */
-export default function tagsTemplate ({ pages, vars }) {
+export default function tagsTemplate ({ data, vars }) {
   const siteVars = getSiteVars(vars);
   const { authorName, siteUrl } = siteVars;
 
-  // Extract global styles/scripts from any initialized page
-  const styles = pages[0]?.styles ?? [];
-  const scripts = pages[0]?.scripts ?? [];
-
-  // Access pre-computed tag data from global.data.js (via PageData.vars getter which includes globalDataVars)
-  const pageVars = pages[0]?.vars ?? {};
-  const allTags = /** @type {Record<string, Array<Record<string, unknown>>>} */ (pageVars.allTags) || {};
-  const tagCounts = /** @type {Array<{tag: string, count: number}>} */ (pageVars.tagCounts) || [];
+  const { scripts = [], styles = [] } = /** @type {{ scripts?: string[], styles?: string[] }} */ (data.globalAssets);
+  const allTags = /** @type {Record<string, Array<Record<string, unknown>>>} */ (data.allTags) || {};
+  const tagCounts = /** @type {Array<{tag: string, count: number}>} */ (data.tagCounts) || [];
 
   /** @type {TemplateOutputOverride[]} */
   const output = [];

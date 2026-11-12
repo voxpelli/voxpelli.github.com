@@ -5,14 +5,18 @@ import { renderPost } from './lib/render-post.js';
 import { safePostUrl } from './lib/safe-url.js';
 import rootLayout from './root.layout.js';
 
+export const vars = {
+  dataDeps: ['blogPosts', 'socialPosts', 'tilPosts', 'releasePosts'],
+};
+
 /**
  * Article/post layout - extends root layout with webmention form and post rendering
  *
- * @param {{ children: string, page?: { path: string }, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars, scripts?: string[], styles?: string[] }} options
+ * @param {{ children: string, data: Record<string, unknown>, page?: { path: string, url?: string }, vars: Record<string, unknown> & import('./global-types.d.ts').SiteVars, scripts?: string[], styles?: string[] }} options
  * @returns {string}
  */
-export default function articleLayout ({ children, page, scripts = [], styles = [], vars }) {
-  const pageUrl = page?.path ? '/' + page.path + '/' : String(vars.pageUrl || '');
+export default function articleLayout ({ children, data, page, scripts = [], styles = [], vars }) {
+  const pageUrl = page?.url || (page?.path ? '/' + page.path + '/' : String(vars.pageUrl || ''));
 
   const postVars = {
     ...vars,
@@ -53,7 +57,7 @@ export default function articleLayout ({ children, page, scripts = [], styles = 
   // tilPosts were filter-excluded and currentIndex was always -1.
   const postList = getCategoryCollection(
     typeof vars.category === 'string' ? vars.category : undefined,
-    vars
+    data
   );
   const currentIndex = postList.findIndex(p => String(p.pageUrl) === pageUrl);
   const prevPost = currentIndex !== -1 ? postList[currentIndex + 1] : undefined; // older

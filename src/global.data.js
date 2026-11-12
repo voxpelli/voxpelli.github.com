@@ -118,27 +118,13 @@ export default async function globalData ({ pages }) {
     lifestreamWeight += slots;
   }
 
-  // Render all blog posts to get content for excerpts and reading time.
-  await Promise.all(blogPosts.map(async (post) => {
+  // Render each post once so page and template subscribers can use its HTML
+  // without receiving or re-rendering the source PageData collection.
+  await Promise.all(allPosts.map(async (post) => {
     const page = pagesByPath.get(post.path);
     if (!page || typeof page.renderInnerPage !== 'function') return;
     try {
-      const renderedHtml = await page.renderInnerPage({ pages });
-      if (typeof renderedHtml === 'string' && renderedHtml) {
-        post.content = renderedHtml;
-      }
-    } catch {
-      // Silently skip failed renders — excerpts are non-critical
-    }
-  }));
-
-  // Also pre-render TIL posts so topic-index pages (src/til/topics.template.js)
-  // can surface excerpts on compact cards. Same pattern as blogPosts above.
-  await Promise.all(tilPosts.map(async (post) => {
-    const page = pagesByPath.get(post.path);
-    if (!page || typeof page.renderInnerPage !== 'function') return;
-    try {
-      const renderedHtml = await page.renderInnerPage({ pages });
+      const renderedHtml = await page.renderInnerPage();
       if (typeof renderedHtml === 'string' && renderedHtml) {
         post.content = renderedHtml;
       }
@@ -190,5 +176,10 @@ export default async function globalData ({ pages }) {
     postsByYear,
     allTags,
     tagCounts,
+    sourcePagePaths: pages.map(page => page.pageInfo.path),
+    globalAssets: {
+      scripts: pages[0]?.scripts ?? [],
+      styles: pages[0]?.styles ?? [],
+    },
   };
 }

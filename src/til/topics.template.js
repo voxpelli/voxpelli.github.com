@@ -4,8 +4,9 @@ import { renderPost } from '../lib/render-post.js';
 import { slugifyTopic } from '../lib/slugify-topic.js';
 import rootLayout from '../root.layout.js';
 
-/** @import { TemplateOutputOverride } from '@domstack/static' */
-/** @import { PageData } from '../global-types.d.ts' */
+/** @import { TemplateOutputOverride } from '../global-types.d.ts' */
+
+export const dataDeps = ['tilPosts', 'globalAssets'];
 
 /**
  * Generate per-topic TIL index pages at /til/topics/<slug>/.
@@ -16,23 +17,17 @@ import rootLayout from '../root.layout.js';
  * canonical TIL permalink lives under /til/YYYY/MM/slug/, renaming a topic
  * only changes these index pages — no individual post URL breaks.
  *
- * Templates receive `{ vars, pages }` where `vars` is global.vars only; the
- * global.data.js output (including `tilPosts`) is exposed via the
- * `PageData.vars` getter on any rendered page, so we pull it from `pages[0]`.
+ * Global data subscriptions provide posts and the assets used by normal pages.
  *
- * @param {{ vars: Record<string, unknown>, pages: PageData[] }} options
+ * @param {{ vars: Record<string, unknown>, data: Record<string, unknown> }} options
  * @returns {TemplateOutputOverride[]}
  */
-export default function topicsTemplate ({ pages, vars }) {
+export default function topicsTemplate ({ data, vars }) {
   const siteVars = getSiteVars(vars);
   const { authorName, siteUrl } = siteVars;
 
-  const styles = pages[0]?.styles ?? [];
-  const scripts = pages[0]?.scripts ?? [];
-
-  // TODO [@domstack/static@>=11.0.4]: PR #240 (merged 2026-04-20, unreleased) passes global.data.js output in template `vars` — drop this pages[0].vars pull here, in tags.template.js and in feeds.template.js once the release ships.
-  const pageVars = pages[0]?.vars ?? {};
-  const tilPosts = /** @type {Array<Record<string, unknown>>} */ (pageVars.tilPosts) || [];
+  const { scripts = [], styles = [] } = /** @type {{ scripts?: string[], styles?: string[] }} */ (data.globalAssets);
+  const tilPosts = /** @type {Array<Record<string, unknown>>} */ (data.tilPosts) || [];
 
   // Group TILs by normalised topic slug. Preserve the first-seen display form
   // (author's original casing/spacing) so the page heading reads naturally.
@@ -53,7 +48,7 @@ export default function topicsTemplate ({ pages, vars }) {
     }
   }
 
-  /** @type {import('@domstack/static').TemplateOutputOverride[]} */
+  /** @type {TemplateOutputOverride[]} */
   const output = [];
 
   // Emit one index page per topic. No index-of-topics page here — discovery
