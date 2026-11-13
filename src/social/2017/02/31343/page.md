@@ -1,0 +1,8 @@
+---
+layout: article
+date: '2017-02-28T08:42:23.975Z'
+category: social
+mf-like-of:
+  - 'http://tantek.com/2015/069/t1/js-dr-javascript-required-dead'
+---
+

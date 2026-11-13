@@ -1,53 +1,57 @@
-'use strict';
+// Service worker — inspired by Jeremy Keith: https://adactio.com/journal/9775
 
-// This file has been heavily inspired by Jeremy Keith's work: https://adactio.com/journal/9775
+const SW_VERSION = '__BUILD_VERSION__';
 
-const staticCacheName = 'static';
-const version = 'v1::';
+const CACHE_NAME = `static-${SW_VERSION}`;
+const OFFLINE_FALLBACK_URL = '/offline/';
 
-const updateStaticCache = () => {
-  return caches.open(version + staticCacheName)
-    .then(cache => {
-      // Do not wait for these
-      cache.addAll([
-        '/css/img/loader.gif',
-        '/about/'
-      ]);
+/**
+ * Pre-cache essential pages during install.
+ *
+ * @returns {Promise<void>}
+ */
+async function updateStaticCache () {
+  const cache = await caches.open(CACHE_NAME);
 
-      // But please, do wait for these
-      return cache.addAll([
-        '/js/indieconfig.js',
-        '/js/webaction.js',
-        '/css/style.css',
-        '/avatar.jpg',
-        '/offline/',
-        '/'
-      ]);
-    });
-};
+  // Non-blocking: cache in background
+  cache.addAll([
+    '/about/',
+  ]);
 
-// It's install time! Hurry, lets get everything in order so we can start the party? Right? Go!
-self.addEventListener('install', event => {
-  event.waitUntil(updateStaticCache());
-});
+  // Blocking: wait for these before completing install
+  await cache.addAll([
+    '/avatar.jpg',
+    OFFLINE_FALLBACK_URL,
+    '/',
+  ]);
+}
 
-// Omg – it's party time! This is going to be so unbelievable fun. Lets take another look in the mirror and get going!
-self.addEventListener('activate', event => {
+// Install: pre-cache essential assets, then activate immediately so the
+// newly-installed SW can take over on first load.
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    // Fetch all existing keys
-    caches.keys()
-      .then(keys => Promise.all(
-        // Filter out all old caches – and then remove them
-        keys
-          .filter(key => !key.startsWith(version))
-          .map(key => caches.delete(key))
-      ))
+    updateStaticCache().then(() => self.skipWaiting())
   );
 });
 
-// It's time for the dance floor. Everyone is watching. Now is no time for failure. Lets do it! Dance moves: 💃
-self.addEventListener('fetch', event => {
-  const request = event.request;
+// Activate: remove old caches from previous versions and claim existing clients
+// so already-open tabs are controlled without requiring a reload.
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+// Fetch: network-first for HTML (with runtime cache warming + offline fallback),
+// cache-first for other assets.
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
   const url = new URL(request.url);
 
   // Ignore non-GET requests
@@ -56,31 +60,42 @@ self.addEventListener('fetch', event => {
   // Ignore requests from other hosts
   if (url.hostname !== self.location.hostname) { return; }
 
-  // For HTML requests, try the network first, fall back to the cache, finally the offline page
-  if (request.headers.get('Accept').indexOf('text/html') !== -1) {
+  const accept = request.headers.get('Accept') ?? '';
+
+  // HTML: try network first; on success, warm the runtime cache; on failure,
+  // fall back to a previously-cached copy, then to the offline page.
+  if (accept.includes('text/html')) {
     event.respondWith(
       fetch(request)
-        // TODO: Stash the response in a cache
+        .then(async (response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            const cache = await caches.open(CACHE_NAME);
+            // Don't await — cache.put is fire-and-forget so the response
+            // reaches the client without extra latency.
+            cache.put(request, copy).catch(() => { /* ignore cache put errors */ });
+          }
+          return response;
+        })
         .catch(() =>
           caches.match(request)
-            .then(response => response || caches.match('/offline/'))
+            .then((response) => response || caches.match(OFFLINE_FALLBACK_URL))
         )
     );
     return;
   }
 
-  // For non-HTML requests, look in the cache first, fall back to the network
+  // Non-HTML: try cache first, fall back to network
   event.respondWith(
     caches.match(request)
-      .then(response => {
+      .then((response) => {
         if (response) { return response; }
 
         return fetch(request)
-          // TODO: Stash the response in a cache
-          .catch(err => {
-            // If the request is for an image, show an offline placeholder
-            if (request.headers.get('Accept').indexOf('image') !== -1) {
-              return new Response('<svg role="img" aria-labelledby="offline-title" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><title id="offline-title">Offline</title><g fill="none" fill-rule="evenodd"><path fill="#D8D8D8" d="M0 0h400v300H0z"/><text fill="#9B9B9B" font-family="Helvetica Neue,Arial,Helvetica,sans-serif" font-size="72" font-weight="bold"><tspan x="93" y="172">offline</tspan></text></g></svg>', {headers: {'Content-Type': 'image/svg+xml'}});
+          .catch((err) => {
+            // For image requests, return an offline placeholder SVG
+            if (accept.includes('image')) {
+              return new Response('<svg role="img" aria-labelledby="offline-title" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><title id="offline-title">Offline</title><g fill="none" fill-rule="evenodd"><path fill="#D8D8D8" d="M0 0h400v300H0z"/><text fill="#9B9B9B" font-family="Helvetica Neue,Arial,Helvetica,sans-serif" font-size="72" font-weight="bold"><tspan x="93" y="172">offline</tspan></text></g></svg>', { headers: { 'Content-Type': 'image/svg+xml' } });
             }
             throw err;
           });

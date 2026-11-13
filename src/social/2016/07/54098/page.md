@@ -1,0 +1,8 @@
+---
+layout: article
+date: '2016-07-30T15:01:38.994Z'
+category: social
+mf-like-of:
+  - 'https://barryfrost.com/2016/07/introducing-webhook-mentions'
+---
+

@@ -1,5 +1,60 @@
-/_site
-
 /node_modules
+/public
+/.env
+
+# Top-level screenshot/scratch leak guard (site assets under images/** still tracked)
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
 npm-debug.log
 yarn-error.log
+/.playwright-mcp
+
+# OS junk. Also covered by ~/.gitignore_global on this machine, but that is not
+# portable — a fresh clone, a contributor, or CI gets no such protection. Note
+# images/ and media/ are copied wholesale into the build (`domstack --copy`), so
+# stray dotfiles in there are worth keeping out of the tree.
+.DS_Store
+Thumbs.db
+
+# Retrospectives and sprint plans (local session notes)
+RETRO-*.md
+SWARM-*.md
+SYNERGY-*
+PR_COMMENTS*.md
+BRANCH-REVIEW-*
+
+# Machine-specific .claude/ state (synergy registry + any *.local.json)
+.claude/*.local.json
+.claude/synergy-*
+# Workflow scripts run in the Claude Code sandbox (top-level return/await —
+# not valid standalone modules; eslint.config.js ignores .claude/ so lint
+# never parses them). branch-lifecycle-review is tracked deliberately — the
+# canonical copy lives at ~/.claude/workflows/, this is the project mirror.
+.claude/workflows/*
+!.claude/workflows/branch-lifecycle-review.js
+
+# liggare ledger (local SQLite register of expiring TODOs)
+.liggare/
+
+# impeccable: DESIGN.md's sidecar (.impeccable/design.json) and the live-mode
+# config ARE tracked — they're project design context. Only machine-local and
+# transient runtime state is excluded.
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
+.impeccable/live/annotations/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+
+# Beads / Dolt files — entire .beads/ dir excluded (repo is public;
+# issue tracker data stays local). History still contains prior commits
+# of .beads/issues.jsonl; a scrub would require history rewrite.
+.beads/
+.dolt/
+*.db
+.beads-credential-key

@@ -1,0 +1,2502 @@
+/* === Reset === */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Design Tokens: Sovereign Warmth === */
+:root {
+  --color-canvas: #f4f1eb;
+  --color-canvas-alt: #e9e5de;
+  --color-ink: #2c2a28;
+  --color-ink-light: #555250;
+  --color-falu-red: #8c2121;
+  --color-cloudberry: #d97714;
+  /* Cloudberry is a display accent: as small text it only reaches 2.8:1 on
+     parchment, failing WCAG AA. This is the AA-safe text variant — darker and
+     ~9deg redder (OKLCH L67 C.155 h57 -> L49 C.134 h48), not merely dimmer.
+
+     Solving it is not a plain fg/bg sum: .post-type-badge tints its own backdrop
+     with color-mix(currentColor 10%, transparent), so the text colour also sets
+     its background; and the pill sits inside .til-card, which swaps to
+     --color-canvas-alt on hover. The value must clear 4.5:1 on BOTH composites
+     (5.16:1 resting, 4.66:1 hover). test/token-contrast.spec.js enforces this —
+     do not retune by eye. Use for cloudberry small TEXT; keep --color-cloudberry
+     for non-text decoration. */
+  --color-cloudberry-text: #984200;
+  --color-stone: #d1ccc5;
+  --color-stone-light: #e0dcd5;
+  --color-grid: #e0dcd5;
+  --color-btn-shadow: var(--color-stone);
+  /* The sidebar's border in dark mode ONLY — inert in light, where the sidebar
+     takes its colour from the border shorthands. Composites to ~#7b302f on the
+     dark canvas: a subdued red edge. Deliberately NOT --color-falu-red, which is
+     #e56b6b in dark and at 2px reads as a warning line rather than an accent.
+     Declared once here so the two dark blocks reference a value instead of each
+     re-typing the literal. */
+  --color-sidebar-accent-dark: rgba(200, 64, 64, 0.55);
+
+  --font-serif: 'Newsreader', serif;
+  --font-sans: 'Public Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --space-xs: clamp(0.5rem, 0.455rem + 0.227vw, 0.75rem);
+  --space-sm: clamp(0.75rem, 0.682rem + 0.341vw, 1.125rem);
+  --space-md: clamp(1.125rem, 1.023rem + 0.511vw, 1.6875rem);
+  --space-lg: clamp(1.5rem, 1.364rem + 0.682vw, 2.25rem);
+  --space-xl: clamp(2.25rem, 2.045rem + 1.023vw, 3.375rem);
+
+  /* Font-size scale — consolidated per ni5, see RETRO-08.
+     Fluid tokens use clamp(min, preferred, max) for viewport-responsive sizing.
+     Fixed-rem tokens are used where elements shouldn't scale with viewport
+     (metadata, UI chrome, small labels). em-based values elsewhere remain
+     literal — they're intentionally relative to their parent context. */
+  --fs-xs: 0.8rem;        /* tiny mono metadata, reply verbs, domain badges */
+  --fs-sm: 0.85rem;       /* ubiquitous small — profile info, nav labels, footers */
+  --fs-sm-plus: 0.9rem;   /* nav items, content-header, elsewhere strong */
+  --fs-md: 0.95rem;       /* buttons, bookmark content, post-nav titles */
+  --fs-base: clamp(1rem, 0.955rem + 0.227vw, 1.125rem); /* body text */
+  --fs-code: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);     /* pre/code blocks */
+  --fs-article: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem); /* article body, about-page */
+  --fs-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);     /* bookmark title */
+  --fs-h2: clamp(1.5rem, 1.364rem + 0.682vw, 1.875rem); /* post-title (index summaries) */
+  --fs-h1: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);     /* article h1, about h1 */
+  --fs-display: clamp(3rem, 2.545rem + 2.273vw, 4.25rem); /* brand title, global h1 */
+
+  --border-structural: 1px solid var(--color-stone);
+  --border-heavy: 2px solid var(--color-ink);
+
+  /* Radius scale. DESIGN.md declares all five steps ("Five steps, and only
+     five" — `full` covers the circles: avatars, webmention glyphs). There is
+     no pill step, and there must not be one — pills are an explicit
+     anti-reference (the "corporate dev-marketing blog"). A radius outside
+     this set is drift, not a new size: reach for the nearest step, or amend
+     DESIGN.md and the sidecar together. test/token-contrast.spec.js enforces
+     this — a literal border-radius fails the build; `.impeccable/design.json`
+     documents the rule for design tooling. */
+  --rounded-hairline: 1px;
+  --rounded-chip: 2px;
+  --rounded-control: 4px;
+  --rounded-avatar: 6px;
+  --rounded-full: 50%;
+
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --hl-bg: #f8f5f0;
+  --hl-comment: #707063;
+  --hl-string: #d14;
+  --hl-number: #007c7c;
+  --hl-name: #006a6a;
+  --hl-error-bg: #e3d2d2;
+  --hl-add-bg: #ddffdd;
+  --hl-del-bg: #ffdddd;
+
+  color-scheme: light dark;
+}
+
+/* === Increased contrast (macOS/iOS "Increase Contrast", and the Chromium/Firefox
+   equivalent) ===
+
+   This is the Apple-platform counterpart to `forced-colors`. Per WebKit, there is
+   NO forced-colors mode on iOS, iPadOS, macOS or visionOS — so `prefers-contrast`
+   is how an Apple user asks for more contrast, and this block is what serves them.
+
+   The restrained default stays restrained; users who explicitly ask for more, get
+   more. Only light needs it: dark already clears AAA (ink-light is 8.27:1 there).
+
+   MUST stay above the dark-mode blocks — it redefines :root, and the dark blocks
+   have to win for dark users. */
+@media (prefers-contrast: more) {
+  :root {
+    /* 6.88:1 -> 7.06:1. PRODUCT.md sets AAA (7:1) as the goal for text; the default
+       muted tone misses it by a hair, and this closes that for users who asked. */
+    --color-ink-light: #53504e;
+
+    /* 1.42:1 -> 3.02:1 against the canvas. The stone underline under in-prose links
+       is a valid non-colour cue but a barely perceivable one. Under increased
+       contrast it becomes a real cue — and every hairline border and divider
+       tightens with it. */
+    --color-stone: #8e8b86;
+  }
+}
+
+/* === Dark Mode === */
+/* No-JS fallback: follows OS preference when FOWT script hasn't run */
+/* Dark-mode blocks are INTENTIONALLY duplicated — the media-query branch
+   handles OS auto-follow when JS omits data-theme; the attribute branch
+   handles explicit user override. See test/dark-mode-sync.spec.js — tests
+   catch silent drift between the two blocks during palette revisions. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --color-canvas: #1e1d1b;
+    --color-canvas-alt: #2a2826;
+    --color-ink: #cecbc7;
+    --color-ink-light: #bab5ae;
+    --color-falu-red: #e56b6b;
+    --color-cloudberry: #e8941f;
+    /* Literal, NOT var(--color-cloudberry): the dark accent already clears AA on
+       dark surfaces, but aliasing would let a future palette edit silently drop
+       small text below 4.5:1. Keep >=4.5:1 against --color-canvas. */
+    --color-cloudberry-text: #e8941f;
+    --color-stone: #857f78;
+    --color-stone-light: #6e6862;
+    --color-grid: #2a2826;
+    --color-btn-shadow: var(--color-ink-light);
+    --border-heavy: 2px solid var(--color-stone);
+    --hl-bg: #2a2826;
+    --hl-comment: #9e9892;
+    --hl-string: #e8941f;
+    --hl-number: #6dada0;
+    --hl-name: #b0aba4;
+    --hl-error-bg: #3d2020;
+    --hl-add-bg: #203d20;
+    --hl-del-bg: #3d2020;
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: #1e1d1b;
+  --color-canvas-alt: #2a2826;
+  --color-ink: #cecbc7;
+  --color-ink-light: #bab5ae;
+  --color-falu-red: #e56b6b;
+  --color-cloudberry: #e8941f;
+  /* Literal, NOT var(--color-cloudberry): the dark accent already clears AA on
+     dark surfaces, but aliasing would let a future palette edit silently drop
+     small text below 4.5:1. Keep >=4.5:1 against --color-canvas. */
+  --color-cloudberry-text: #e8941f;
+  --color-stone: #857f78;
+  --color-stone-light: #6e6862;
+  --color-grid: #2a2826;
+  --color-btn-shadow: var(--color-ink-light);
+  --border-heavy: 2px solid var(--color-stone);
+  --hl-bg: #2a2826;
+  --hl-comment: #9e9892;
+  --hl-string: #e8941f;
+  --hl-number: #6dada0;
+  --hl-name: #b0aba4;
+  --hl-error-bg: #3d2020;
+  --hl-add-bg: #203d20;
+  --hl-del-bg: #3d2020;
+}
+
+/* Dark mode: sidebar divider gets warm falu-red accent */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .sidebar {
+    border-color: var(--color-sidebar-accent-dark);
+  }
+}
+
+[data-theme="dark"] .sidebar {
+  border-color: var(--color-sidebar-accent-dark);
+}
+
+/* === Base === */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image: linear-gradient(var(--color-grid) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center top;
+}
+
+/* === Layout Wrapper === */
+.layout-wrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  background-color: var(--color-canvas);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .layout-wrapper {
+    border-left: var(--border-structural);
+    border-right: var(--border-structural);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .layout-wrapper {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .sidebar {
+    border-bottom: none;
+    border-right: var(--border-heavy);
+  }
+
+  .brand-header .title {
+    /* Tablet-specific brand title size — unique clamp, doesn't fit the scale */
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-wrapper {
+    grid-template-columns: 340px 1fr;
+  }
+}
+
+/* === Links === */
+a {
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+@media (hover: hover) {
+  a:hover {
+    color: var(--color-falu-red);
+  }
+}
+
+/* Swedish prose hyphenation — long compound words (e.g. "delningsekonomi")
+   break badly on narrow viewports without this. Scoped to article/post bodies
+   only; avoids hyphenating UI, nav, or code. */
+.e-content[lang="sv"],
+.e-content [lang="sv"],
+[lang="sv"] .e-content {
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+}
+
+/* Auto-linked URLs and other unbreakable strings overflow on narrow viewports
+   without this. Scoped to prose contexts only (article bodies, main content,
+   about page) — avoids breaking UI labels, sidebar nav, or breadcrumbs. */
+.e-content a,
+article :where(a),
+main.content-area p a,
+.about-page a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+a[lang="sv"]::before {
+  content: "";
+  width: 21px;
+  height: 15px;
+  margin-right: 4px;
+  display: inline-block;
+  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Crect width="21" height="15" fill="%23157CBB" rx="2"/%3E%3Cpath fill="%23FFD34D" d="M9 6V0H6v6H0v3h6v6h3V9h12V6H9z"/%3E%3C/g%3E%3C/svg%3E') no-repeat 0 0;
+  vertical-align: -1px;
+}
+
+/* === Images === */
+img {
+  border: 0;
+  max-width: 100%;
+  height: auto;
+}
+
+/* === Sidebar === */
+.sidebar {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: var(--border-heavy);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Tablet: tighter sidebar to fit 100vh without scroll */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar {
+    gap: var(--space-md);
+  }
+}
+
+/* Desktop: restore generous spacing + sticky sidebar layout */
+@media (min-width: 1024px) {
+  .sidebar {
+    /* --space-xl for both padding and gap put ~240px (a quarter of the sidebar)
+       into whitespace, which is what pushed the footer past 100vh. Trimmed to
+       --space-md: costs no content, and lets the sidebar fit — and therefore
+       stick — on ordinary laptop viewports. */
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-md);
+    border-bottom: none;
+    border-right: var(--border-heavy);
+  }
+}
+
+/* Sticky ONLY when the sidebar actually fits the viewport.
+
+   The sidebar must never scroll — it is a navigation landmark, not a scroll
+   region — so `overflow-y: auto` is not on the table. It used to be sticky with
+   `height: 100vh` unconditionally, which meant any content past 100vh painted
+   outside a *pinned* box: page-scrolling could never reach it, and the notbyai
+   badge sat off-screen on every desktop viewport.
+
+   Below this guard the sidebar goes static and scrolls with the page, so
+   everything stays reachable — without the sidebar ever growing a scrollbar.
+
+   860px is not arbitrary: the sidebar's intrinsic content measures 781–833px
+   (it grows with width, because the spacing is fluid `clamp()`), so this clears
+   the worst case with ~27px to spare, while still engaging on ordinary laptop
+   viewports (~866px+).
+
+   That headroom is thin ON PURPOSE, and it is defended: e2e/sidebar.test.js
+   measures the sidebar at a viewport exactly this tall, at the widest layout,
+   and fails if the content no longer fits. Add a sixth nav item and that test
+   goes red — loudly — instead of the badge quietly vanishing again. If it does
+   go red, trim the sidebar or raise this number; do not add an inner scrollbar. */
+@media (min-width: 768px) and (min-height: 860px) {
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+}
+
+.brand-header .title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.25em;
+  padding: 0;
+  text-align: left;
+}
+
+.brand-header .title a {
+  color: var(--color-ink);
+  text-shadow: none;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .brand-header .title a:hover {
+    color: var(--color-ink);
+  }
+}
+
+.brand-header .subtitle {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--color-ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+/* Brand + profile should read as one identity block */
+.brand-header + .profile-widget {
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+@media (min-width: 1024px) {
+  .brand-header + .profile-widget {
+    margin-top: calc(-1 * var(--space-md));
+  }
+}
+
+/* === Profile Widget === */
+.profile-widget {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.profile-widget img {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--rounded-avatar);
+  border: var(--border-structural);
+  filter: grayscale(20%);
+}
+
+/* Tablet: stack profile vertically in narrow sidebar */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .profile-widget {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .profile-widget img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.profile-info {
+  font-size: var(--fs-sm);
+  font-family: var(--font-mono);
+  color: var(--color-ink-light);
+}
+
+.profile-info strong {
+  font-weight: 500;
+  display: block;
+  color: var(--color-ink);
+}
+
+.profile-info span {
+  display: block;
+}
+
+.profile-info strong {
+  display: block;
+  font-family: var(--font-serif);
+  /* Profile name — bespoke size, sits between article h4 and bookmark title */
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* === Navigation Menu === */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* On input capability, two deliberate and opposite decisions:
+
+   - HOVER is gated on `@media (hover: hover)` (see the blocks below). On touch,
+     :hover applies on tap and then STICKS until you tap elsewhere — without the
+     gate, the subscribe button stays falu-red and pressed, and cards stay on
+     their hover surface, after a tap.
+
+   - SIZING is NOT gated on `@media (pointer: coarse)`, because it would be a
+     no-op: these paddings already clear the 44px touch floor at every width, so
+     a touchscreen laptop (coarse pointer, desktop layout) is already served
+     correctly by the desktop rules. That is a measured claim rather than a hope
+     — and a fragile one, since this padding has already been trimmed once to
+     make the sidebar fit its viewport. e2e/touch-targets.test.js measures it on
+     a coarse pointer AT DESKTOP WIDTH and fails if it stops holding. If that
+     test ever goes red, THAT is the moment to add pointer:coarse sizing rules —
+     not before. */
+.nav-item {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm-plus);
+  text-transform: uppercase;
+  padding: 0.75rem 1rem;
+  border-radius: var(--rounded-control);
+  border: 1px solid transparent;
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out), color 0.2s var(--ease-out);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-ink);
+}
+
+/* Scoped to hover-capable pointers. On touch, :hover is applied on tap and then
+   PERSISTS until you tap elsewhere — so without this the button stays falu-red
+   and pressed, and cards stay in their hover state, after a tap. Keyboard users
+   are unaffected: they are served by :focus-visible, not :hover. */
+@media (hover: hover) {
+  .nav-item:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-stone);
+    transform: translateX(4px);
+    color: var(--color-ink);
+  }
+}
+
+.nav-arrow {
+  opacity: 0;
+}
+
+.nav-item.active .nav-arrow {
+  opacity: 1;
+}
+
+.nav-item.active {
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+  border-color: var(--color-ink);
+}
+
+@media (hover: hover) {
+  .nav-item.active:hover {
+    color: var(--color-canvas);
+  }
+}
+
+/* The active nav item is an inverted chip: ink ground, canvas text. Forced-colors
+   mode reverts BOTH `color` and `background-color` to the user's palette, so the
+   inversion simply evaporates and the active item renders identically to every
+   inactive one — the selected state disappears for a sighted high-contrast user.
+   (aria-current still carries it for assistive tech; this is the visual half.)
+   The system-colour keyword pair for a selected item is Highlight/HighlightText,
+   which the UA guarantees to be a legible combination in whatever theme the user
+   picked. Don't substitute our own tokens here: forced-colors would revert them. */
+@media (forced-colors: active) {
+  .nav-item.active,
+  .nav-item.active:hover {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}
+
+/* === Nav Disclosure (button/drawer hamburger) === */
+
+/* No-JS: hamburger never shown, drawer always visible */
+.no-js .hamburger-btn {
+  display: none;
+}
+
+/* Desktop + Tablet: hide hamburger, show drawer */
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none;
+  }
+
+  .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-drawer {
+    /* The 260px tablet column wraps more, so its content runs taller than the
+       desktop one — it was the last thing keeping the sidebar from fitting. */
+    gap: var(--space-sm);
+  }
+
+}
+
+@media (min-width: 1024px) {
+  .nav-drawer {
+    /* Was --space-xl. Between the nav, the subscribe button and the theme
+       toggle that put ~105px of pure gap into the sidebar's height, which is
+       part of what pushed its footer past 100vh. */
+    gap: var(--space-md);
+  }
+}
+
+/* === Hamburger button === */
+.hamburger-btn {
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  line-height: 1;
+}
+
+/* Override generic focus ring: falu-red over dark canvas is only ~4.3:1.
+   --color-ink is near-white in dark mode (~11:1 over canvas) and deep ink
+   in light (~13:1), matching the site's asymmetric 10:1 contrast goal. */
+.hamburger-btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 22px;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-ink);
+  border-radius: var(--rounded-hairline);
+  transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-btn[aria-expanded="true"] .hamburger-icon span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* === Mobile: compact sidebar + hamburger drawer === */
+@media (max-width: 767px) {
+  .sidebar {
+    padding: var(--space-sm) var(--space-sm);
+    gap: 0;
+    position: relative;
+  }
+
+  /* When drawer is open, elevate sidebar above main content */
+  .js:has(#nav-drawer.is-open) .sidebar {
+    z-index: 100;
+  }
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-right: calc(44px + var(--space-xs));
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-header .title {
+    /* Mobile brand title — same clamp as article h1 (--fs-h1) */
+    font-size: var(--fs-h1);
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .brand-header .subtitle {
+    display: none;
+  }
+
+  .profile-widget {
+    display: none;
+  }
+
+  .js .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--rounded-control);
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 2;
+    transition: background-color 0.15s var(--ease-out);
+  }
+
+  /* Nested hover gate: the hamburger is a touch-primary control — without
+     this, a tap leaves it stuck on the hover surface until the next tap. */
+  @media (hover: hover) {
+    .js .hamburger-btn:hover {
+      background-color: var(--color-canvas-alt);
+    }
+  }
+
+  .nav-disclosure {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide drawer by default on mobile — prevents FOUC before JS adds .js class */
+  .nav-drawer {
+    display: none;
+  }
+
+  .js .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-color: var(--color-canvas);
+    gap: var(--space-lg);
+    /* iOS safe-area: respect notch (left/right in landscape) + home-indicator (bottom) */
+    padding-top: calc(var(--space-sm) + 44px + var(--space-lg) + env(safe-area-inset-top));
+    padding-right: max(var(--space-lg), env(safe-area-inset-right));
+    padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+    padding-left: max(var(--space-lg), env(safe-area-inset-left));
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      opacity 0.15s var(--ease-out),
+      visibility 0s linear 0.15s;
+  }
+
+  .js .nav-drawer.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition:
+      opacity 0.15s var(--ease-out),
+      visibility 0s linear 0s;
+  }
+
+  .no-js .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .nav-drawer .nav-menu {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .nav-drawer .nav-item {
+    /* Mobile nav override — fixed 1rem (no fluid scaling in drawer) */
+    font-size: 1rem;
+    /* Was 0.875rem. Trimmed to help the sidebar fit its own viewport; still
+       ~50px tall, comfortably over the 44px touch-target floor that
+       e2e/touch-targets.test.js enforces. */
+    padding: 0.6875rem 1rem;
+  }
+
+  .nav-drawer .nav-arrow {
+    display: block;
+  }
+}
+
+/* === Button === */
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.875rem 1.5rem;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  border: var(--border-heavy);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
+  box-shadow: 4px 4px 0 var(--color-btn-shadow);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--color-btn-shadow);
+    background-color: var(--color-falu-red);
+    border-color: var(--color-falu-red);
+    color: var(--color-canvas);
+  }
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-btn-shadow);
+}
+
+/* === Content Area === */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent grid child from expanding viewport with wide content */
+}
+
+.content-header {
+  padding: var(--space-xl) var(--space-lg) var(--space-md);
+  border-bottom: var(--border-structural);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.content-header h2,
+.content-header h3,
+.content-header .content-title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm-plus);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+/* === Post List === */
+.post-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-card {
+  padding: var(--space-lg);
+  border-bottom: var(--border-structural);
+  display: grid;
+  gap: var(--space-xs);
+  transition: background-color 0.2s var(--ease-out);
+  position: relative;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--color-falu-red);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+@media (hover: hover) {
+  /* The hover SURFACE itself is painted by the shared --card-surface block
+     below (one declaration for card + fade, both card types) — only the
+     accent-bar reveal lives here. */
+  .post-card:hover::before {
+    transform: scaleY(1);
+  }
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-ink-light);
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  border: 1px solid var(--color-stone);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--rounded-chip);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+.post-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  line-height: 1.2;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.post-title a {
+  display: block;
+}
+
+/* === Card cover-link stacking ===
+   The title anchor stretches over its whole card, so body text is clickable and
+   no second link enters the accessibility tree. The card goes where its title
+   goes — for a LINK card that means the source it bookmarks; the "Read full
+   note" anchor is the escape hatch to the note itself.
+
+   Two levels, only two:
+
+     1  the cover      — the title anchor's stretched pseudo (::after on
+                         post/TIL titles, ::before on bookmark titles — WHICH
+                         pseudo is not free, see below)
+     2  escape hatches — anything with its OWN destination, which has to stay
+                         clickable through the cover
+
+   Both levels are load-bearing, and both were previously wrong.
+
+   The cover must OUT-RANK positioned content, not merely be positioned itself.
+   `.post-excerpt` is `position: relative` (it must be — it contains the
+   absolutely-positioned fade), and a positioned sibling later in the DOM paints
+   over a cover left at `z-index: auto`. That is what made every excerpt body
+   dead to clicks.
+
+   And the element HOSTING the cover must NOT be positioned: `inset: 0` resolves
+   against the nearest positioned ancestor, so a positioned host traps the cover
+   inside its own box instead of letting it span the card.
+
+   WHICH PSEUDO hosts the cover is not free — every pseudo on a title anchor is
+   already spoken for by something, and an element has only one ::before:
+
+     - post/TIL titles (`a.u-url`) may carry `lang="sv"`, and `a[lang="sv"]::before`
+       paints the Swedish flag. So their cover goes on ::after.
+     - bookmark titles (`a.u-bookmark-of`) spend ::after on the ↗ glyph. So their
+       cover goes on ::before.
+
+   The two never collide: `lang=` only ever lands on `u-url` title anchors, never
+   on `u-bookmark-of` (checked across the built site). If a bookmark title ever
+   gains a `lang`, its flag and its cover will fight over ::before and the card
+   will go dead — put the flag somewhere else that day, don't move the cover. */
+.post-title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .post-card:hover .post-title a {
+    color: var(--color-falu-red);
+  }
+}
+
+/* === Post excerpt === */
+
+/* Excerpt cards need more vertical space than title-only cards */
+.post-card:has(.post-excerpt) {
+  gap: var(--space-sm);
+}
+
+.post-excerpt {
+  font-family: var(--font-serif);
+  font-size: 0.95em;
+  line-height: 1.55;
+  color: var(--color-ink-light);
+  position: relative;
+  overflow: hidden;
+  max-height: 14em;
+}
+
+.post-excerpt p {
+  margin: 0 0 0.5em;
+}
+
+/* The excerpt is muted (--color-ink-light) while a link inside it keeps --color-ink.
+   That is a 1.84:1 difference — under the 3:1 WCAG asks for when colour is the ONLY
+   thing separating a link from its surrounding text, so the link needs a second cue.
+   Underline it, exactly as .e-content a already is in article bodies. Enforced by
+   axe's link-in-text-block rule on /articles/. */
+.post-excerpt a {
+  /* Escape hatch (level 2): a real link inside the prose keeps its own
+     destination rather than being swallowed by the card cover. */
+  position: relative;
+  z-index: 2;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.post-excerpt p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Strip headings that leak into excerpts — they're section intros, not excerpt structure */
+.post-excerpt h2,
+.post-excerpt h3 {
+  font-size: 1em;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  margin: 0 0 0.25em;
+}
+
+/* The fade must dissolve into whatever surface its card is *currently* painting,
+   so the card owns that colour and the fade only reads it. Declaring it twice is
+   what broke it: the swap was scoped to `.post-card:hover`, so a hovered
+   `.til-card` darkened to canvas-alt while its fade kept dissolving into the
+   resting canvas — a pale band with a hard edge across the excerpt. The swap was
+   also ungated, so on a touch device the fade changed while the card (correctly
+   gated) did not — the same mismatch, inverted. One declaration per surface means
+   a third card type cannot reintroduce either bug — which is also why the
+   hover block below paints the card's own background-color from the same
+   variable: the card background and the fade target are ONE value, swapped in
+   ONE place. (It was three synced places once, and they drifted.) */
+.post-card,
+.til-card {
+  --card-surface: var(--color-canvas);
+}
+
+.post-excerpt-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3em;
+  background: linear-gradient(to bottom, transparent, var(--card-surface));
+  pointer-events: none;
+  /* Above the escape hatches (level 2): `.post-excerpt a` is lifted to z-2 to
+     stay clickable through the card cover, which put prose links ABOVE the
+     fade — full-contrast text sitting un-dissolved inside the fade band. The
+     fade must out-paint everything in the excerpt; pointer-events: none keeps
+     the links clickable underneath it. */
+  z-index: 3;
+}
+
+@media (hover: hover) {
+  .post-card:hover,
+  .til-card:hover {
+    --card-surface: var(--color-canvas-alt);
+    background-color: var(--card-surface);
+  }
+}
+
+.post-read-more {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+  /* Escape hatch (level 2). On a post card this is the same destination as the
+     cover; on a bookmark card it is the ONLY route to the note, since the cover
+     goes off-site. */
+  position: relative;
+  z-index: 2;
+}
+
+@media (hover: hover) {
+  .post-card:hover .post-read-more {
+    color: var(--color-falu-red);
+  }
+}
+
+/* === Headings === */
+h1 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  line-height: 0.9;
+}
+
+h2,
+h3,
+h4 {
+  font-size: 1em;
+  font-weight: 500;
+}
+
+h2,
+h3 {
+  margin-bottom: 0.3em;
+}
+
+/* === Spacing === */
+p,
+ul,
+ol,
+.e-content,
+pre:has(> code.hljs),
+.webmention-mention,
+.webmention-facepile,
+.linklist,
+.h-entry .media .u-photo,
+.h-entry .media .u-video {
+  margin-bottom: 1em;
+}
+
+li {
+  margin-bottom: 0.25em;
+}
+
+ul,
+ol {
+  padding-left: 1.5em;
+}
+
+/* === Code highlighting === */
+pre:has(> code.hljs) {
+  font-size: var(--fs-code);
+  overflow: auto;
+}
+
+/* === Content sections (articles, etc.) === */
+.content-area > section,
+.content-area > article,
+.content-area > nav,
+.content-area > div:not(.content-header):not(.post-list) {
+  padding: var(--space-lg);
+  border-bottom: var(--border-structural);
+}
+
+/* === Author cards === */
+.h-entry .h-card .u-photo,
+.h-card.summary-card .u-photo {
+  width: 20px;
+  border-radius: var(--rounded-full);
+  vertical-align: middle;
+  position: relative;
+  top: -2px;
+  margin-left: 0.25em;
+}
+
+.h-card.full-card .u-photo {
+  width: 97px;
+  border-radius: var(--rounded-full);
+  float: left;
+  margin-right: var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+.h-card.full-card {
+  display: flow-root;
+  padding-bottom: var(--space-xs);
+}
+
+.h-card.full-card p {
+  margin-bottom: var(--space-xs);
+}
+
+/* === Post list (legacy ul-based for archive) === */
+ul.posts,
+ul.past {
+  list-style: none;
+  padding: 0;
+}
+
+ul.posts time,
+ul.posts span.time-to-read,
+article footer,
+.webmention-footer,
+.u-responses {
+  color: var(--color-ink-light);
+  /* em-relative (not --fs-xs rem): scales with inherited body size so
+     metadata stays a fixed proportion below surrounding copy. */
+  font-size: 0.8em;
+}
+
+/* Numeric runs (dates, reading-time, counts) align as columns */
+time,
+.relative-time,
+relative-time,
+ul.posts span.time-to-read,
+.domain-badge {
+  font-variant-numeric: tabular-nums;
+}
+
+time a,
+.webmention-footer a {
+  color: var(--color-ink-light);
+}
+
+/* === Posts extras nav === */
+.posts-extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  list-style: none;
+  padding: var(--space-lg);
+  border-bottom: var(--border-structural);
+}
+
+.posts-extras a {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-stone);
+  border-radius: var(--rounded-control);
+  text-decoration: none;
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .posts-extras a:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-falu-red);
+    transform: translateX(4px);
+  }
+}
+
+/* === Webmention responses link === */
+.u-responses {
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+
+.u-responses::before {
+  content: "";
+  opacity: 0.7;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px 0 0;
+  vertical-align: text-top;
+
+  /* Paint the glyph via a mask rather than shipping a pre-coloured image.
+     The SVG carries no `fill`, so as a background-image it rendered black —
+     invisible on the dark canvas. Worse, a url() background-image is one of the
+     few things forced-colors mode does NOT override (MDN), so it would keep its
+     own black while every surface around it flipped to the user's palette.
+     Masking the shape and colouring it with `currentColor` fixes dark mode.
+     It does NOT, on its own, fix forced-colors — see the block below. */
+  background-color: currentColor;
+  -webkit-mask: url('data:image/svg+xml,%3Csvg width="8" height="8" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M.09 0C.03 0 0 .04 0 .09V5.9c0 .05.04.09.09.09H6l2 2V.08c0-.06-.04-.09-.09-.09H.1z"/%3E%3C/svg%3E') no-repeat center center;
+  -webkit-mask-size: auto 13px;
+  mask: url('data:image/svg+xml,%3Csvg width="8" height="8" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M.09 0C.03 0 0 .04 0 .09V5.9c0 .05.04.09.09.09H6l2 2V.08c0-.06-.04-.09-.09-.09H.1z"/%3E%3C/svg%3E') no-repeat center center;
+  mask-size: auto 13px;
+}
+
+/* `background-color: currentColor` is not enough in forced colours. The property
+   IS reverted — but to a BACKGROUND system colour (Canvas), not to the text
+   colour, so the masked glyph paints white-on-white and disappears. Measured:
+   the ::before computed rgb(255,255,255) while its own link computed
+   rgb(0,0,159). Name a TEXT system colour explicitly — the glyph sits inside a
+   link, so LinkText is the one it should match. Opacity is never forced, so a
+   0.7 that merely looked soft in our own palette would quietly eat contrast from
+   a palette chosen for maximum contrast; take it back to 1. */
+@media (forced-colors: active) {
+  .u-responses::before {
+    background-color: LinkText;
+    opacity: 1;
+  }
+}
+
+html.js .u-responses {
+  display: none;
+}
+
+/* === Subscribe === */
+.subtome {
+  text-align: center;
+}
+
+/* === Blockquote === */
+blockquote {
+  border-left: 4px solid var(--color-stone);
+  padding-left: var(--space-sm);
+  margin-left: var(--space-md);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* === Inline link lists === */
+.linklist {
+  overflow-wrap: break-word;
+}
+
+.linklist strong {
+  display: inline;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+.linklist ul,
+.linklist li {
+  display: inline;
+  padding: 0;
+  margin: 0;
+}
+
+.linklist li:not(:last-child)::after {
+  content: ", ";
+}
+
+/* === Post media === */
+.h-entry .media .u-photo,
+.h-entry .media .u-video {
+  width: 100%;
+  display: block;
+}
+
+/* === Blog article summary stacking (archive) === */
+div.blog-article-summary + div.blog-article-summary {
+  margin-top: -1px;
+  padding-top: 0;
+  position: relative;
+}
+
+.likelist p.h-entry:last-of-type {
+  margin-bottom: 0;
+}
+
+/* === Webmentions === */
+.u-responses,
+.webmention-container > :first-child {
+  margin-top: 1em;
+}
+
+.webmention-mention {
+  padding-left: var(--space-xl);
+  position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.webmention-mention:last-child {
+  margin-bottom: 0;
+}
+
+.webmention-author img {
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--space-xs));
+  width: 50px;
+  border-radius: var(--rounded-full);
+}
+
+/* === Webmention form === */
+input[type=url] {
+  width: min(100%, 30rem);
+  border: var(--border-structural);
+  padding: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  border-radius: var(--rounded-control);
+}
+
+input[type=submit] {
+  border: var(--border-heavy);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-stone);
+  transition: background-color 0.2s var(--ease-spring), border-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-spring);
+}
+
+@media (hover: hover) {
+  input[type=submit]:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--color-stone);
+    background-color: var(--color-falu-red);
+    color: var(--color-canvas);
+    border-color: var(--color-falu-red);
+  }
+}
+
+input[type=submit]:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-stone);
+}
+
+form label[for="webmention-source"] {
+  font-family: var(--font-serif);
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+form:has(#webmention-source) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.webmention-facepile {
+  padding-left: 0;
+  margin-left: calc(-1 * var(--space-xs));
+}
+
+.webmention-facepile:last-child {
+  margin-bottom: calc(-1 * var(--space-xs));
+}
+
+.webmention-facepile > li {
+  display: inline-block;
+  position: relative;
+  margin: 0 var(--space-xs) var(--space-xs) 0;
+}
+
+.webmention-interaction-presentation::after {
+  display: block;
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  padding: 4px;
+  width: 1em;
+  height: 1em;
+
+  /* Webmention interaction presentation badge — bespoke 12px */
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+
+  color: var(--color-ink);
+  background: var(--color-canvas-alt);
+  border: 1px solid var(--color-stone);
+  border-radius: var(--rounded-full);
+}
+
+.webmention-interaction-like .webmention-interaction-presentation::after {
+  content: "\2665";
+}
+
+.webmention-interaction-repost .webmention-interaction-presentation::after {
+  content: "\267A";
+}
+
+.webmention-interaction-presentation > span {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  width: 2em;
+  height: 2em;
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas-alt);
+  border: 1px solid var(--color-stone);
+}
+
+.webmention-interaction-presentation > span > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+/* === Theme toggle === */
+/* Styles handled by Shadow DOM inside the <theme-toggle> web component.
+   The element is display:none by default; connectedCallback sets display:flex. */
+
+/* === Relative time === */
+relative-time .relative-label {
+  color: var(--color-ink-light);
+  font-size: var(--fs-sm);
+}
+
+/* === Visually hidden (screen reader only) === */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* === Skip-to-content link === */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: var(--space-lg);
+  z-index: 100;
+  padding: var(--space-xs) var(--space-sm);
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  border-radius: 0 0 var(--rounded-control) var(--rounded-control);
+}
+
+.skip-link:focus {
+  top: 0;
+  color: var(--color-canvas);
+}
+
+/* Explicit focus ring so the outline is not cascade-dependent on the
+   generic :focus-visible rule (asymmetric semantics fix for mouse focus). */
+.skip-link:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* === Focus states === */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-falu-red);
+  outline-offset: 2px;
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* === Article content === */
+.content-area > .h-entry {
+  padding: var(--space-lg);
+}
+
+.content-area > .h-entry .e-content {
+  font-family: var(--font-serif);
+  font-size: var(--fs-article);
+  line-height: 1.7;
+  max-width: 65ch;
+  overflow-wrap: break-word;
+}
+
+/* Code blocks: horizontal scroll for wide content */
+.e-content pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Video iframes (YouTube etc.): constrain width, preserve aspect ratio */
+.e-content iframe {
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* === Markdown structural wrappers === */
+/* Applied by src/markdown-it.settings.js to give fenced code, tables,
+   titled images, and bare iframes semantic containers. */
+
+/* Video embed: constrain aspect ratio + let the iframe fill the wrapper */
+.video-embed {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+}
+
+.video-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Code block wrapper: horizontal scroll on overflow
+   (duplicates .e-content pre scrolling but scopes it to fenced blocks
+   regardless of nesting context — e.g. code blocks in templates). */
+.code-block {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Table wrapper: independent horizontal scroll for wide tables */
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Figure + figcaption: reset default UA margins, italic centered caption */
+figure {
+  margin: var(--space-md) 0;
+  padding: 0;
+}
+
+figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+figcaption {
+  margin-top: var(--space-xs);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.9em;
+  color: var(--color-ink-light);
+  text-align: center;
+  line-height: 1.45;
+}
+
+/* Article sub-heading scale: 1.35 / 1.15 / 1.05rem — a bespoke stepped
+   hierarchy that sits between body (--fs-article ≈ 1.05-1.2rem) and the
+   article h1 (--fs-h1). Kept as literal values rather than tokens because
+   these sizes only appear here and exist as a cohesive sub-scale. */
+.content-area > .h-entry .e-content h2 {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
+.content-area > .h-entry .e-content h3 {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
+.content-area > .h-entry .e-content h4 {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
+.content-area > .h-entry > header h1,
+.content-area > .h-entry > header h2 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+  text-wrap: balance;
+}
+
+.content-area > .h-entry > footer {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  padding-top: var(--space-md);
+  border-top: var(--border-structural);
+  margin-top: var(--space-lg);
+}
+
+.content-area > .h-entry > footer a {
+  color: var(--color-ink-light);
+  transition: color 0.2s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .content-area > .h-entry > footer a:hover {
+    color: var(--color-falu-red);
+  }
+}
+
+/* Content links: underlines for readability (article body + about page + the
+   sidebar subtitle's in-prose link — passes axe link-in-text-block via a
+   non-color cue, since the subtitle text is intentionally muted) */
+.e-content a,
+.about-page a,
+.brand-header .subtitle a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-stone);
+  text-underline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .e-content a:hover,
+  .about-page a:hover,
+  .brand-header .subtitle a:hover {
+    text-decoration-color: var(--color-falu-red);
+    color: var(--color-falu-red);
+  }
+}
+
+/* Metadata section labels: mono uppercase */
+.linklist strong {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+}
+
+/* Tags as badges */
+.tags .p-category {
+  display: inline-block;
+  border: 1px solid var(--color-stone);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--rounded-chip);
+  background-color: var(--color-canvas);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+@media (hover: hover) {
+  /* :has(a) — categorized posts render their tags as PLAIN TEXT (the tag
+     index only covers blog posts), and a hover signal on non-interactive
+     text is a false affordance. Only chips that actually link may glow. */
+  .tags .p-category:has(a):hover {
+    border-color: var(--color-falu-red);
+  }
+}
+
+/* === About page === */
+.about-page {
+  font-family: var(--font-serif);
+  font-size: var(--fs-article);
+  line-height: 1.7;
+  max-width: 65ch;
+}
+
+.about-page h1 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+
+.about-lede {
+  /* About-page lede — unique size, sits between --fs-article and --fs-h3 */
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.about-page .p-nickname {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+/* About page sections inherit the article's reading width */
+.about-page + section {
+  max-width: 65ch;
+}
+
+.about-page + section h2 {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+  font-weight: 500;
+  margin-bottom: var(--space-sm);
+}
+
+/* Elsewhere link list */
+.elsewhere-links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.elsewhere-links li {
+  margin-bottom: 0;
+}
+
+.elsewhere-links a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--rounded-control);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .elsewhere-links a:hover {
+    background-color: var(--color-canvas-alt);
+    border-color: var(--color-stone);
+    transform: translateX(4px);
+    color: var(--color-ink);
+  }
+}
+
+.elsewhere-links strong {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm-plus);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .elsewhere-links a:hover strong {
+    color: var(--color-falu-red);
+  }
+}
+
+.elsewhere-desc {
+  color: var(--color-ink-light);
+  font-size: var(--fs-sm);
+}
+
+/* === Syntax highlighting (highlight.js theme-aware) === */
+pre code.hljs { background: var(--hl-bg); border-radius: var(--rounded-control); padding: var(--space-xs); display: block; }
+.hljs-comment { color: var(--hl-comment); font-style: italic }
+.hljs-keyword { font-weight: bold }
+.hljs-string { color: var(--hl-string) }
+.hljs-attr,
+.hljs-property { color: var(--hl-name) }
+.hljs-built_in { color: var(--hl-name) }
+.hljs-title { color: var(--color-falu-red); font-weight: bold }
+.hljs-params { color: var(--color-ink) }
+.hljs-punctuation { color: var(--color-ink-light) }
+.hljs-number { color: var(--hl-number) }
+.hljs-literal { color: var(--hl-number) }
+.hljs-regexp { color: var(--hl-number) }
+.hljs-symbol { color: var(--color-cloudberry-text) }
+.hljs-type { color: var(--hl-name); font-weight: bold }
+.hljs-meta { color: var(--hl-comment); font-weight: bold }
+.hljs-addition { background-color: var(--hl-add-bg) }
+.hljs-deletion { background-color: var(--hl-del-bg) }
+
+/* === Social Stream Type Detection via :has() === */
+
+/* Likes: lightest weight — mono, muted, compact */
+.h-entry:has(.u-like-of) {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--color-ink-light);
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-lg);
+  line-height: 1.4;
+}
+
+.h-entry:has(.u-like-of) a {
+  color: var(--color-ink-light);
+  text-decoration: underline;
+  text-decoration-color: var(--color-stone);
+}
+
+/* Replies: conversational — inset shadow accent (avoids clash with sidebar border) */
+.h-entry:has(.u-in-reply-to) {
+  box-shadow: inset 3px 0 0 var(--color-stone);
+  padding-inline-start: calc(var(--space-lg) + 3px);
+}
+
+/* Reply verb label: mono uppercase */
+.h-entry:has(.u-in-reply-to) strong {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+}
+
+/* Bookmarks: curated link — inset shadow accent */
+.h-entry:has(.u-bookmark-of) {
+  box-shadow: inset 3px 0 0 var(--color-stone-light);
+  padding-inline-start: calc(var(--space-lg) + 3px);
+}
+
+/* Bookmark title: serif, slightly smaller than articles */
+.h-entry:has(.u-bookmark-of) .p-name {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h3);
+  font-weight: 500;
+}
+
+/* Bookmark commentary: sans, subordinate to title */
+.h-entry:has(.u-bookmark-of) .e-content {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+
+/* === TIL card shell (base for .til-card and .til-card--bookmark) ===
+   Mirrors .post-card's padding + border + grid so til-cards and post-cards
+   can co-exist in the same .post-list (homepage lifestream) without
+   collapsing into a broken-masonry visual. Deliberately no ::before
+   hover-accent (unlike .post-card) — bookmark + release variants get
+   their own left-edge inset-shadow accents instead. */
+.til-card {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: var(--border-structural);
+  display: grid;
+  gap: var(--space-xs);
+  transition: background-color 0.2s var(--ease-out);
+  position: relative;
+  line-height: 1.45;
+  box-shadow: inset 3px 0 0 var(--color-stone);
+}
+
+/* .til-card's hover surface is painted by the shared --card-surface block
+   (see the fade ownership comment) — no per-component hover background. */
+
+.til-card .post-excerpt {
+  max-height: 8em;
+  overflow: hidden;
+}
+
+.til-card--bookmark,
+.til-card--release {
+  padding-inline-start: calc(var(--space-md) + 3px);
+}
+
+/* Header row: pill + title. Baseline-align so the mono pill sits on the
+   serif title's text baseline rather than floating mid-row. Wrap-friendly
+   so long titles don't push the pill off-screen at 375px. */
+.til-card-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.til-card-header .post-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Pill sits above the .post-title a::after cover-link overlay. Same
+   escape-hatch pattern as .post-read-more. Baseline-aligned (via parent's
+   align-items: baseline) so the mono text sits on the serif title's
+   baseline rather than centered-above. */
+.til-card-header .post-type-badge {
+  /* Escape hatch (level 2) — its own destination (/links/, /til/, ...). */
+  position: relative;
+  z-index: 2;
+}
+
+/* Footer row: read-more (left) + right-aligned meta rail (date + topic +
+   domain + tags). When no read-more (excerpt didn't truncate), meta
+   auto-pushes right via margin-left:auto; with read-more, read-more sits
+   left, meta sits right, sharing one row on desktop. Flex-wrap drops meta
+   below read-more at narrow widths. */
+.til-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-ink-light);
+}
+
+.til-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  margin-left: auto;
+}
+
+.til-card-footer a,
+.til-card-footer .linklist {
+  /* Escape hatches (level 2): the permalink, the domain, the tags. */
+  position: relative;
+  z-index: 2;
+}
+
+/* Inside the compact footer rail, the "Tags:" label reads as form-field
+   scaffolding next to date and domain. Drop it visually; the tag chips
+   still read as tags. Keep the string in DOM for screen readers. */
+.til-card-footer .linklist strong {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Variant: .til-card--bookmark (links posts).
+   The base .h-entry:has(.u-bookmark-of) rule earlier in the file provides
+   the serif title + smaller size for any bookmark h-entry; this variant
+   layers the cloudberry left-edge accent + domain-badge restyle + external
+   link glyph that differentiate "link I curated" from "I wrote this." */
+
+.til-card--bookmark {
+  /* Warm amber left edge — signals external origin (link curated) distinct
+     from the structural stone accent on the base bookmark rule. */
+  box-shadow: inset 3px 0 0 var(--color-cloudberry);
+}
+
+.til-card--bookmark .p-name {
+  /* Match TIL card title size. Audit P1: 24px vs 30px reads as unintended
+     hierarchy; bookmarks are peer content, accent does the differentiation. */
+  font-size: var(--fs-h2);
+}
+
+.til-card-footer .domain-badge {
+  /* Footer rail: inline flow next to date + tags. Strip block/margin from
+     the base .domain-badge rule, inherit footer font/colour vocabulary.
+     Applies to both bookmark (aria-hidden span) and release/TIL (u-bookmark-of
+     link) domain-badge usages in the compact card footer. */
+  display: inline;
+  margin-top: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* The bookmark title anchor covers its whole card, so the card goes where the
+   title goes: off-site, to the source. It uses ::before because ::after below is
+   the ↗ glyph. See "Card cover-link stacking". */
+.til-card--bookmark .p-name a.u-bookmark-of::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.til-card--bookmark .p-name a.u-bookmark-of::after {
+  /* External-link glyph (P2 audit): NBSP + ↗ after the bookmark title so readers
+     see the title goes off-site — and, since the title anchor now covers the whole
+     card, that the CARD goes off-site. Cloudberry ties it to the left-edge accent.
+     position:static + inset:auto undo the base `.post-title a::after` cover, which
+     this rule replaces: on a bookmark card the cover lives on ::before instead. */
+  content: '\00A0\2197';
+  font-size: 0.8em;
+  /* The AA-safe variant, not the raw accent: this glyph carries meaning ("the
+     title goes off-site"), and at 2.8:1 the accent failed even the 3:1 large-text
+     bar. It stays in the cloudberry family, so the tie to the left-edge accent
+     (which remains --color-cloudberry) still reads. */
+  color: var(--color-cloudberry-text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  position: static;
+  inset: auto;
+}
+
+/* The bookmark title anchor hosts its card's cover, so it must stay UNPOSITIONED:
+   `position: relative` here would make it the containing block for its own
+   ::before and trap the cover inside the title's own box. That is precisely the
+   bug this replaced — the old cover hung off `.post-read-more`, which was
+   `position: relative`, so the "whole-card" hit area only ever covered the
+   read-more link.
+
+   "Read full note →" is now the escape hatch to the note itself, at level 2 with
+   the other footer links. No duplicate anchor is introduced — screen readers
+   still see one link per destination, not an extra "excerpt-body" link. */
+
+/* Variant: .til-card--release (release notes posts).
+   Falu-red left-edge accent signals a product-release post (npm package
+   shipped, GitHub release), distinct from cloudberry bookmarks and the
+   base stone TIL. */
+
+.til-card--release {
+  box-shadow: inset 3px 0 0 var(--color-falu-red);
+}
+
+@media (max-width: 500px) {
+  /* Long domains (e.g. aaronparecki.com, githubengineering.com) can force
+     overflow at 375px. Cap + ellipsis; domain is aria-hidden, so truncation
+     is purely cosmetic and doesn't lose screen-reader info. */
+  .til-card-footer .domain-badge {
+    max-width: 16ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
+
+/* === Post type badge (pill) ===
+   Bordered + slight tinted fill in the pill's own colour. color-mix gives
+   a restrained wash (~10% alpha of currentColor) that lets the pill read
+   as a filled chip rather than a hollow outline while staying well below
+   Sovereign Warmth's noise floor. */
+.post-type-badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.1em 0.4em;
+  border-radius: var(--rounded-chip);
+  border: 1px solid currentColor;
+  background-color: color-mix(in oklab, currentColor 10%, transparent);
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.post-type-badge--til     { color: var(--color-ink);        border-color: var(--color-stone); }
+/* No border-color override: the base rule drives border + backdrop from
+   currentColor, so the AA-safe text colour carries them both. Pinning the border
+   to the brighter --color-cloudberry left it at 2.8:1 — below the 3:1 that WCAG
+   1.4.11 wants for a real link's boundary. */
+.post-type-badge--link    { color: var(--color-cloudberry-text); }
+.post-type-badge--release { color: var(--color-falu-red);   border-color: var(--color-falu-red); }
+
+/* === TIL topic affordance === */
+.til-topic {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--color-stone);
+  text-underline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .til-topic:hover {
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
+  }
+}
+
+/* Like grouping: override content-area section padding for compact likes */
+.content-area > .likelist {
+  padding: var(--space-sm) var(--space-lg);
+}
+
+.likelist .h-entry + .h-entry {
+  margin-top: var(--space-xs);
+}
+
+/* Likes inside likelist: remove per-entry inline padding (section handles it) */
+.likelist .h-entry:has(.u-like-of) {
+  padding-inline: 0;
+  padding-block: 0;
+}
+
+/* Domain badge for bookmark posts */
+.domain-badge {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-ink-light);
+  margin-top: 0.25rem;
+}
+
+/* Post navigation (prev/next) */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: var(--border-structural);
+}
+
+.post-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-decoration: none;
+  max-width: 45%;
+}
+
+.post-nav-next {
+  margin-left: auto;
+  text-align: right;
+}
+
+.post-nav-label {
+  font-family: var(--font-mono);
+  /* Smallest label — one tick below --fs-xs for hierarchical contrast */
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-light);
+}
+
+.post-nav-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-md);
+  color: var(--color-ink);
+}
+
+@media (hover: hover) {
+  .post-nav-link:hover .post-nav-title {
+    color: var(--color-falu-red);
+  }
+}
+
+/* === Year-jump nav (archive) === */
+.year-nav {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  overflow-x: auto;
+  border-bottom: var(--border-structural);
+  background: var(--color-canvas);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* === Sticky year headers (archive) === */
+.post-list > .content-header {
+  position: sticky;
+  top: 2.5rem;
+  z-index: 5;
+  background: var(--color-canvas);
+}
+
+/* === Subgrid alignment (archive, tablet+ only) === */
+@supports (grid-template-columns: subgrid) {
+  @media (min-width: 768px) {
+    .post-list {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+    }
+
+    .post-list > .content-header,
+    .post-list > .post-card {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+    }
+
+    /* Til-cards live alongside post-cards on the homepage lifestream. They
+       don't participate in the archive's 3-column subgrid (date/title/tags)
+       — they have their own internal layout. Force full-width span + single-
+       column internal grid so they stack cleanly in the column flow. */
+    .post-list > .til-card {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+    }
+
+    /* Excerpt cards need vertical stacking, not 3-column subgrid */
+    .post-list > .post-card:has(.post-excerpt) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+/* === Tag cloud (tags index) === */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+}
+
+.tag-cloud a {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-stone);
+  border-radius: var(--rounded-chip);
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: background-color 0.15s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .tag-cloud a:hover {
+    background: var(--color-canvas-alt);
+  }
+}
+
+/* === Motion === */
+
+/* --- 1. View Transitions (cross-document MPA, Chrome/Edge 126+, Safari 18+) --- */
+/* Opt-in is itself a navigation rule, outside CSS property cascade — gate here,
+   not via ::view-transition-* pseudo duration overrides (which don't prevent
+   the transition from initiating). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+.sidebar {
+  view-transition-name: sidebar;
+}
+
+#main-content {
+  view-transition-name: main-content;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(main-content) {
+    animation: vt-fade-out 0.2s var(--ease-out) forwards;
+  }
+
+  ::view-transition-new(main-content) {
+    animation: vt-fade-in 0.2s var(--ease-out) forwards;
+  }
+
+  /* Sidebar stays static — no animation */
+  ::view-transition-old(sidebar),
+  ::view-transition-new(sidebar) {
+    animation: none;
+  }
+
+  /* Root: suppress default cross-fade (named elements handle everything) */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* --- 2. Scroll-driven post card fade-up (Chrome/Edge 115+, Firefox 110+, Safari 18+) --- */
+@keyframes card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .post-card {
+      animation: card-fade-up 0.3s var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
+
+/* --- 3. Expanding underline on article body links --- */
+.e-content a {
+  position: relative;
+}
+
+.e-content a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-falu-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+@media (hover: hover) {
+  .e-content a:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Let the expanding underline carry the hover signal, not text color */
+@media (hover: hover) {
+  .e-content a:hover {
+    text-decoration-color: var(--color-stone);
+    color: inherit;
+  }
+}
+
+/* --- 4. Reading progress bar (article pages only) --- */
+@keyframes reading-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .content-area > .h-entry::before {
+      content: '';
+      position: fixed;
+      top: env(safe-area-inset-top, 0);
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--color-falu-red);
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: reading-progress linear both;
+      animation-timeline: scroll(root);
+      z-index: 100;
+    }
+  }
+}
+
+/* === Print === */
+@media print {
+  /* Reset colors and background for clean printing */
+  :root {
+    --color-canvas: #fff;
+    --color-canvas-alt: #fff;
+    --color-ink: #000;
+    --color-ink-light: #333;
+    --color-stone: #ccc;
+    --color-stone-light: #eee;
+    --color-falu-red: #000;
+    --color-cloudberry: #000;
+    --color-cloudberry-text: #000;
+  }
+
+  body {
+    background-image: none;
+  }
+
+  /* Hide non-content elements */
+  .sidebar,
+  .skip-link,
+  .webmention-form,
+  .post-nav,
+  theme-toggle {
+    display: none !important;
+  }
+
+  /* Full-width content — override grid layout */
+  .layout-wrapper {
+    display: block;
+    max-width: none;
+    border: none;
+  }
+
+  .content-area {
+    width: 100%;
+  }
+
+  /* Remove decorative borders and shadows */
+  .layout-wrapper,
+  .post-card,
+  .btn {
+    border: none;
+    box-shadow: none;
+  }
+
+  .post-card::before {
+    display: none;
+  }
+
+  /* Remove sticky/fixed positioning */
+  .sidebar,
+  .content-header,
+  .year-nav {
+    position: static;
+  }
+
+  /* Show URLs for external links in article content; in-page and
+     relative anchors stay suppressed. Self-documenting via :not() —
+     don't split this into "hide all ::after, then re-show http"
+     (see voxpelli.github.com-gc4: cascade ordering trap). */
+  .e-content a[href^="http"]::after {
+    display: inline;
+    content: " (" attr(href) ")";
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+
+  .e-content a:not([href^="http"])::after {
+    display: none;
+  }
+
+  /* Avoid breaking inside post cards and articles */
+  .post-card,
+  .h-entry {
+    break-inside: avoid;
+  }
+}
+
+/* notbyai.fyi badge — preserve per vendor's usage terms (link back, no modification).
+   Two placements, exactly one visible per viewport:
+   - .notbyai-badge--sidebar lives at the bottom of the sidebar flex-column (desktop).
+   - .notbyai-badge--drawer lives inside the mobile hamburger drawer so the badge
+     remains visible in both closed and open states on mobile (the fixed-overlay
+     drawer otherwise hides a sidebar-level badge). */
+.notbyai-badge {
+  align-self: center;
+  display: inline-block;
+  line-height: 0;
+  padding-top: var(--space-sm);
+}
+
+/* NB: no `margin-top: auto` here. That belongs only to the sticky case, where
+   the sidebar is a fixed 100vh box and the badge should sit at its foot. When
+   the sidebar is static it stretches to the full grid row (the article's whole
+   height), and an auto margin there resolves to thousands of pixels — flinging
+   the badge to the very bottom of the page, far from the nav it belongs with.
+   See the sticky guard block above. */
+.notbyai-badge--sidebar {
+  margin-top: var(--space-sm);
+}
+
+/* Sticky case only: the sidebar is a fixed 100vh box, so drop the badge to its
+   foot. This MUST live after the base rule above — both are single-class
+   selectors, so the later one wins, and putting it up with the sticky guard
+   (~line 290) meant the base rule silently overrode it and the badge floated
+   mid-column. Keep the media query in sync with that guard. */
+@media (min-width: 768px) and (min-height: 860px) {
+  .notbyai-badge--sidebar {
+    margin-top: auto;
+  }
+}
+
+.notbyai-badge--drawer {
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .notbyai-badge--drawer {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .notbyai-badge--sidebar {
+    display: none;
+  }
+}
+
+.notbyai-badge img {
+  width: auto;
+  /* Minimum 30px height per notbyai.fyi badge guidelines */
+  height: clamp(2rem, 2.4vw, 2.5rem);
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "@voxpelli/tsconfig/node20.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": [
+    "src/global.client.js"
+  ]
+}

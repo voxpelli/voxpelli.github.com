@@ -1,0 +1,19 @@
+{
+  "extends": "@voxpelli/tsconfig/node20.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "noPropertyAccessFromIndexSignature": false,
+    // Override inherited skipLibCheck:false (@voxpelli/tsconfig). Keep this true
+    // for eslint-plugin-package-json@0.91.2's broken declarations.
+    "skipLibCheck": true
+  },
+  "files": ["eslint.config.js"],
+  "include": [
+    "src/**/*.js",
+    "tools/**/*.js",
+    "test/**/*.js"
+  ],
+  "exclude": [
+    "src/global.client.js"
+  ]
+}
