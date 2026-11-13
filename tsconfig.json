@@ -4,8 +4,7 @@
     "types": ["node"],
     "noPropertyAccessFromIndexSignature": false,
     // Override inherited skipLibCheck:false (@voxpelli/tsconfig). Keep this true
-    // for eslint-plugin-package-json@0.91.2's broken declarations. DOMStack v12
-    // types are also kept out of this project until their declarations parse in TS6.
+    // for eslint-plugin-package-json@0.91.2's broken declarations.
     "skipLibCheck": true
   },
   "files": ["eslint.config.js"],

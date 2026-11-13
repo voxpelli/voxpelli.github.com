@@ -20,24 +20,5 @@ export interface SiteVars {
 
 export type ValidatedSiteVars = SiteVars;
 
-/**
- * Keep these narrow local shapes until DOMStack's published v12 declarations
- * can be parsed by TypeScript 6.
- */
-// TODO [@domstack/static@>=12.0.1]: use the public types from `@domstack/static/types.js` once its declarations parse under TypeScript 6.
-export interface PageData {
-  pageInfo: {
-    path: string;
-    url: string;
-    outputRelname: string;
-  };
-  vars: Record<string, unknown>;
-  renderInnerPage?: () => Promise<string>;
-  styles?: string[];
-  scripts?: string[];
-}
-
-export interface TemplateOutputOverride {
-  outputName: string;
-  content: string;
-}
+export type PageData = import('@domstack/static/types.js').PageData<Record<string, unknown>, unknown>;
+export type { TemplateOutputOverride } from '@domstack/static/types.js';
