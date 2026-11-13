@@ -3,6 +3,13 @@ import { getSiteVars } from './lib/get-site-vars.js';
 import { groupTopics } from './lib/topics.js';
 import { redirects } from './redirects.template.js';
 
+/**
+ * @typedef {object} SitemapData
+ * @property {string[]} sourcePagePaths
+ * @property {Array<{tag: string}>} tagCounts
+ * @property {Array<Record<string, unknown>>} tilPosts
+ */
+
 export const dataDeps = ['sourcePagePaths', 'tagCounts', 'tilPosts'];
 
 // Redirect stubs (meta-refresh), feed files, and the 404 page are not
@@ -29,11 +36,7 @@ function isIndexable (pagePath) {
 export default function sitemapTemplate ({ data, vars }) {
   const { siteUrl } = getSiteVars(vars);
 
-  const { sourcePagePaths, tagCounts, tilPosts } = /** @type {{
-    sourcePagePaths: string[],
-    tagCounts: Array<{tag: string}>,
-    tilPosts: Array<Record<string, unknown>>,
-  }} */ (data);
+  const { sourcePagePaths, tagCounts, tilPosts } = /** @type {SitemapData} */ (data);
   const pagePaths = new Set([
     ...sourcePagePaths,
     'tags',
