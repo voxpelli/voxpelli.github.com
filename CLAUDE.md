@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build Commands
 
 - `npm run dev` — watch mode with live reload (browser-sync)
-- `npm run build` — production build to `public/`
+- `npm run build` — clean production build to `public/`
 - `npm test` — full pipeline: lint + tsc + type-coverage + build + smoke tests (also runs on pre-push via husky)
 - `npm run check` — lint + tsc + type-coverage in parallel (no build)
 - `npm run check:lint` — ESLint only
@@ -98,7 +98,7 @@ DomStack (`@domstack/static` v12) static site generator with convention-based fi
 
 Smoke tests in `test/smoke.spec.js` use `node:test`. They read build output from `public/` and validate: homepage structure, Atom feed content, webmention forms, redirects, sitemap, service worker, and absence of defunct services.
 
-Smoke tests require a clean production build, NOT a dev build. The regex `/global-[A-Z0-9]+\.css/i` expects hashed asset names which `npm run dev` does not produce. If smoke tests fail with "did not match regex", run `rm -f public/global-*.css public/global.client-*.js && npm run build` first. `public/` accumulates dozens of stale hashed files over a dev session — periodic cleanup is fine.
+Smoke tests require a clean production build, NOT a dev build. The regex `/global-[A-Z0-9]+\.css/i` expects hashed asset names which `npm run dev` does not produce. `npm run build` removes `public/` first, including stale draft and hashed outputs.
 
 E2E tests in `e2e/smoke.test.js` use Playwright (`@playwright/test`). They run against the built site served on port 3456. Two projects: chromium desktop + Pixel 5 mobile. `@axe-core/playwright` available for accessibility testing. Run separately from `npm test` — CI gates on `npm run test:e2e` (chromium only); `npm run e2e` adds the mobile project, which has a known red baseline (see Build Commands above). A real mobile regression must be judged against that baseline SET, not against "is anything red".
 

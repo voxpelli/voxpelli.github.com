@@ -1,8 +1,9 @@
 import { escapeXml } from './lib/escape.js';
 import { getSiteVars } from './lib/get-site-vars.js';
+import { groupTopics } from './lib/topics.js';
 import { redirects } from './redirects.template.js';
 
-export const dataDeps = ['sourcePagePaths'];
+export const dataDeps = ['sourcePagePaths', 'tagCounts', 'tilPosts'];
 
 // Redirect stubs (meta-refresh), feed files, and the 404 page are not
 // canonical content — excluding them keeps crawlers focused on real pages.
@@ -28,7 +29,18 @@ function isIndexable (pagePath) {
 export default function sitemapTemplate ({ data, vars }) {
   const { siteUrl } = getSiteVars(vars);
 
-  const urls = /** @type {string[]} */ (data.sourcePagePaths)
+  const { sourcePagePaths, tagCounts, tilPosts } = /** @type {{
+    sourcePagePaths: string[],
+    tagCounts: Array<{tag: string}>,
+    tilPosts: Array<Record<string, unknown>>,
+  }} */ (data);
+  const pagePaths = new Set([
+    ...sourcePagePaths,
+    'tags',
+    ...tagCounts.map(({ tag }) => `tags/${encodeURIComponent(tag)}`),
+    ...[...groupTopics(tilPosts).keys()].map(slug => `til/topics/${slug}`),
+  ]);
+  const urls = [...pagePaths]
     .filter(pagePath => isIndexable(pagePath))
     .map(pagePath => {
       const url = pagePath ? '/' + pagePath + '/' : '/';

@@ -1,37 +1,37 @@
 ## Feature Requests
 
-- **pageUrl not available to layouts** (2026-03-24) — Layouts receive `vars` but `pageUrl` is never injected. Every page's canonical URL and webmention target resolve to `/`. See `domstack-issues/12-pageurl-not-available-in-layouts.md`. [upstream: bcomnes/domstack#238 → PR #250 **MERGED 2026-05-24**, landed as a `url` field on `PageInfo` — **unreleased**]
-  Ownership: upstream · Workaround: full — construct from `page.path` in the layouts. Cannot be removed until a release ships
+- **pageUrl not available to layouts** (2026-03-24) — **FIXED in v12:** [PR #250](https://github.com/bcomnes/domstack/pull/250) added `PageInfo.url`; both layouts now prefer it. The path/`vars.pageUrl` fallback remains useful for manually rendered template pages without a `page` object. See `domstack-issues/12-pageurl-not-available-in-layouts.md`.
+  Ownership: upstream fixed; site adopted · Workaround: fallback only
 
-- **Export PageData, PageInfo types from package entry** (2026-03-24) — DomStack exports function types but not the data types those functions receive. Users wanting full type safety must manually define PageData/PageInfo. See `domstack-issues/01-export-pagedata-types.md`. [upstream: bcomnes/domstack#227 → PR #241 **MERGED 2026-05-24** — **unreleased**]
-  Ownership: upstream · Workaround: partial — manual JSDoc typedefs
+- **Export PageData, PageInfo types from package entry** (2026-03-24) — **FIXED in v12:** [PR #241](https://github.com/bcomnes/domstack/pull/241) shipped public types; v12 exposes type-only exports from `@domstack/static/types.js`, with `PageData` also exported at the root. The site uses the public `PageData` and `TemplateOutputOverride` types; broader inline parameter typing is optional. See `domstack-issues/01-export-pagedata-types.md`.
+  Ownership: upstream fixed; site adopted
 
-- **Templates should receive global.data.js output in vars** (2026-03-24) — Templates get only `global.vars.js` in `vars`, not the aggregated `global.data.js` output. See `domstack-issues/09-global-data-not-available-to-templates.md`. [upstream: bcomnes/domstack#235 → PR #240 **MERGED 2026-04-20** — **unreleased**]
-  Ownership: upstream · Workaround: full — access via `pages[0].vars` (PageData getter includes globalDataVars)
+- **Templates should receive global.data.js output** (2026-03-24) — **FIXED with a changed API in v12:** [PR #240](https://github.com/bcomnes/domstack/pull/240) was superseded by explicit `dataDeps` and a separate `data` argument, not global-data keys in `vars`. Feeds, tags and topics subscribe directly; `pages[0]` in `global.data.js` is now used for assets, not collection access. See `domstack-issues/09-global-data-not-available-to-templates.md` and the [v12 migration guide](https://github.com/bcomnes/domstack/blob/v12.0.0/docs/migrations/v12-migration.md#global-data-subscriptions-and-page-introspection).
+  Ownership: upstream fixed; site adopted
 
-- **PageData.vars getter creates fresh objects on each access** (2026-04-13) — `PageData.vars` is a getter that merges globalVars + globalDataVars + pageVars + builderVars into a new object each call. Setting `page.vars.x = y` writes to a temporary object that is immediately garbage-collected. Breaks write-through patterns where global.data.js tries to enrich page vars. [upstream: bcomnes/domstack#233 → PR #242 **MERGED 2026-05-24** — but the PR only improved the *error messages* around the getter; the fresh-object semantics are unchanged, so the write-through footgun persists even after release. PR #243 (**MERGED 2026-06-26**) additionally caches page vars, which may or may not change this — re-check on release]
-  Ownership: upstream · Workaround: full — mutate array items from the `global.data.js` return value, never assign through the getter
+- **PageData.vars getter creates fresh objects on each access** (2026-04-13) — **FIXED/changed in v12:** [PR #242](https://github.com/bcomnes/domstack/pull/242) improved errors and [PR #243](https://github.com/bcomnes/domstack/pull/243) caches the shallow-frozen vars cascade. Write-through is still unsupported; strict-mode assignment throws rather than silently mutating a discarded object. Global data is separate from vars.
+  Ownership: upstream fixed; site enriches separate returned records
 
-- **`--copy` for individual files** (2026-03-24) — The `--copy` flag only handles directories, so a root-level `sw.js` needs a manual `cp` in the build script. **DECLINED upstream.** PR #252 was closed unmerged on 2026-06-26: *"Rejecting this idea because you should just: a) put the files in the src directory, or b) set up the copy dir and whatever structure you want in it and point the copy flag at it."* The tracking issue stays open only for a possible warning when a non-directory path is passed. See `domstack-issues/10-service-worker-management.md`. [upstream: bcomnes/domstack#236 OPEN → PR #252 **CLOSED, rejected**]
-  Ownership: us · Workaround: full and **permanent** — `cp sw.js public/sw.js` stays in the build script. It carries a `sed` substitution for `__BUILD_VERSION__` anyway, which `--copy` could never have replaced. Do not wait on this; there is nothing coming
+- **`--copy` for individual files** (2026-03-24) — **DECLINED:** [PR #252](https://github.com/bcomnes/domstack/pull/252) was closed unmerged and [issue #236](https://github.com/bcomnes/domstack/issues/236) is closed as not planned. `--copy` remains directory-only. v12 also offers a native service-worker convention at `/service-worker.js`, but adopting it is a separate decision from this site's `/sw.js` and build-version substitution. See `domstack-issues/10-service-worker-management.md`.
+  Ownership: us · Workaround: keep the current build substitution and watch-start copy unless a service-worker migration is deliberately evaluated
 
 - **`--copy <dir>` silently strips the top-level directory — wants a prefix-preserving mode or a loud docs warning** (2026-07-16) — `--copy images` becomes the glob `images/**` handed to cpx2 (`lib/build-copy/index.js`), so files land relative to the glob base: `images/2015-03-15/iosbug.gif` → `public/2015-03-15/iosbug.gif`, never `public/images/…`. Nothing in the docs says the top-level segment is dropped, and on a migration the effect is destructive at a distance: every historical in-content URL under `/images/` and `/media/` on this site 404'd in the built output while the build stayed green (confirmed as a review major, invisible to the pipeline). Given the #252 rejection rationale ("set up the copy dir and whatever structure you want in it"), the flattening is presumably by design — so the ask is either an opt-in prefix-preserving form (e.g. `--copy images:images`) or a prominent docs warning that `--copy` copies *contents*, not the directory.
-  Ownership: shared — upstream's undocumented design surprise, our unaudited migration · Workaround: full — nest the tree one level (`images/images/…`) so the flatten lands where legacy URLs point (done, with a smoke fence walking every built page's asset refs)
+  **v12 update:** [assets documentation](https://github.com/bcomnes/domstack/blob/v12.0.0/docs/assets/README.md#--copy-directories) now illustrates destination-relative contents, but no prefix-preserving option or explicit flattening warning was found. Ownership: shared · Workaround: double-nest legacy assets and keep the smoke fence
 
 ## Bugs
 
-- **Published `.d.ts` files fail `tsc` — every v11 release** (2026-07-11) [degraded] — The type declarations shipped in the package do not type-check: self-aliased re-exports (`export type X = X` colliding with an `import type { X }`) and generics referenced but never declared (`Cannot find name 'T'/'U'`). Any consumer with `skipLibCheck: false` gets ~19 errors originating entirely inside `node_modules`, with nothing wrong in their own code — which reads as a broken toolchain and sends you hunting the wrong thing (it cost a full TypeScript-downgrade investigation here before the cause was found). Reproduced against every published v11, and independent of the consumer's TypeScript version. Draft report ready at `domstack-issues/15-broken-dts-under-skiplibcheck.md`, not filed.
-  Severity: degraded · Ownership: upstream · Workaround: full — `skipLibCheck: true` in `tsconfig.json`, which silences the package's broken types along with everyone else's
+- **Published `.d.ts` files fail `tsc` — every v11 release** (2026-07-11) [degraded] — **Public-entry failures fixed in v12.0.1:** [PR #300](https://github.com/bcomnes/domstack/pull/300) repaired the v12 declarations. Clean packed consumers of both public entries passed TS 6 and TS 7.1 beta with `skipLibCheck: false`; see [PR #32 verification](https://github.com/voxpelli/voxpelli.github.com/pull/32#issuecomment-6841180944). The v11 report remains historical in `domstack-issues/15-broken-dts-under-skiplibcheck.md`.
+  **Remaining upstream limitations:** checking every declaration still reports missing `HandlebarsTemplateDelegate` and `@11ty/dependency-tree` types; deep HTML/Markdown builder signatures reject explicit `options: undefined` under `exactOptionalPropertyTypes`. These were not reached by the clean public-entry checks. [PR #331](https://github.com/bcomnes/domstack/pull/331) later removed the packed-consumer matrix. The site's `skipLibCheck` now remains enabled for a different dependency, not DomStack.
 
-- **markdown-it-highlightjs renders bare `<pre><code>` without `.highlight` wrapper** (2026-04-13) [degraded] — DomStack's default markdown-it config uses `markdown-it-highlightjs@4.1.0`, which renders code blocks as `<pre><code class="hljs">` with no wrapping `<div class="highlight">`. The default ejected CSS targets `.highlight { overflow: auto }` and 28+ token colour rules (`.highlight .c`, `.highlight .k`, …) — **all** dead CSS that never matches the built output. Those token classes are Jekyll/Rouge conventions (`c`, `k`, `err`), not highlight.js ones (`hljs-attr`, `hljs-string`, `hljs-keyword`). Both the overflow handling and the entire syntax theme are broken out of the box.
-  Severity: degraded · Ownership: upstream · Workaround: full — add `.e-content pre { overflow-x: auto }` for overflow; retarget theme rules to `.hljs` classes for token colours
+- **markdown-it-highlightjs renders bare `<pre><code>` without `.highlight` wrapper** (2026-04-13) [degraded] — **FIXED for v12 defaults:** DomStack's default CSS now imports matching highlight.js light/dark themes, with `pre` overflow supplied by mine.css. The markup remains bare `pre > code.hljs`; the site's custom accessible theme and overflow rules are still intentional.
+  Ownership: upstream fixed; site keeps its custom styling
 
-- **HTML builder doesn't strip YAML frontmatter** (2026-03-24) [degraded] — Only the markdown builder strips frontmatter. HTML pages (`page.html`) with frontmatter render it as visible text.
+- **HTML builder doesn't strip YAML frontmatter** (2026-03-24) [degraded] — **Still present in v12.0.1:** HTML files render frontmatter as text; current docs describe adjacent vars files. Whether upstream considers HTML frontmatter a supported feature is unverified.
   Severity: degraded · Ownership: upstream · Workaround: full — use `page.vars.js` alongside `page.html`
 
 ## Upstream Opportunities
 
-- **Native async-htm-to-string support** (2026-03-24) — DomStack's default layout ships with htm/preact; async-htm-to-string is a zero-dependency alternative with auto-escaping, and this project demonstrates full integration across layouts, pages and components. Resolved docs-first: async-htm-to-string is now documented as a first-class option, but the default runtime remains htm/preact, so our manual import stays load-bearing. See `domstack-issues/14-native-async-htm-to-string-support.md`. [upstream: bcomnes/domstack#239 → PR #247 **MERGED 2026-06-27** (docs only) — **unreleased**]
+- **Native async-htm-to-string support** (2026-03-24) — **Documentation fixed in v12:** [PR #247](https://github.com/bcomnes/domstack/pull/247) documented the alternative. The bundled v12 default is now `fragtml`, not htm/preact; this site's custom layout still uses async-htm-to-string. See `domstack-issues/14-native-async-htm-to-string-support.md`.
   Source: src/root.layout.js, src/article.layout.js, src/lib/ · Merge readiness: needs-redesign
   Ownership: us · Workaround: full — manual import in each file, permanently
 
@@ -45,7 +45,16 @@ _No entries yet._
 
 ## Trend Reviews
 
+### Review — 2026-11-13
+
+- **v12.0.1 is installed.** The previous release gate and adoption sequence are superseded. The site has adopted public types, `PageInfo.url` and the v12 subscription API.
+- **Migration follow-up:** data-dependent posts cannot be pre-rendered while `global.data.js` is resolving; the site now fails the build with the post path and original cause instead of publishing incomplete listings. Supporting those posts requires a different rendering/data design.
+- **Watch and output ownership:** ordinary post collections can now be fingerprinted without dropping defined values. DomStack 12.0.1 still leaves obsolete template-owned tag/topic pages in a reused watch output directory; generated-page ownership is a separate possible migration. Production and draft builds clean `public/` first.
+- **Declarations:** public-entry checks pass, but the all-declarations and strict optional-property limitations above remain. Keep those distinct from the fixed public-entry failures.
+
 ### Review — 2026-07-11
+
+_Historical snapshot; superseded by the v12 review above._
 
 - **The batch landed; none of it shipped.** Of the 13 PRs (#240–#253), **11 are MERGED** (#240 Apr 20; #241, #242, #250 May 24; #243–#246 Jun 26; #247, #249, #251 Jun 27), **#252 was CLOSED unmerged** (rejected — see the `--copy` entry), and **#253 is still OPEN** (redirect-pattern docs). The 2026-04-19 review recorded all 13 as "OPEN · MERGEABLE"; that is three months stale and was wrong in both directions.
 - **The external gate is the whole story.** The latest published release is **v11.0.3 (2026-02-21)**, which predates *every* merge above. `@domstack/static@11.0.3` is what we build against, so **not one workaround can be removed yet**, no matter how many PRs merged. The adoption checklist below is entirely release-gated; the merge dates are noise until bcomnes cuts a release.
@@ -61,22 +70,20 @@ _No entries yet._
 
 ## Adoption Checklist (post-merge)
 
-**Nothing here is actionable yet.** Every row is gated on a `@domstack/static` release that includes the merged PRs, and no such release exists — latest is v11.0.3 (2026-02-21), which predates all of them. Watch the npm tag / GitHub releases, not the PR list.
+Status against `@domstack/static@12.0.1`; historical proposals may have changed shape before release.
 
-| PR | Tracker | Status | What lands | Workaround to remove | Files to edit | Beads |
-|------|---------|--------|-------------|-----------------------|----------------|-------|
-| #240 | #235 | MERGED, unreleased | `global.data.js` keys exposed on `vars` in templates | `pages[0].vars` indirection + duplicated `filterAndSortPosts` pipeline | `src/feeds.template.js` (drop import + re-derivation); `src/tags.template.js` (`pages[0]?.vars.*` → `vars.*`) | `2vy` |
-| #241 | #227 | MERGED, unreleased | `PageData` / `PageInfo` / `*FunctionParams` type exports | Local `PageData` typedef + inline `@param {{...}}` blocks | `src/global.data.js`, `src/feeds.template.js`, `src/tags.template.js`, `src/links/page.js`, `src/social/page.js`, `src/archive/full/page.js`, `src/root.layout.js`, `src/article.layout.js` → `GlobalDataFunction` / `TemplateFunctionParams` / `PageFunctionParams` / `LayoutFunctionParams`. Do NOT touch site-local `PageVars` (`src/page.js`) or `PostVars` (`src/lib/render-post.js`) | `6pz` |
-| #250 | #238 | MERGED, unreleased | `url` field on `PageInfo` for canonical URLs in layouts | Manual `'/' + page.path + '/'` construction. **The tag-template manual spread stays** — #250 covers `page.js` pages, not synthetic pages emitted by templates | `src/root.layout.js:22`, `src/article.layout.js:15`. Keep the `{ ...vars, pageUrl: '/tags/...' }` spread at `src/tags.template.js:45,73` | `ung` |
-| #252 | #236 | **CLOSED — rejected** | *(nothing)* | **None. Do not remove the workaround.** `cp sw.js public/sw.js` is permanent; the build's `sed`/`__BUILD_VERSION__` step needs it regardless | — | **`bpz` — invalid, drop it** |
-| #242 | #233 | MERGED, unreleased | Better error messages around the `PageData.vars` getter | **None** — fresh-object semantics unchanged; the write-through footgun persists. Mental-model fix only | — | — |
-| #243 | #228 | MERGED, unreleased | Caches page vars + adds a markdown content helper | **None**, but re-check whether the caching changes the `PageData.vars` fresh-object behaviour above | — | — |
-| #244–#246 | #229–#231 | MERGED, unreleased | Docs: `renderInnerPage`/`renderFullPage`, template return types, layout composition pitfalls | **None** — consume for `pages` + `workers` destructuring awareness in layout params | — | — |
-| #247 | #239 | MERGED, unreleased | Docs: async-htm-to-string as a first-class option | **None** — runtime stays htm/preact; our manual import remains load-bearing | — | — |
-| #249 | #232 | MERGED, unreleased | Default asset loaders in the esbuild config | **Re-audit on release** — may overlap `src/esbuild.settings.js` | — | — |
-| #251 | #234 | MERGED, unreleased | Programmatic build-testing support (+ copy path-resolution fix) | **Re-audit on release** — could simplify the smoke-test setup | — | — |
-| #253 | #237 | **OPEN** | Docs: redirect-pages template pattern | **None** — `src/redirects.template.js` stays; docs will endorse it as the official approach | — | — |
+| PR | Tracker | v12.0.1 status | Site action |
+|---|---|---|---|
+| #240 | #235 | **Fixed, API changed** | Adopted `dataDeps`/`data`; do not move collections into `vars`. |
+| #241 | #227 | **Fixed** | Public `PageData` and `TemplateOutputOverride` types adopted via `types.js`; broader parameter typing is optional. |
+| #250 | #238 | **Fixed** | Both layouts prefer `page.url`; preserve fallbacks for template-created pages. |
+| #252 | #236 | **Rejected**, issue closed | Keep the `/sw.js` substitution; evaluate native service-worker support separately. |
+| #242 | #233 | **Fixed** | Error context shipped; write-through remains unsupported. |
+| #243 | #228 | **Fixed, semantics changed** | Vars are cached and shallow-frozen; keep enrichment in returned data. |
+| #244–#246 | #229, #231, #232 | **Fixed** | Rendering, template return types and layout composition documented; v12 no longer passes source `pages` to consumers. |
+| #247 | #239 | **Fixed, docs** | Keep custom async-htm-to-string imports; the v12 default is `fragtml`. |
+| #249 | #230 | **Fixed** | Default asset loaders shipped; no local `src/esbuild.settings.js` to remove. |
+| #251 | #234 | **Fixed** | `testBuild()` and copy path resolution shipped; adoption is optional. |
+| #253 | #237 | **Fixed, scope changed** | Generated pages and redirect recipe shipped; the existing redirect template can remain. |
 
-**Summary**: 3 PRs carry concrete file-removal actions on release (#240, #241, #250 → beads `2vy`, `6pz`, `ung` under epic `9v8`). `bpz` is **dead** — #252 was rejected. 2 need a re-audit on release (#249, #251). The rest are docs or behaviour clarifications with nothing to remove.
-
-**Sequencing** (unchanged): `2vy` and `6pz` share files (`feeds.template.js`, `tags.template.js`) and must ship in one commit. `ung` depends on both (it touches `root.layout.js` / `article.layout.js`, which `6pz` also edits) and adds canonical-URL e2e assertions in the same commit.
+The old release-gated beads `2vy`, `6pz` and `ung` need reconciliation against the work already adopted, not blind execution. The `bpz` copy-file request was rejected.

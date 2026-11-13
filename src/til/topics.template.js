@@ -1,7 +1,7 @@
 import { escapeXml } from '../lib/escape.js';
 import { getSiteVars } from '../lib/get-site-vars.js';
 import { renderPost } from '../lib/render-post.js';
-import { slugifyTopic } from '../lib/slugify-topic.js';
+import { groupTopics } from '../lib/topics.js';
 import rootLayout from '../root.layout.js';
 
 /** @import { TemplateOutputOverride } from '../global-types.d.ts' */
@@ -29,31 +29,12 @@ export default function topicsTemplate ({ data, vars }) {
   const { scripts = [], styles = [] } = /** @type {{ scripts?: string[], styles?: string[] }} */ (data.globalAssets);
   const tilPosts = /** @type {Array<Record<string, unknown>>} */ (data.tilPosts) || [];
 
-  // Group TILs by normalised topic slug. Preserve the first-seen display form
-  // (author's original casing/spacing) so the page heading reads naturally.
-  // `topic` flows through filterAndSortPosts' allowlist (src/lib/posts.js),
-  // and `content` is populated by global.data.js, so no raw-frontmatter re-fetch needed.
-  /** @type {Map<string, { display: string, posts: Array<Record<string, unknown>> }>} */
-  const topicsBySlug = new Map();
-  for (const post of tilPosts) {
-    const rawTopic = post['topic'];
-    const topic = typeof rawTopic === 'string' ? rawTopic.trim() : '';
-    const slug = topic && slugifyTopic(topic);
-    if (!slug) continue;
-    const existing = topicsBySlug.get(slug);
-    if (existing) {
-      existing.posts.push(post);
-    } else {
-      topicsBySlug.set(slug, { display: topic, posts: [post] });
-    }
-  }
-
   /** @type {TemplateOutputOverride[]} */
   const output = [];
 
   // Emit one index page per topic. No index-of-topics page here — discovery
   // lives on the /til/ landing (handled separately).
-  for (const [slug, { display, posts }] of topicsBySlug) {
+  for (const [slug, { display, posts }] of groupTopics(tilPosts)) {
     const postHtml = posts
       .map(post => renderPost({
         post: /** @type {import('../lib/render-post.js').PostVars} */ (post),

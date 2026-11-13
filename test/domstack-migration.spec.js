@@ -48,6 +48,13 @@ test('ordinary post collections have stable, content-sensitive watch fingerprint
   assert.equal(posts[0]?.category, undefined);
   assert.deepEqual(posts[0]?.tags, ['example']);
   assert.deepEqual(posts[0]?.['mf-photo'], ['https://example.com/a.png']);
+
+  const date = new Date('2020-01-01T00:00:00Z');
+  const opaque = await globalData({ pages: [postPage({ ...vars, date }, '<p>First</p>')] });
+  const opaquePosts = /** @type {Array<Record<string, unknown>>} */ (opaque.allPosts);
+  assert.equal(opaquePosts[0]?.date, date);
+  // eslint-disable-next-line unicorn/no-null -- DomStack uses null for an un-fingerprintable value.
+  assert.equal(fingerprint(opaque.allPosts), null, 'opaque values must retain conservative invalidation');
 });
 
 test('post rendering preserves intentionally empty content and reports failures', async () => {
@@ -112,6 +119,9 @@ test('a production build removes outputs left by a draft build', async () => {
     const draft = path.join(dir, 'public/stress/index.html');
     await execFileAsync('npm', ['run', 'build-drafts'], options);
     await access(draft);
+    const sitemap = await readFile(path.join(dir, 'public/sitemap.xml'), 'utf8');
+    assert.match(sitemap, /<loc>https:\/\/voxpelli\.com\/til\/topics\/css\/<\/loc>/);
+    await access(path.join(dir, 'public/til/topics/css/index.html'));
     await execFileAsync('npm', ['run', 'build'], options);
     await assert.rejects(access(draft), { code: 'ENOENT' });
     await access(path.join(dir, 'public/index.html'));

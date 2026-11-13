@@ -346,12 +346,26 @@ test('sitemap has URLs', async () => {
   assert.match(xml, /<url>/);
 });
 
+test('sitemap includes every generated tag and topic page', async () => {
+  const xml = await readFile('public/sitemap.xml', 'utf8');
+  let count = 0;
+  for (const pattern of ['public/tags/**/index.html', 'public/til/topics/**/index.html']) {
+    for await (const filename of glob(pattern)) {
+      const urlPath = filename.replace(/^public/, '').replace(/index\.html$/, '');
+      assert.ok(xml.includes(`<loc>${escapeXml(globalVars.siteUrl + urlPath)}</loc>`), `missing ${urlPath} in sitemap`);
+      count += 1;
+    }
+  }
+  assert.ok(count > 1, 'expected generated tag pages in the production build');
+});
+
 test('sitemap excludes redirect stubs, feeds, and the 404 page', async () => {
   const xml = await readFile('public/sitemap.xml', 'utf8');
   const locPattern = /<loc>([^<]+)<\/loc>/g;
   const locs = [...xml.matchAll(locPattern)].map(m => m[1] || '');
 
   assert.ok(locs.length > 0, 'sitemap should have at least one <loc>');
+  assert.equal(new Set(locs).size, locs.length, 'sitemap locations must be unique');
 
   for (const loc of locs) {
     // Strip siteUrl to get the path (plus trailing slash)
