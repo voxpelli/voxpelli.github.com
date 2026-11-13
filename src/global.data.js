@@ -27,13 +27,18 @@ export default async function globalData ({ pages }) {
   // Filter and sort posts using shared helper, then enrich with extra fields
   const allPosts = filterAndSortPosts(pages).map(post => {
     const vars = varsByPath.get(post.path);
-    return {
+    const enrichedPost = {
       ...post,
       content: vars?.content || '',
       tags: vars?.tags,
       persontags: vars?.persontags,
       submitto: vars?.submitto,
     };
+    // Absent values have the same reads as undefined properties, but let
+    // DomStack fingerprint ordinary post collections in watch mode.
+    return /** @type {typeof enrichedPost} */ (Object.fromEntries(
+      Object.entries(enrichedPost).filter(([, value]) => value !== undefined)
+    ));
   });
 
   // Parse-time URL safety warning layer — non-mutating. Calls safePostUrl
@@ -122,14 +127,17 @@ export default async function globalData ({ pages }) {
   // without receiving or re-rendering the source PageData collection.
   await Promise.all(allPosts.map(async (post) => {
     const page = pagesByPath.get(post.path);
-    if (!page || typeof page.renderInnerPage !== 'function') return;
+    if (!page || typeof page.renderInnerPage !== 'function') {
+      throw new Error(`Cannot render post "${post.path}": source page is unavailable`);
+    }
     try {
       const renderedHtml = await page.renderInnerPage();
-      if (typeof renderedHtml === 'string' && renderedHtml) {
-        post.content = renderedHtml;
+      if (typeof renderedHtml !== 'string') {
+        throw new TypeError('Expected rendered post content to be a string');
       }
-    } catch {
-      // Silently skip failed renders — excerpts are non-critical
+      if (renderedHtml) post.content = renderedHtml;
+    } catch (err) {
+      throw new Error(`Cannot render post "${post.path}" while resolving global data`, { cause: err });
     }
   }));
 

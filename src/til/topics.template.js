@@ -76,7 +76,7 @@ export default function topicsTemplate ({ data, vars }) {
         </div>`,
         vars: {
           ...siteVars,
-          title: `TILs: ${safeDisplay}`,
+          title: `TILs: ${display}`,
           pageUrl: `/til/topics/${slug}/`,
         },
         styles,

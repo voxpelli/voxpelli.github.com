@@ -67,8 +67,7 @@ export default function tagsTemplate ({ data, vars }) {
       }))
       .join('\n');
 
-    // Escape tag name before interpolating into HTML body and <title> via vars.title.
-    // Tag values come from post frontmatter — treat as untrusted input.
+    // The body is a raw HTML string; rootLayout escapes vars.title separately.
     const safeTag = escapeXml(tag);
 
     output.push({
@@ -82,7 +81,7 @@ export default function tagsTemplate ({ data, vars }) {
         </div>`,
         vars: {
           ...siteVars,
-          title: `Tag: ${safeTag}`,
+          title: `Tag: ${tag}`,
           pageUrl: `/tags/${encodeURIComponent(tag)}/`,
         },
         styles,

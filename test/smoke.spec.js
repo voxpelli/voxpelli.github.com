@@ -11,10 +11,13 @@ import {
   access, glob, readdir, readFile,
 } from 'node:fs/promises';
 
+import globalVars from '../src/global.vars.js';
 import { escapeXml } from '../src/lib/escape.js';
 import { safePostUrl } from '../src/lib/render-post.js';
 import { safeHref } from '../src/lib/safe-url.js';
 import { redirects } from '../src/redirects.template.js';
+import tagsTemplate from '../src/tags.template.js';
+import topicsTemplate from '../src/til/topics.template.js';
 
 test('homepage has h-feed and DomStack assets', async () => {
   const html = await readFile('public/index.html', 'utf8');
@@ -618,14 +621,38 @@ test('XSS: escapeXml neutralizes <script>-bearing tag names', () => {
   assert.equal(escapeXml('"\'&<>'), '&quot;&apos;&amp;&lt;&gt;');
 });
 
-test('XSS: tags page source escapes tag names before interpolation', async () => {
-  // Source-level regression: ensure tags.template.js routes tag names through
-  // escapeXml before writing into HTML bodies and <title>.
-  const src = await readFile('src/tags.template.js', 'utf8');
-  assert.match(src, /escapeXml/, 'tags.template.js must import/use escapeXml');
-  // The raw `${tag}` interpolation inside HTML content must be gone.
-  assert.doesNotMatch(src, /content-title">Tag: \$\{tag\}</);
-  assert.doesNotMatch(src, /title: `Tag: \$\{tag\}`/);
+test('XSS: tags page escapes tag names once in the body and title', () => {
+  const tag = 'r&d <script>alert(1)</script>';
+  const pages = tagsTemplate({
+    vars: globalVars,
+    data: {
+      globalAssets: { scripts: [], styles: [] },
+      allTags: { [tag]: [] },
+      tagCounts: [{ tag, count: 1 }],
+    },
+  });
+  const page = pages.find(({ outputName }) => outputName === `tags/${encodeURIComponent(tag)}/index.html`);
+  assert.ok(page);
+  assert.match(page.content, /<title>Tag: r&amp;d &lt;script&gt;alert\(1\)&lt;\/script&gt; – VoxPelli<\/title>/);
+  assert.match(page.content, /class="content-title">Tag: r&amp;d &lt;script&gt;alert\(1\)&lt;\/script&gt;</);
+  assert.doesNotMatch(page.content, /&amp;amp;|<script>alert\(1\)<\/script>/);
+});
+
+test('XSS: TIL topic page escapes the heading and title once', () => {
+  const topic = 'r&d <script>alert(1)</script>';
+  const pages = topicsTemplate({
+    vars: globalVars,
+    data: {
+      globalAssets: { scripts: [], styles: [] },
+      tilPosts: [{ topic, category: 'til', date: '2026-01-01', pageUrl: '/til/example/' }],
+    },
+  });
+  assert.equal(pages.length, 1);
+  const page = pages[0];
+  assert.ok(page);
+  assert.match(page.content, /<title>TILs: r&amp;d &lt;script&gt;alert\(1\)&lt;\/script&gt; – VoxPelli<\/title>/);
+  assert.match(page.content, /TILs tagged with: r&amp;d &lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+  assert.doesNotMatch(page.content, /&amp;amp;|<script>alert\(1\)<\/script>/);
 });
 
 test('XSS: safePostUrl allowlists safe schemes for href interpolation', async () => {
